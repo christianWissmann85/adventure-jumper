@@ -1,0 +1,72 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (debug)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": ["--dart-define=ENV=DEV"],
+      "console": "debugConsole"
+    },
+    {
+      "name": "Flutter (profile)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Flutter (release)",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Flutter (mobile device)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "mobile",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Flutter (web)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "chrome",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Flutter (windows)",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "windows",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Flutter (attach)",
+      "request": "attach",
+      "type": "dart"
+    },
+    {
+      "name": "Dart",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Dart (tests)",
+      "request": "launch",
+      "type": "dart",
+      "program": ".dart_tool/test/runner/test.dart",
+      "args": [
+        "--name",
+        "test_name"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=827846
+  // for the documentation about the extensions.json format
+  "recommendations": [
+    "Dart-Code.dart-code",
+    "Dart-Code.flutter",
+    "nash.awesome-flutter-snippets",
+    "aaron-bond.better-comments",
+    "usernamehw.errorlens",
+    "eamodio.gitlens",
+    "nash.awesome-flutter-snippets",
+    "mariomatheu.syntax-project-pbxproj",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "mhutchie.git-graph",
+    "Gruntfuggly.todo-tree",
+    "mhutchie.git-graph",
+    "esbenp.prettier-vscode",
+    "nhoizey.gremlins"
+  ]
+}

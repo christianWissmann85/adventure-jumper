@@ -1,0 +1,204 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Coverage directory
+coverage/
+
+# Dependency directories
+.packages
+.pub-cache/
+.pub/
+
+# Build directories
+build/
+**/build/
+
+# IDE specific files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/tasks.json
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+.packages/
+.pub-cache/
+.pub/
+/build/
+
+# Web related
+web/__deploy_assets/
+web/assets/asset_manifest.json
+web/assets/FontManifest.json
+web/assets/NOTICES
+web/assets/packages/cupertino_icons/assets/
+web/assets/shaders/
+web/assets/fonts/MaterialIcons-Regular.otf
+
+# Android/IntelliJ
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/**/GeneratedPluginRegistrant.java
+
+# iOS/XCode
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*.xcodeproj/
+**/ios/**/*.xcworkspace/
+**/ios/**/xcuserdata/
+**/ios/.generated/
+**/ios/Flutter/App.framework/
+**/ios/Flutter/Flutter.framework/
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+
+# Windows
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugins.cmake
+**/windows/flutter/generated_*_plugin_registrant.h
+**/windows/runner/*.res
+**/windows/**/CMakeLists.txt.user
+**/windows/**/CMakeCache.txt
+**/windows/**/CMakeFiles/
+**/windows/**/*.sln
+**/windows/**/*.vcxproj
+**/windows/**/*.vcxproj.filters
+**/windows/**/x64/
+**/windows/**/Win32/
+**/windows/**/Debug/
+**/windows/**/Release/
+**/windows/**/Runner.rc
+**/windows/**/Runner.aps
+**/windows/**/Runner.rc2
+
+# macOS
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/macos/Runner/GeneratedPluginRegistrant.swift
+**/macos/Runner/DerivedData/
+**/macos/Runner/build/
+**/macos/.symlinks/
+
+# Linux
+**/linux/flutter/generated_plugin_registrant.cc
+**/linux/flutter/generated_plugins.cmake
+**/linux/flutter/generated_*_plugin_registrant.h
+**/linux/**/CMakeLists.txt.user
+**/linux/**/CMakeCache.txt
+**/linux/**/CMakeFiles/
+**/linux/**/Makefile
+**/linux/**/cmake_install.cmake
+**/linux/**/install_manifest.txt
+**/linux/**/compile_commands.json
+**/linux/**/generated/
+**/linux/**/generated_plugin_registrant.cc
+**/linux/**/generated_plugin_registrant.h
+**/linux/**/my_application
+
+# Test coverage
+coverage/
+*.lcov
+
+# Local development
+.local-*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local development
+.local-*
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release

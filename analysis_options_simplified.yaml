@@ -1,0 +1,6 @@
+# Simplified analysis options to enforce trailing commas
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    require_trailing_commas: true

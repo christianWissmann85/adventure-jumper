@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "name": "Test Level 1",
+    "author": "Adventure Jumper Team",
+    "description": "First test level with basic platforming",
+    "nextLevel": "level_2.json",
+    "parTime": 60,
+    "theme": "forest"
+  },
+  "camera": {
+    "bounds": {"x": 0, "y": 0, "width": 1600, "height": 900},
+    "startPosition": {"x": 0, "y": 0}
+  },
+  "playerStart": {"x": 100, "y": 700},
+  "layers": [
+    {
+      "name": "background",
+      "type": "tilelayer",
+      "parallax": 0.5,
+      "tileset": "forest_tiles",
+      "data": [
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+      ]
+    },
+    {
+      "name": "foreground",
+      "type": "objectlayer",
+      "objects": [
+        {
+          "name": "coin_1",
+          "type": "collectible",
+          "x": 300,
+          "y": 650,
+          "width": 16,
+          "height": 16,
+          "properties": {
+            "value": 10,
+            "type": "coin"
+          }
+        },
+        {
+          "name": "enemy_1",
+          "type": "enemy",
+          "x": 500,
+          "y": 650,
+          "width": 32,
+          "height": 32,
+          "properties": {
+            "type": "slime",
+            "health": 2,
+            "damage": 1,
+            "speed": 50,
+            "patrolDistance": 200
+          }
+        }
+      ]
+    }
+  ],
+  "tilesets": {
+    "forest_tiles": {
+      "image": "tiles/forest/tiles.png",
+      "tileWidth": 32,
+      "tileHeight": 32,
+      "tileProperties": {
+        "0": {"collision": false, "damage": 0},
+        "1": {"collision": true, "damage": 0}
+      }
+    }
+  }
+}
