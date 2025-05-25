@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 
+import '../utils/logger.dart';
 import 'sprite_loader.dart';
 
 /// Handles loading and management of animations for the game
@@ -8,7 +9,8 @@ class AnimationLoader {
   AnimationLoader._internal();
   static final AnimationLoader _instance = AnimationLoader._internal();
 
-  final Map<String, SpriteAnimation> _animationCache = <String, SpriteAnimation>{};
+  final Map<String, SpriteAnimation> _animationCache =
+      <String, SpriteAnimation>{};
   final SpriteLoader _spriteLoader = SpriteLoader();
 
   bool _isInitialized = false;
@@ -33,7 +35,8 @@ class AnimationLoader {
     double? spriteHeight,
     bool loop = true,
   }) async {
-    final String cacheKey = '$spritePath:$frameCount:$stepTime:$columns:$rows:$loop';
+    final String cacheKey =
+        '$spritePath:$frameCount:$stepTime:$columns:$rows:$loop';
 
     if (_animationCache.containsKey(cacheKey)) {
       return _animationCache[cacheKey]!;
@@ -158,11 +161,14 @@ class AnimationLoader {
   }
 
   /// Load enemy animations
-  Future<Map<String, Map<String, SpriteAnimation>>> loadEnemyAnimations() async {
-    final Map<String, Map<String, SpriteAnimation>> enemyAnimations = <String, Map<String, SpriteAnimation>>{};
+  Future<Map<String, Map<String, SpriteAnimation>>>
+      loadEnemyAnimations() async {
+    final Map<String, Map<String, SpriteAnimation>> enemyAnimations =
+        <String, Map<String, SpriteAnimation>>{};
 
     // Goblin animations
-    final Map<String, SpriteAnimation> goblinAnims = <String, SpriteAnimation>{};
+    final Map<String, SpriteAnimation> goblinAnims =
+        <String, SpriteAnimation>{};
     goblinAnims['idle'] = await createAnimation(
       'enemies/goblin_idle.png',
       frameCount: 4,
@@ -299,7 +305,8 @@ class AnimationLoader {
   Future<CompositeAnimation> createCompositeAnimation(
     Map<String, AnimationLayer> layers,
   ) async {
-    final Map<String, SpriteAnimation> animationLayers = <String, SpriteAnimation>{};
+    final Map<String, SpriteAnimation> animationLayers =
+        <String, SpriteAnimation>{};
 
     for (final MapEntry<String, AnimationLayer> entry in layers.entries) {
       final String layerName = entry.key;
@@ -334,7 +341,7 @@ class AnimationLoader {
       // Load basic UI animations
       await loadUIAnimations();
     } catch (e) {
-      print('Warning: Failed to preload some animations: $e');
+      logger.warning('Failed to preload some animations', e);
     }
   }
 
@@ -372,7 +379,8 @@ class AnimationLoader {
     try {
       // Try to load from predefined animation sets
       if (name.startsWith('player_')) {
-        final Map<String, SpriteAnimation> playerAnimations = await loadPlayerAnimations();
+        final Map<String, SpriteAnimation> playerAnimations =
+            await loadPlayerAnimations();
         final String animName = name.substring(7); // Remove 'player_' prefix
         return playerAnimations[animName];
       } else if (name.startsWith('enemy_')) {
@@ -380,22 +388,25 @@ class AnimationLoader {
         if (parts.length >= 3) {
           final String enemyType = parts[1];
           final String animName = parts.sublist(2).join('_');
-          final Map<String, Map<String, SpriteAnimation>> enemyAnimations = await loadEnemyAnimations();
+          final Map<String, Map<String, SpriteAnimation>> enemyAnimations =
+              await loadEnemyAnimations();
           return enemyAnimations[enemyType]?[animName];
         }
       } else if (name.startsWith('ui_')) {
-        final Map<String, SpriteAnimation> uiAnimations = await loadUIAnimations();
+        final Map<String, SpriteAnimation> uiAnimations =
+            await loadUIAnimations();
         final String animName = name.substring(3); // Remove 'ui_' prefix
         return uiAnimations[animName];
       } else if (name.startsWith('env_')) {
-        final Map<String, SpriteAnimation> envAnimations = await loadEnvironmentAnimations();
+        final Map<String, SpriteAnimation> envAnimations =
+            await loadEnvironmentAnimations();
         final String animName = name.substring(4); // Remove 'env_' prefix
         return envAnimations[animName];
       }
 
       return null;
     } catch (e) {
-      print('Failed to load animation: $name. Error: $e');
+      logger.warning('Failed to load animation: $name', e);
       return null;
     }
   }

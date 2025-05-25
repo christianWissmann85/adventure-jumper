@@ -55,11 +55,32 @@ This UI system specifically supports all three Design Pillars:
 
 ```dart
 // Main UI management system
-class UISystem extends GameSystem {
+class UISystem extends BaseFlameSystem {
   // UI state management
   // Layer coordination
   // Theme handling
   // UI transitions
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has UI components
+    return entity.children.whereType<UIComponent>().isNotEmpty ||
+           entity.hasTags(['ui', 'interface', 'menu']);
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Update UI components on entities
+    // Handle entity-specific UI elements (health bars, indicators)
+    // Process UI interactions and state changes
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Update global UI state
+    // Handle screen transitions
+    // Process theme changes and animations
+  }
 }
 
 // UI screen controller

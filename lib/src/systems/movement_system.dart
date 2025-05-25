@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flame/components.dart';
 
 import '../components/physics_component.dart';
@@ -43,12 +45,13 @@ class MovementSystem extends BaseFlameSystem {
       transform.setPosition(newPosition);
 
       // Update entity position to match transform
-      entity.position = newPosition;
-
-      // Debug output for position changes
+      entity.position =
+          newPosition; // Debug output for position changes - use temporary developer.log for debugging
       if ((velocity.x.abs() > 1.0 || velocity.y.abs() > 1.0)) {
-        print(
-            'Movement: Entity ${entity.id} moved from ${oldPosition.x.toStringAsFixed(1)},${oldPosition.y.toStringAsFixed(1)} to ${newPosition.x.toStringAsFixed(1)},${newPosition.y.toStringAsFixed(1)} (velocity: ${velocity.x.toStringAsFixed(1)},${velocity.y.toStringAsFixed(1)})');
+        developer.log(
+          'Movement: Entity ${entity.id} moved from ${oldPosition.x.toStringAsFixed(1)},${oldPosition.y.toStringAsFixed(1)} to ${newPosition.x.toStringAsFixed(1)},${newPosition.y.toStringAsFixed(1)} (velocity: ${velocity.x.toStringAsFixed(1)},${velocity.y.toStringAsFixed(1)})',
+          name: 'MovementSystem',
+        );
       }
     }
   }

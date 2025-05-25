@@ -27,11 +27,34 @@ Defines the implementation of crafting mechanics for Adventure Jumper, including
 
 ```dart
 // Main crafting system manager
-class CraftingSystem extends GameSystem {
+class CraftingSystem extends BaseSystem {
   // Recipe management
   // Resource tracking
   // Crafting operations
   // Upgrade calculations
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has resource components or is a crafting station
+    return entity.children.whereType<ResourceComponent>().isNotEmpty ||
+           entity.children.whereType<CraftingStationComponent>().isNotEmpty ||
+           entity is ResourceNode || 
+           entity is CraftingStation;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Process resource respawn timers
+    // Update crafting station states
+    // Handle resource node interactions
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Process ongoing crafting operations
+    // Update recipe availability based on player progression
+    // Handle resource discovery notifications
+  }
 }
 
 // Recipe manager

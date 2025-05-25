@@ -17,15 +17,6 @@ void main() async {
     enablePerformanceTracking: kDebugMode,
   );
 
-  // Initialize debug infrastructure
-  await Debug.initialize(
-    enableDebugMode: kDebugMode,
-    enableVerboseLogging: kDebugMode,
-    enableInGameConsole: kDebugMode,
-    enableVisualDebugging: kDebugMode,
-    enablePerformanceTracking: kDebugMode,
-  );
-
   runApp(const AdventureJumperApp());
 }
 

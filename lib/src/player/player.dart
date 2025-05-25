@@ -25,10 +25,9 @@ class Player extends Entity {
 
   Player({
     Vector2? position,
-    Vector2? size,
+    super.size,
   }) : super(
           position: position ?? Vector2.zero(),
-          size: size,
           id: 'player',
           type: 'player',
         );
@@ -102,5 +101,77 @@ class Player extends Entity {
   Vector2 get playerPosition => position;
 
   /// Get the input component for external system integration
-  InputComponent get inputComponent => input;
+  InputComponent get inputComponent =>
+      input; // T2.3.1: Jump mechanics integration with PhysicsComponent
+
+  /// Attempt to perform a jump if conditions are met
+  /// Returns true if jump was executed, false otherwise
+  bool tryJump({double? customForce}) {
+    // Use the controller's new public method
+    return controller.attemptJump();
+  }
+
+  /// Check if player can currently jump
+  bool get canJump => controller.canPerformJump();
+
+  /// Get current jump state
+  String get jumpState => controller.jumpState.toString();
+
+  /// Check if player is currently grounded
+  bool get isGrounded => controller.isGrounded;
+
+  /// Check if player is currently jumping (ascending)
+  bool get isJumping => controller.isJumping;
+
+  /// Check if player is currently falling
+  bool get isFalling => controller.isFalling;
+
+  /// Check if player is in landing state
+  bool get isLanding => controller.isLanding;
+
+  /// Get remaining jump cooldown time
+  double get jumpCooldownRemaining => controller.jumpCooldownRemaining;
+
+  /// Get remaining coyote time
+  double get coyoteTimeRemaining => controller.coyoteTimeRemaining;
+
+  /// Apply external force to player (useful for external systems)
+  void applyForce(Vector2 force) {
+    physics?.applyForce(force);
+  }
+
+  /// Apply impulse to player (instant velocity change)
+  void applyImpulse(Vector2 impulse) {
+    physics?.applyImpulse(impulse);
+  }
+
+  /// Set player velocity directly
+  void setVelocity(Vector2 velocity) {
+    physics?.setVelocity(velocity);
+  }
+
+  /// Get current player velocity
+  Vector2 get velocity => physics?.velocity ?? Vector2.zero();
+
+  /// T2.3.5: Jump parameter configuration methods for testing/tuning
+
+  /// Reset jump state (useful for testing or level transitions)
+  void resetJumpState() {
+    controller.resetInputState();
+  }
+
+  /// Get detailed jump state information for debugging
+  Map<String, dynamic> getJumpDebugInfo() {
+    return {
+      'jumpState': jumpState.toString(),
+      'isGrounded': isGrounded,
+      'canJump': canJump,
+      'jumpCooldownRemaining': jumpCooldownRemaining,
+      'coyoteTimeRemaining': coyoteTimeRemaining,
+      'velocity': velocity.toString(),
+      'isOnGround': physics?.isOnGround ?? false,
+      'justLanded': physics?.justLanded ?? false,
+      'justLeftGround': physics?.justLeftGround ?? false,
+    };
+  }
 }

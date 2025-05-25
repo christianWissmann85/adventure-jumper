@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flame/src/game/notifying_vector2.dart';
 
 /// Component that handles physics simulation for entities
 /// Manages velocity, acceleration, gravity, and other physics properties
@@ -39,15 +38,30 @@ class PhysicsComponent extends Component {
 
   // Environmental properties
   final Vector2 _gravity = Vector2(0, 9.8); // Default gravity
-
   // Ground contact state
   bool _isOnGround = false;
   bool _wasOnGround = false;
 
+  // T2.5.1: Enhanced landing detection with collision normals
+  Vector2? _lastCollisionNormal;
+  Vector2? _lastSeparationVector;
+  double _lastLandingVelocity = 0.0;
+  Vector2? _lastLandingPosition;
+  String? _lastPlatformType;
+
+  // T2.6: Edge detection properties
+  bool _isNearLeftEdge = false;
+  bool _isNearRightEdge = false;
+  double _leftEdgeDistance = double.infinity;
+  double _rightEdgeDistance = double.infinity;
+  final double _edgeDetectionThreshold =
+      32.0; // Distance threshold for edge proximity
+  Vector2? _leftEdgePosition;
+  Vector2? _rightEdgePosition;
+
   // Max velocity capping
   final double _maxVelocityX = 400;
   final double _maxVelocityY = 800;
-
   @override
   void update(double dt) {
     super.update(dt);
@@ -57,32 +71,9 @@ class PhysicsComponent extends Component {
     // Store previous ground state
     _wasOnGround = _isOnGround;
 
-    // Apply gravity
-    if (_affectedByGravity) {
-      _acceleration.y += _gravity.y * _gravityScale;
-    }
-
-    // Apply acceleration to velocity
-    _velocity += _acceleration * dt;
-
-    // Apply friction when on ground
-    if (_isOnGround) {
-      _velocity.x *= 1 - _friction;
-    }
-
-    // Cap velocity
-    _velocity.x = _velocity.x.clamp(-_maxVelocityX, _maxVelocityX);
-    _velocity.y = _velocity.y.clamp(-_maxVelocityY, _maxVelocityY);
-
-    // Apply velocity to position
-    if (parent is PositionComponent) {
-      final NotifyingVector2 parentPos = (parent as PositionComponent).position;
-      parentPos.x += _velocity.x * dt;
-      parentPos.y += _velocity.y * dt;
-    }
-
-    // Reset acceleration
-    _acceleration = Vector2.zero();
+    // Physics processing is now handled by PhysicsSystem
+    // This ensures consistent physics simulation across all entities
+    // Acceleration is reset by PhysicsSystem after integration
   }
 
   /// Apply a force to this entity
@@ -117,12 +108,51 @@ class PhysicsComponent extends Component {
     _isOnGround = onGround;
   }
 
+  /// T2.5.1: Set landing data for enhanced detection
+  void setLandingData({
+    Vector2? collisionNormal,
+    Vector2? separationVector,
+    double? landingVelocity,
+    Vector2? landingPosition,
+    String? platformType,
+  }) {
+    if (collisionNormal != null) _lastCollisionNormal = collisionNormal.clone();
+    if (separationVector != null) {
+      _lastSeparationVector = separationVector.clone();
+    }
+    if (landingVelocity != null) _lastLandingVelocity = landingVelocity;
+    if (landingPosition != null) _lastLandingPosition = landingPosition.clone();
+    if (platformType != null) _lastPlatformType = platformType;
+  }
+
+  // T2.6.1: Set edge detection data
+  void setEdgeDetectionData({
+    bool? isNearLeftEdge,
+    bool? isNearRightEdge,
+    double? leftEdgeDistance,
+    double? rightEdgeDistance,
+    Vector2? leftEdgePosition,
+    Vector2? rightEdgePosition,
+  }) {
+    if (isNearLeftEdge != null) _isNearLeftEdge = isNearLeftEdge;
+    if (isNearRightEdge != null) _isNearRightEdge = isNearRightEdge;
+    if (leftEdgeDistance != null) _leftEdgeDistance = leftEdgeDistance;
+    if (rightEdgeDistance != null) _rightEdgeDistance = rightEdgeDistance;
+    if (leftEdgePosition != null) _leftEdgePosition = leftEdgePosition.clone();
+    if (rightEdgePosition != null) {
+      _rightEdgePosition = rightEdgePosition.clone();
+    }
+  }
+
   // Getters/setters
   Vector2 get velocity => _velocity;
   Vector2 get acceleration => _acceleration;
   double get mass => _mass;
   double get friction => _friction;
   double get restitution => _restitution;
+  double get gravityScale => _gravityScale;
+  double get maxVelocityX => _maxVelocityX;
+  double get maxVelocityY => _maxVelocityY;
   bool get isStatic => _isStatic;
   set isStatic(bool value) => _isStatic = value;
   bool get isSensor => _isSensor;
@@ -131,5 +161,28 @@ class PhysicsComponent extends Component {
   bool get wasOnGround => _wasOnGround;
   bool get justLanded => _isOnGround && !_wasOnGround;
   bool get justLeftGround => !_isOnGround && _wasOnGround;
+  bool get affectedByGravity => _affectedByGravity;
   set affectedByGravity(bool value) => _affectedByGravity = value;
+
+  // T2.5.1: Enhanced landing detection getters
+  Vector2? get lastCollisionNormal => _lastCollisionNormal?.clone();
+  Vector2? get lastSeparationVector => _lastSeparationVector?.clone();
+  double get lastLandingVelocity => _lastLandingVelocity;
+  Vector2? get lastLandingPosition => _lastLandingPosition?.clone();
+  String? get lastPlatformType => _lastPlatformType;
+
+  // T2.6.1: Edge detection getters
+  bool get isNearLeftEdge => _isNearLeftEdge;
+  bool get isNearRightEdge => _isNearRightEdge;
+  bool get isNearAnyEdge => _isNearLeftEdge || _isNearRightEdge;
+  double get leftEdgeDistance => _leftEdgeDistance;
+  double get rightEdgeDistance => _rightEdgeDistance;
+  double get edgeDetectionThreshold => _edgeDetectionThreshold;
+  Vector2? get leftEdgePosition => _leftEdgePosition?.clone();
+  Vector2? get rightEdgePosition => _rightEdgePosition?.clone();
+
+  /// Set gravity scale multiplier
+  void setGravityScale(double scale) {
+    _gravityScale = scale;
+  }
 }

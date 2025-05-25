@@ -27,11 +27,31 @@ Defines the implementation of level loading, scene management, checkpoints, worl
 
 ```dart
 // Main level management system
-class LevelManager extends GameSystem {
+class LevelManager extends BaseSystem {
   // Current level state
   // Loading queue management
   // Transition coordination
   // Performance monitoring
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // LevelManager typically doesn't process entities directly
+    // It mainly manages level state through processSystem
+    return false;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Not typically used in standard operation
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Process loading queue
+    // Handle level transitions
+    // Update active level state
+    // Monitor performance metrics
+  }
 }
 
 // Individual level controller

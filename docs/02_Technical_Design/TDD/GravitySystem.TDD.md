@@ -25,11 +25,32 @@ Defines the implementation of gravity manipulation mechanics for Void's Edge wor
 
 ```dart
 // Main gravity manipulation system
-class GravitySystem extends GameSystem {
+class GravitySystem extends BaseSystem {
   // Global gravity state management
   // Gravity field coordination
   // Physics system integration
   // Performance optimization
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has gravity-affected components
+    return entity.children.whereType<GravityAffected>().isNotEmpty ||
+           entity.children.whereType<PhysicsComponent>().isNotEmpty;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Apply appropriate gravity to entity based on fields and global settings
+    // Update entity orientation based on gravity direction
+    // Handle physics modifications and transitions
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Update global gravity state
+    // Process gravity field interactions
+    // Handle camera orientation adjustments
+  }
 }
 
 // Gravity field component

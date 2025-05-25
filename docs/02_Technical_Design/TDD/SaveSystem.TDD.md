@@ -27,11 +27,31 @@ Defines the implementation of the save system for Adventure Jumper, including ga
 
 ```dart
 // Main save system manager
-class SaveSystem extends GameSystem {
+class SaveSystem extends BaseSystem {
   // Save file management
   // Serialization coordination
   // Load operations
   // Checkpoint integration
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Save system doesn't typically process entities directly
+    // It will mainly use processSystem for global state operations
+    return false;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Save system doesn't typically process entities individually
+    // Not used in standard operation
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Handle auto-save timing
+    // Process checkpoint activation events
+    // Manage save queuing and background operations
+  }
 }
 
 // Game state container

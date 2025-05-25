@@ -30,7 +30,7 @@ class GameLogger {
     Logger.root.onRecord.listen((record) {
       // Format message with context
       final String loggerName = record.loggerName;
-      final String message = '${record.message}';
+      final String message = record.message;
       final String formattedMessage = '[$loggerName] $message';
 
       // Handle based on log level
@@ -54,13 +54,13 @@ class GameLogger {
             stackTrace: record.stackTrace,
           );
         } else {
-          // Standard logging for info and below
+          // Standard logging for info and below - use debugPrint for better Flutter integration
           if (kDebugMode) {
-            // Use print in debug mode for all levels
-            print('[${record.level.name}] $formattedMessage');
+            // Use debugPrint in debug mode for all levels
+            debugPrint('[${record.level.name}] $formattedMessage');
           } else if (record.level >= Level.INFO) {
             // In release mode, only print INFO and above
-            print('[${record.level.name}] $formattedMessage');
+            debugPrint('[${record.level.name}] $formattedMessage');
           }
         }
       }

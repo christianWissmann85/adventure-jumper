@@ -1,10 +1,9 @@
 // Test file for input system functionality
+import 'package:adventure_jumper/src/player/player.dart';
+import 'package:adventure_jumper/src/systems/input_system.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import '../lib/src/player/player.dart';
-import '../lib/src/systems/input_system.dart';
 
 void main() {
   group('InputSystem Tests', () {
@@ -64,8 +63,11 @@ void main() {
         );
 
         inputSystem.handleKeyEvent(keyEvent);
-        expect(inputSystem.isMovementKeyPressed(entry.value), isTrue,
-            reason: 'Key ${entry.key} should map to action ${entry.value}');
+        expect(
+          inputSystem.isMovementKeyPressed(entry.value),
+          isTrue,
+          reason: 'Key ${entry.key} should map to action ${entry.value}',
+        );
 
         // Reset for next test
         final keyUpEvent = KeyUpEvent(

@@ -1,6 +1,8 @@
 import 'dart:developer' as developer;
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import 'exceptions.dart';
 
 /// Log levels for different types of messages
@@ -31,7 +33,6 @@ class ErrorHandler {
     LogLevel level = LogLevel.error,
   }) {
     final String logMessage = _formatLogMessage(message, context, error);
-
     developer.log(
       logMessage,
       name: _logName,
@@ -40,13 +41,16 @@ class ErrorHandler {
       stackTrace: stackTrace,
     );
 
-    // In development, also print to console for easier debugging
-    print('[$_logName] ${level.name.toUpperCase()}: $logMessage');
-    if (error != null) {
-      print('Error details: $error');
-    }
-    if (stackTrace != null) {
-      print('Stack trace: $stackTrace');
+    // Use Flutter's debugPrint for console output - better than print() for development
+    // This provides proper console output that works well with Flutter DevTools
+    if (kDebugMode) {
+      debugPrint('[$_logName] ${level.name.toUpperCase()}: $logMessage');
+      if (error != null) {
+        debugPrint('Error details: $error');
+      }
+      if (stackTrace != null) {
+        debugPrint('Stack trace: $stackTrace');
+      }
     }
   }
 
@@ -101,7 +105,8 @@ class ErrorHandler {
     } on FormatException catch (e) {
       logError(
         'Asset format error for $assetPath',
-        error: AssetCorruptedException(assetPath, assetType, context: e.message),
+        error:
+            AssetCorruptedException(assetPath, assetType, context: e.message),
         context: context ?? 'AssetManager',
       );
       return fallback;
@@ -127,7 +132,8 @@ class ErrorHandler {
     try {
       return await operation();
     } on FormatException catch (e) {
-      final SaveFileCorruptedException exception = SaveFileCorruptedException(context: e.message);
+      final SaveFileCorruptedException exception =
+          SaveFileCorruptedException(context: e.message);
       logError(
         'Save file corruption detected during $operationType',
         error: exception,
@@ -144,7 +150,8 @@ class ErrorHandler {
         // Permission denied
         exception = SavePermissionException(operationType, context: e.message);
       } else {
-        exception = SaveDataException(e.message, operationType, context: e.path);
+        exception =
+            SaveDataException(e.message, operationType, context: e.path);
       }
       logError(
         'File system error during $operationType',
@@ -154,7 +161,8 @@ class ErrorHandler {
       if (shouldRethrow) throw exception;
       return fallback;
     } catch (e, stackTrace) {
-      final SaveDataException exception = SaveDataException(e.toString(), operationType);
+      final SaveDataException exception =
+          SaveDataException(e.toString(), operationType);
       logError(
         'Unexpected save/load error during $operationType',
         error: exception,
@@ -216,7 +224,8 @@ class ErrorHandler {
     try {
       return await operation();
     } on FormatException catch (e) {
-      final LevelDataCorruptedException exception = LevelDataCorruptedException(levelId, context: e.message);
+      final LevelDataCorruptedException exception =
+          LevelDataCorruptedException(levelId, context: e.message);
       logError(
         'Level data corruption detected for $levelId',
         error: exception,
@@ -234,7 +243,8 @@ class ErrorHandler {
       if (shouldRethrow) throw exception;
       return fallback;
     } catch (e, stackTrace) {
-      final LevelException exception = LevelException(e.toString(), levelId, 'load');
+      final LevelException exception =
+          LevelException(e.toString(), levelId, 'load');
       logError(
         'Unexpected level loading error for $levelId',
         error: exception,
@@ -299,7 +309,8 @@ class ErrorHandler {
         exception = FileNotFoundException(filePath, context: e.message);
       } else if (e.osError?.errorCode == 13) {
         // Permission denied
-        exception = FileAccessException(filePath, operationType, context: e.message);
+        exception =
+            FileAccessException(filePath, operationType, context: e.message);
       } else if (e.osError?.errorCode == 17) {
         // File already exists
         exception = FileAlreadyExistsException(filePath, context: e.message);

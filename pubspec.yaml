@@ -32,6 +32,7 @@ dependencies:
   audioplayers: ^6.0.0  # Audio playback
   flame: ^1.29.0  # Game engine
   flame_audio: ^2.11.6  # Audio for Flame
+  flame_test: ^1.19.2
   flutter:
     sdk: flutter
   logging: ^1.2.0  # Logging infrastructure

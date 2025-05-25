@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flame/components.dart';
 import 'package:flutter/services.dart';
 
+import '../utils/logger.dart';
 import 'level.dart';
 
 /// Level file parsing and loading utility
@@ -23,15 +24,14 @@ class LevelLoader {
   Future<Level> loadLevel(String levelId) async {
     // Check cache first if enabled
     if (enableCaching && _levelCache.containsKey(levelId)) {
-      print('LevelLoader: Loading level $levelId from cache');
+      logger.info('Loading level $levelId from cache');
       return _levelCache[levelId]!;
     }
 
-    print('LevelLoader: Loading level $levelId from file');
+    logger.info('Loading level $levelId from file');
 
     // Determine file path based on level ID
     final String filePath = _getLevelFilePath(levelId);
-
     try {
       // Load level JSON file
       final String jsonData = await rootBundle.loadString(filePath);
@@ -44,7 +44,7 @@ class LevelLoader {
 
       return level;
     } catch (e) {
-      print('LevelLoader: Error loading level $levelId - $e');
+      logger.severe('Error loading level $levelId', e);
       // Return a fallback empty level
       return _createEmptyLevel(levelId);
     }
@@ -53,7 +53,7 @@ class LevelLoader {
   /// Clear the level cache
   void clearCache() {
     _levelCache.clear();
-    print('LevelLoader: Cache cleared');
+    logger.fine('Level cache cleared');
   }
 
   /// Remove a specific level from the cache
@@ -105,7 +105,8 @@ class LevelLoader {
   ) async {
     // Player spawn point
     if (data.containsKey('playerSpawn')) {
-      final Map<String, dynamic> spawnData = data['playerSpawn'] as Map<String, dynamic>;
+      final Map<String, dynamic> spawnData =
+          data['playerSpawn'] as Map<String, dynamic>;
       level.playerSpawnPoint = Vector2(
         (spawnData['x'] as num).toDouble(),
         (spawnData['y'] as num).toDouble(),
@@ -116,7 +117,8 @@ class LevelLoader {
       // Platform creation will be implemented in Sprint 3
       for (final dynamic platformData in platformsData) {
         // ignore: unused_local_variable
-        final Map<String, dynamic> platformInfo = platformData as Map<String, dynamic>;
+        final Map<String, dynamic> platformInfo =
+            platformData as Map<String, dynamic>;
         // Will process platform data in Sprint 3
       }
     }
@@ -126,7 +128,8 @@ class LevelLoader {
       final List<dynamic> enemiesData = data['enemies'] as List<dynamic>;
       for (final dynamic enemyData in enemiesData) {
         // ignore: unused_local_variable
-        final Map<String, dynamic> enemyInfo = enemyData as Map<String, dynamic>;
+        final Map<String, dynamic> enemyInfo =
+            enemyData as Map<String, dynamic>;
         // Enemy creation will be implemented in future sprints
       }
     }

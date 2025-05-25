@@ -24,8 +24,7 @@ class AnimationSystem extends BaseSystem {
     final double scaledDt = dt * _globalAnimationSpeed;
 
     // Find any AnimationComponent on the entity
-    final Iterable<AnimationComponent> animationComponents =
-        entity.children.whereType<AnimationComponent>();
+    final Iterable<AnimationComponent> animationComponents = entity.children.whereType<AnimationComponent>();
 
     for (final AnimationComponent animComponent in animationComponents) {
       processAnimation(entity, animComponent, scaledDt);

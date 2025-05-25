@@ -27,11 +27,25 @@ Defines the implementation of the combat system including attack mechanics, hit 
 
 ```dart
 // Main combat system manager
-class CombatSystem extends GameSystem {
+class CombatSystem extends BaseSystem {
   // Attack registration and processing
   // Hit detection coordination
   // Damage application
   // Combat state management
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has health component or is combat-capable
+    return entity.children.whereType<HealthComponent>().isNotEmpty ||
+           entity is Player ||
+           entity is Enemy;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Combat is mainly event-driven rather than per-frame processing
+    // Most combat logic is triggered by collisions or explicit attack commands
+  }
 }
 
 // Attack definition and execution

@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import '../components/collision_component.dart';
 import '../entities/entity.dart';
 import '../player/player.dart';
+import '../utils/logger.dart';
 import 'portal_types.dart';
 
 /// Level transition mechanics
@@ -20,7 +21,8 @@ class Portal extends Entity {
     this.transitionDuration = 1.0,
   })  : _portalState = initialState,
         _interactionType = interactionType,
-        requiresInteraction = interactionType == PortalInteractionType.requiresInteraction,
+        requiresInteraction =
+            interactionType == PortalInteractionType.requiresInteraction,
         isActive = initialState == PortalState.active;
 
   // Portal properties
@@ -152,7 +154,7 @@ class Portal extends Entity {
   /// Show prompt for player interaction
   void _showInteractionPrompt() {
     // Prompt will be implemented in future sprints
-    print('Portal: Press E to enter portal to $targetLevelId');
+    logger.info('Portal: Press E to enter portal to $targetLevelId');
   }
 
   /// Hide interaction prompt
@@ -167,16 +169,15 @@ class Portal extends Entity {
     _isTransitioning = true;
 
     // Play transition effect
-    _playTransitionEffect();
-
-    // Notify level manager of portal entry
+    _playTransitionEffect(); // Notify level manager of portal entry
     // This will be properly integrated in future sprints
 
-    // For now, we just print a message
-    print('Portal: Transitioning to $targetLevelId');
+    // Log portal transition
+    logger.info('Portal: Transitioning to $targetLevelId');
 
     // Reset state after transition
-    Future<void>.delayed(Duration(milliseconds: (transitionDuration * 1000).toInt()), () {
+    Future<void>.delayed(
+        Duration(milliseconds: (transitionDuration * 1000).toInt()), () {
       _isTransitioning = false;
     });
   }

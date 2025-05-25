@@ -24,13 +24,11 @@ class RenderSystem extends BaseSystem {
   void processEntity(Entity entity, double dt) {
     // No need to check for sprite component - canProcessEntity handles that
     final TransformComponent transform = entity.transformComponent;
-    final AdvSpriteComponent sprite =
-        entity.sprite!; // Safe to use ! as we checked in canProcessEntity
+    final AdvSpriteComponent sprite = entity.sprite!; // Safe to use ! as we checked in canProcessEntity
 
     // Update sprite position based on transform
     if (sprite.parent is PositionComponent) {
-      final PositionComponent positionComponent =
-          sprite.parent! as PositionComponent;
+      final PositionComponent positionComponent = sprite.parent! as PositionComponent;
       positionComponent.position = transform.position;
       positionComponent.scale = transform.scale;
       positionComponent.angle = transform.rotation;

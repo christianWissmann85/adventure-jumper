@@ -5,6 +5,7 @@ Welcome to the Adventure Jumper documentation suite. This repository contains al
 ## Documentation Categories
 
 1. [Game Design](01_Game_Design/README.md) - Game mechanics, narrative, worlds, characters, and UI/UX design
+
    - [Game Design Document (GDD)](01_Game_Design/GDD.md) - Master design document
    - [Characters](01_Game_Design/Characters/README.md) - Character designs and specifications
    - [Worlds](01_Game_Design/Worlds/README.md) - World designs and environments
@@ -17,21 +18,26 @@ Welcome to the Adventure Jumper documentation suite. This repository contains al
    - [Lore](01_Game_Design/Lore/README.md) - World history and background
 
 2. [Technical Design](02_Technical_Design/README.md) - Architecture, technical specifications, and technical design documents
+
    - [Architecture](02_Technical_Design/Architecture.md) - System architecture overview
    - [Asset Pipeline](02_Technical_Design/AssetPipeline.md) - Asset workflow
    - [Technical Design Documents](02_Technical_Design/TDD/README.md) - System specifications
 
 3. [Development Process](03_Development_Process/README.md) - Implementation guides and development workflows
+
    - [Implementation Guide](03_Development_Process/ImplementationGuide.md) - Code standards
    - [Testing Strategy](03_Development_Process/TestingStrategy.md) - QA approach
    - [Version Control](03_Development_Process/VersionControl.md) - Git workflow
+   - [Action Plan: Logging Migration](ActionPlan_LoggingMigration.md) - Guide for refactoring `print()` calls to a structured logging system.
 
 4. [Project Management](04_Project_Management/README.md) - Roadmaps, sprint plans, and task tracking
+
    - [Roadmap](04_Project_Management/Roadmap.md) - Development timeline
    - [Sprint Plan](04_Project_Management/AgileSprintPlan.md) - Current sprint
    - [Task Tracking](04_Project_Management/TaskTracking.md) - Work management
 
 5. [Style Guides](05_Style_Guides/README.md) - Code, art, audio, UI/UX, and documentation style guides
+
    - [Code Style](05_Style_Guides/CodeStyle.md) - Programming standards
    - [Art Style](05_Style_Guides/ArtStyle.md) - Visual guidelines
    - [Audio Style](05_Style_Guides/AudioStyle.md) - Sound design standards
@@ -45,24 +51,28 @@ Welcome to the Adventure Jumper documentation suite. This repository contains al
 ## Key Documents by Role
 
 ### For Designers
+
 - [Game Design Document (GDD)](01_Game_Design/GDD.md) - Complete game design overview
 - [Core Gameplay Loop](01_Game_Design/Mechanics/CoreGameplayLoop.md) - Fundamental gameplay
 - [World Connections](01_Game_Design/Worlds/00-World-Connections.md) - World structure
 - [Story Outline](01_Game_Design/Narrative/00-story-outline.md) - Narrative flow
 
 ### For Developers
+
 - [Architecture](02_Technical_Design/Architecture.md) - System architecture
 - [TDD Directory](02_Technical_Design/TDD/README.md) - Technical specifications
 - [Implementation Guide](03_Development_Process/ImplementationGuide.md) - Development standards
 - [Asset Pipeline](02_Technical_Design/AssetPipeline.md) - Asset workflow
 
 ### For Artists
+
 - [Art Style Guide](05_Style_Guides/ArtStyle.md) - Visual standards
 - [World Design Documents](01_Game_Design/Worlds/) - Environment specifications
 - [Character Design Documents](01_Game_Design/Characters/) - Character specifications
 - [UI/UX Style Guide](05_Style_Guides/UI_UX_Style.md) - Interface guidelines
 
 ### For Project Managers
+
 - [Development Roadmap](04_Project_Management/Roadmap.md) - Project timeline
 - [Agile Sprint Plan](04_Project_Management/AgileSprintPlan.md) - Current sprint
 - [Task Tracking](04_Project_Management/TaskTracking.md) - Work management
@@ -80,6 +90,7 @@ This documentation is organized to provide a clear separation of concerns while 
 ## Getting Started
 
 New team members should start by reading:
+
 1. The Game Design Document (GDD) in [01_Game_Design/GDD.md](01_Game_Design/GDD.md)
 2. The Technical Architecture overview in [02_Technical_Design/Architecture.md](02_Technical_Design/Architecture.md)
 3. The Implementation Guide in [03_Development_Process/ImplementationGuide.md](03_Development_Process/ImplementationGuide.md)

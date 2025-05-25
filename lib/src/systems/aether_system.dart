@@ -1,17 +1,15 @@
+// filepath: c:\Users\User\source\repos\Cascade\adventure-jumper\lib\src\systems\aether_system.dart
 import 'package:flame/components.dart';
 
 import '../components/aether_component.dart';
 import '../entities/entity.dart';
 import '../player/player.dart';
-import 'system.dart';
+import 'base_system.dart';
 
 /// System that manages Aether mechanics processing
 /// Handles Aether abilities, energy flow, and environmental Aether effects
-class AetherSystem extends System {
+class AetherSystem extends BaseSystem {
   AetherSystem();
-
-  // Entities processed by this system
-  final List<Entity> _entities = <Entity>[];
 
   // Configuration
   double _globalAetherMultiplier = 1;
@@ -27,27 +25,13 @@ class AetherSystem extends System {
   bool _environmentalAetherActive = false;
 
   @override
-  void update(double dt) {
-    if (!isActive) return;
-
-    // Process Aether for each entity
-    for (final Entity entity in _entities) {
-      if (!entity.isActive) continue;
-
-      processEntityAether(entity, dt);
-    }
-
-    // Update active Aether effects
-    _updateAetherEffects(dt);
-
-    // Update environmental Aether
-    if (_environmentalAetherActive) {
-      _updateEnvironmentalAether(dt);
-    }
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has an aether component
+    return entity.children.whereType<AetherComponent>().isNotEmpty;
   }
 
-  /// Process Aether mechanics for a single entity
-  void processEntityAether(Entity entity, double dt) {
+  @override
+  void processEntity(Entity entity, double dt) {
     // Find Aether component on entity
     final Iterable<AetherComponent> aetherComponents =
         entity.children.whereType<AetherComponent>();
@@ -70,6 +54,17 @@ class AetherSystem extends System {
     }
 
     // Aether component handles most of its own update logic internally
+  }
+
+  @override
+  void processSystem(double dt) {
+    // Update active Aether effects
+    _updateAetherEffects(dt);
+
+    // Update environmental Aether
+    if (_environmentalAetherActive) {
+      _updateEnvironmentalAether(dt);
+    }
   }
 
   /// Update all active Aether effects
@@ -122,23 +117,16 @@ class AetherSystem extends System {
     return effect;
   }
 
-  /// Register an entity with this system
+  /// Helper method for backward compatibility
+  @override
   void registerEntity(Entity entity) {
-    if (!_entities.contains(entity)) {
-      _entities.add(entity);
-    } // Track player entity
-    if (entity is Player && _playerEntity == null) {
-      _playerEntity = entity;
-    }
+    addEntity(entity);
   }
 
-  /// Unregister an entity from this system
+  /// Helper method for backward compatibility
+  @override
   void unregisterEntity(Entity entity) {
-    _entities.remove(entity);
-
-    if (entity == _playerEntity) {
-      _playerEntity = null;
-    }
+    removeEntity(entity);
   }
 
   /// Set global Aether multiplier
@@ -155,19 +143,12 @@ class AetherSystem extends System {
     }
   }
 
-  /// Clear all entities
-  void clearEntities() {
-    _entities.clear();
-    _playerEntity = null;
-  }
-
   /// Clear all Aether effects
   void clearEffects() {
     _activeEffects.clear();
   }
 
   // Getters
-  int get entityCount => _entities.length;
   double get aetherMultiplier => _globalAetherMultiplier;
   double get environmentalAetherLevel => _environmentalAetherLevel;
   bool get environmentalAetherActive => _environmentalAetherActive;
@@ -179,20 +160,18 @@ class AetherSystem extends System {
   }
 
   @override
-  void dispose() {
-    _entities.clear();
-    _activeEffects.clear();
-    _playerEntity = null;
+  void onEntityAdded(Entity entity) {
+    // Track player entity
+    if (entity is Player && _playerEntity == null) {
+      _playerEntity = entity;
+    }
   }
 
   @override
-  void addEntity(Entity entity) {
-    registerEntity(entity);
-  }
-
-  @override
-  void removeEntity(Entity entity) {
-    unregisterEntity(entity);
+  void onEntityRemoved(Entity entity) {
+    if (entity == _playerEntity) {
+      _playerEntity = null;
+    }
   }
 }
 

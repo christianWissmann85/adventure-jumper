@@ -63,6 +63,22 @@ Adventure Jumper is built using the Flame game engine on top of Flutter, followi
 - **Entities**: Game objects (Player, Enemies, Items, etc.)
 - **Components**: Reusable behaviors and properties (e.g., Position, Physics, Render)
 - **Systems**: Logic that processes components (e.g., MovementSystem, CollisionSystem)
+  
+#### ECS Architecture Improvements
+The ECS architecture was refactored in Sprint 1 to improve code organization, reduce duplication, and increase maintainability:
+
+- **BaseSystem & BaseFlameSystem**: Created standardized base classes for all systems
+  - `BaseSystem`: Standard implementation of the System interface with common entity management
+  - `BaseFlameSystem`: Extends Flame's Component class while implementing System interface
+  
+- **System Standardization**: All systems now follow a consistent pattern:
+  - Entity filtering via `canProcessEntity(Entity entity)` method
+  - Entity processing via `processEntity(Entity entity, double dt)` method
+  - System-wide logic via `processSystem(double dt)` method
+
+- **Refactored Systems**:
+  - **Core systems**: RenderSystem, PhysicsSystem, MovementSystem, AISystem, AnimationSystem, DialogueSystem
+  - **Complex systems**: InputSystem, CombatSystem, AetherSystem, AudioSystem
 
 ### 3. Game State Management
 - **Game State**: Tracks current game state (Menu, Playing, Paused, Game Over)
@@ -268,6 +284,56 @@ graph TD
 - **Aether** and **Health** manage character states and abilities
 
 See [Components Reference](ComponentsReference.md) for a complete list of components and their properties.
+
+## Systems Architecture
+
+Our Entity-Component-System (ECS) architecture uses standardized system classes to process entities based on their components. Following Sprint 1 refactoring, all systems use a consistent architecture. For detailed information on all systems, see [Systems Reference](SystemsReference.md).
+
+### Core System Classes
+
+#### BaseSystem
+**Purpose**: Standard implementation of the System interface that provides entity management functionality.
+**Key Features**:
+- Entity registration with filtering capabilities
+- Entity iteration and processing per frame
+- System lifecycle management (initialize, update, dispose)
+- Active state control for pausing processing
+
+#### BaseFlameSystem
+**Purpose**: Extends Flame's Component class while implementing the System interface.
+**Key Features**:
+- Same entity management as BaseSystem
+- Integration with Flame's component lifecycle
+- Direct integration with Flame's game loop
+- Proper rendering order through Flame's component hierarchy
+
+### System Organization
+All game systems extend one of these base classes:
+
+1. **Input & Controls**
+   - `InputSystem (BaseFlameSystem)`: Processes user input and routes to entities
+
+2. **Physics & Movement**
+   - `PhysicsSystem (BaseFlameSystem)`: Handles physics calculations and forces
+   - `MovementSystem (BaseFlameSystem)`: Processes entity movements and velocity changes
+
+3. **Gameplay Systems**
+   - `CombatSystem (BaseSystem)`: Manages combat interactions and damage
+   - `AetherSystem (BaseSystem)`: Handles special ability mechanics
+   - `AISystem (BaseSystem)`: Controls non-player entity behaviors
+
+4. **Visual & Feedback**
+   - `RenderSystem (BaseSystem)`: Manages rendering order and visual effects
+   - `AnimationSystem (BaseSystem)`: Processes sprite animations
+   - `AudioSystem (BaseSystem)`: Handles sound effects and music
+   - `DialogueSystem (BaseSystem)`: Manages in-game dialogue and text
+
+### System Processing Flow
+1. Entity added to game world
+2. Systems evaluate the entity via `canProcessEntity()` method
+3. Systems that can process the entity add it to their internal list
+4. On each frame, systems process their entities via `processEntity()`
+5. System-wide logic runs via `processSystem()`
 
 ## Subsystems Detail
 

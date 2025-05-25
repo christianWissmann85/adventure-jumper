@@ -25,11 +25,29 @@ Defines the implementation of the Aether energy system that powers all abilities
 
 ```dart
 // Main Aether energy management system
-class AetherSystem extends GameSystem {
+class AetherSystem extends BaseSystem {
   // Current energy levels
   // Regeneration logic
   // Consumption tracking
   // Upgrade management
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has an aether component
+    return entity.children.whereType<AetherComponent>().isNotEmpty;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Process aether component logic
+    // Handle regeneration and energy updates
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Update environmental aether effects
+    // Process active aether abilities
+  }
 }
 
 // Aether pool data structure

@@ -24,22 +24,19 @@ class InputSystem extends BaseFlameSystem {
   bool _useTouch = true;
   bool _useGamepad = false;
 
-  int _priority = 0;
-  @override
-  int get priority => _priority;
-  @override
-  set priority(int value) => _priority = value;
-
   // Input state tracking
   final Map<LogicalKeyboardKey, bool> _keyStates = <LogicalKeyboardKey, bool>{};
   final Map<int, Vector2> _touchPositions = <int, Vector2>{};
-
   // Movement key tracking for left/right movement
   final Map<String, bool> _movementKeys = <String, bool>{
     'move_left': false,
     'move_right': false,
     'jump': false,
   };
+
+  // Jump input tracking for enhanced responsiveness
+  bool _jumpPressed = false;
+  bool _jumpPressedThisFrame = false;
 
   // Virtual controller (for touch/mobile)
   bool _virtualControllerActive = false;
@@ -49,25 +46,35 @@ class InputSystem extends BaseFlameSystem {
 
   // Focus entity (e.g., player) that receives direct input
   Entity? _focusedEntity;
-
   @override
   void update(double dt) {
-    if (!_isActive) return;
+    if (!isActive) return;
+
+    // Reset frame-based jump tracking
+    _jumpPressedThisFrame = false;
 
     // Process input for focused entity first (usually the player)
     if (_focusedEntity != null && _focusedEntity!.isActive) {
       processEntityInput(_focusedEntity!);
     }
 
-    // Process input for other entities
-    for (final Entity entity in _entities) {
-      if (entity == _focusedEntity) {
-        continue; // Skip focused entity, already processed
-      }
-      if (!entity.isActive) continue;
+    super.update(dt);
+  }
 
-      processEntityInput(entity);
+  @override
+  void processEntity(Entity entity, double dt) {
+    if (entity == _focusedEntity) {
+      return; // Skip focused entity, already processed
     }
+
+    processEntityInput(entity);
+  }
+
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity is the focused entity or has an input component
+    return entity == _focusedEntity ||
+        entity.children.whereType<InputComponent>().isNotEmpty;
   }
 
   /// Process input for a specific entity
@@ -87,15 +94,21 @@ class InputSystem extends BaseFlameSystem {
   void _updateEntityMovementInput(InputComponent inputComponent) {
     // Update movement actions based on current key states
     inputComponent.setActionState(
-        'move_left', _movementKeys['move_left'] ?? false);
+      'move_left',
+      _movementKeys['move_left'] ?? false,
+    );
     inputComponent.setActionState(
-        'move_right', _movementKeys['move_right'] ?? false);
-    inputComponent.setActionState('jump', _movementKeys['jump'] ?? false);
+      'move_right',
+      _movementKeys['move_right'] ?? false,
+    );
+
+    // Use enhanced jump tracking for better responsiveness
+    inputComponent.setActionState('jump', _jumpPressedThisFrame);
   }
 
   /// Handle raw key events from Flutter
   void handleKeyEvent(KeyEvent event) {
-    if (!_isActive || !_useKeyboard) return;
+    if (!isActive || !_useKeyboard) return;
 
     final LogicalKeyboardKey key = event.logicalKey;
     final bool isKeyDown = event is KeyDownEvent;
@@ -136,13 +149,19 @@ class InputSystem extends BaseFlameSystem {
       case LogicalKeyboardKey.keyW:
       case LogicalKeyboardKey.space:
         _movementKeys['jump'] = isPressed;
+
+        // Enhanced jump input tracking
+        if (isPressed && !_jumpPressed) {
+          _jumpPressedThisFrame = true;
+        }
+        _jumpPressed = isPressed;
         break;
     }
   }
 
   /// Handle pointer events (for touch controls)
   void handlePointerEvent(PointerEvent event) {
-    if (!_isActive || !_useTouch) return;
+    if (!isActive || !_useTouch) return;
 
     // Handle touch input
     if (event is PointerDownEvent) {
@@ -173,25 +192,22 @@ class InputSystem extends BaseFlameSystem {
     // Then update _virtualControllerPressed state and notify entities
   }
 
-  /// Register an entity with this system
+  /// Helper method for backward compatibility
+  @override
   void registerEntity(Entity entity) {
-    if (!_entities.contains(entity)) {
-      _entities.add(entity);
-    }
+    addEntity(entity);
   }
 
-  /// Unregister an entity from this system
+  /// Helper method for backward compatibility
+  @override
   void unregisterEntity(Entity entity) {
-    _entities.remove(entity);
-    if (_focusedEntity == entity) {
-      _focusedEntity = null;
-    }
+    removeEntity(entity);
   }
 
   /// Set the focused entity (usually the player)
   void setFocusedEntity(Entity entity) {
     _focusedEntity = entity;
-    registerEntity(entity); // Ensure it's registered
+    addEntity(entity); // Ensure it's registered
   }
 
   /// Enable or disable the virtual controller
@@ -205,15 +221,18 @@ class InputSystem extends BaseFlameSystem {
     _touchPositions.clear();
     _virtualControllerPressed.clear();
     _movementKeys.updateAll((key, value) => false);
+    _jumpPressed = false;
+    _jumpPressedThisFrame = false;
   }
 
   /// Get current movement key state
   bool isMovementKeyPressed(String action) => _movementKeys[action] ?? false;
 
   /// Set system active state
+  @override
   void setActive(bool active) {
-    _isActive = active;
-    if (!_isActive) {
+    isActive = active;
+    if (!isActive) {
       clearInputStates();
     }
   }
@@ -226,7 +245,6 @@ class InputSystem extends BaseFlameSystem {
   }
 
   // Getters
-  int get entityCount => _entities.length;
   Entity? get focusedEntity => _focusedEntity;
   bool get isKeyboardEnabled => _useKeyboard;
   bool get isTouchEnabled => _useTouch;
@@ -234,7 +252,6 @@ class InputSystem extends BaseFlameSystem {
   bool isKeyPressed(LogicalKeyboardKey key) => _keyStates[key] ?? false;
   bool get isVirtualControllerActive => _virtualControllerActive;
 
-  // System interface implementation
   @override
   void initialize() {
     // Initialize input system
@@ -242,7 +259,7 @@ class InputSystem extends BaseFlameSystem {
 
   @override
   void dispose() {
-    _entities.clear();
+    super.dispose(); // Call base class implementation
     _keyStates.clear();
     _touchPositions.clear();
     _virtualControllerPositions.clear();
@@ -251,15 +268,12 @@ class InputSystem extends BaseFlameSystem {
   }
 
   @override
-  void addEntity(Entity entity) {
-    if (!_entities.contains(entity)) {
-      _entities.add(entity);
-    }
+  void onEntityAdded(Entity entity) {
+    // Additional setup when entity is added to system
   }
 
   @override
-  void removeEntity(Entity entity) {
-    _entities.remove(entity);
+  void onEntityRemoved(Entity entity) {
     if (_focusedEntity == entity) {
       _focusedEntity = null;
     }

@@ -30,24 +30,130 @@ Defines the high-level architecture of Adventure Jumper, emphasizing design cohe
 
 ```dart
 // Main game class - entry point and system coordinator
-class AdventureGame extends FlameGame {
+class AdventureJumperGame extends FlameGame {
   // System managers
   // Game state management
   // Scene coordination
 }
 
 // Base component for all game entities
-abstract class GameComponent extends Component {
+abstract class Entity extends Component {
   // Common component functionality
   // State management
   // Lifecycle methods
 }
 
-// System manager base class
-abstract class GameSystem {
-  // System initialization
-  // Update cycles
-  // Cleanup procedures
+// System interface that all systems implement
+abstract class System {
+  // System active state
+  bool get isActive;
+  set isActive(bool value);
+  
+  // System priority for update order
+  int get priority;
+  set priority(int value);
+  
+  // Core system methods
+  void update(double dt);
+  void initialize();
+  void dispose();
+  
+  // Entity management
+  void addEntity(Entity entity);
+  void removeEntity(Entity entity);
+}
+
+// Base system implementation
+abstract class BaseSystem implements System {
+  // Entity list for tracking
+  final List<Entity> _entities = <Entity>[];
+  
+  // System state
+  bool _isActive = true;
+  int _priority = 0;
+  
+  // Entity management
+  void addEntity(Entity entity) {
+    if (canProcessEntity(entity) && !_entities.contains(entity)) {
+      _entities.add(entity);
+      onEntityAdded(entity);
+    }
+  }
+  
+  void removeEntity(Entity entity) {
+    if (_entities.remove(entity)) {
+      onEntityRemoved(entity);
+    }
+  }
+  
+  // System update loop
+  void update(double dt) {
+    if (!isActive) return;
+    
+    // Process all registered entities
+    for (final Entity entity in _entities) {
+      if (!entity.isActive) continue;
+      processEntity(entity, dt);
+    }
+    
+    // Handle system-wide logic
+    processSystem(dt);
+  }
+  
+  // Override these in derived systems
+  bool canProcessEntity(Entity entity);
+  void processEntity(Entity entity, double dt);
+  void processSystem(double dt) {}
+  void onEntityAdded(Entity entity) {}
+  void onEntityRemoved(Entity entity) {}
+}
+
+// Flame-specific system implementation
+abstract class BaseFlameSystem extends Component implements System {
+  // Entity list for tracking
+  final List<Entity> _entities = <Entity>[];
+  
+  // System state
+  bool _isActive = true;
+  int _priority = 0;
+  
+  // Entity management
+  void addEntity(Entity entity) {
+    if (canProcessEntity(entity) && !_entities.contains(entity)) {
+      _entities.add(entity);
+      onEntityAdded(entity);
+    }
+  }
+  
+  void removeEntity(Entity entity) {
+    if (_entities.remove(entity)) {
+      onEntityRemoved(entity);
+    }
+  }
+  
+  // Component integration
+  @override
+  void update(double dt) {
+    super.update(dt);
+    
+    if (!isActive) return;
+    
+    // Process all registered entities
+    for (final Entity entity in _entities) {
+      if (!entity.isActive) continue;
+      processEntity(entity, dt);
+    }
+    
+    // Handle system-wide logic
+    processSystem(dt);
+  }
+  
+  // Override these in derived systems
+  bool canProcessEntity(Entity entity);
+  void processEntity(Entity entity, double dt);
+  void processSystem(double dt) {}
+  void onEntityAdded(Entity entity) {}
+  void onEntityRemoved(Entity entity) {}
 }
 ```
 
@@ -68,12 +174,24 @@ class GameConfig {
 }
 ```
 
-### System Registry
+### System Organization
 ```dart
-class SystemRegistry {
-  // Map of active systems
-  // System lifecycle management
-  // Inter-system communication
+// Systems are added to the game world directly
+class GameWorld {
+  // Add systems to the game
+  void addSystem(System system);
+  
+  // Systems organized by function
+  late final RenderSystem renderSystem;        // extends BaseSystem
+  late final PhysicsSystem physicsSystem;      // extends BaseFlameSystem
+  late final MovementSystem movementSystem;    // extends BaseFlameSystem
+  late final InputSystem inputSystem;          // extends BaseFlameSystem
+  late final AISystem aiSystem;                // extends BaseSystem
+  late final CombatSystem combatSystem;        // extends BaseSystem
+  late final AetherSystem aetherSystem;        // extends BaseSystem
+  late final AnimationSystem animationSystem;  // extends BaseSystem
+  late final AudioSystem audioSystem;          // extends BaseSystem
+  late final DialogueSystem dialogueSystem;    // extends BaseSystem
 }
 ```
 
@@ -84,6 +202,22 @@ class SystemRegistry {
 - Dependency resolution for system initialization
 - Event propagation patterns
 
+### System Processing Flow
+1. Entity added to game world 
+2. Each system evaluates the entity using `canProcessEntity()`
+3. If a system can process the entity, it adds it to its internal list
+4. On each update, systems process their entities in order of priority
+5. Within each system, `processEntity()` is called for each active entity
+6. After entity processing, `processSystem()` handles system-wide logic
+
+### ECS Refactoring
+The System architecture was refactored to improve maintainability and reduce code duplication:
+- Created standardized base classes for all systems
+- Implemented consistent entity filtering and processing patterns
+- Reduced duplicate code across systems by ~200 lines
+- Added backward compatibility methods for legacy code
+- Standardized lifecycle management (initialize, update, dispose)
+
 ### Memory Management
 - Object pooling for frequently created/destroyed entities
 - Efficient component storage and retrieval
@@ -91,28 +225,61 @@ class SystemRegistry {
 
 ## 5. API/Interfaces
 
-### System Communication
+### System API
 ```dart
-interface ISystemManager {
+// Core System interface
+abstract class System {
+  // Whether this system is active
+  bool get isActive;
+  set isActive(bool value);
+
+  // Priority for update order (higher values update first)
+  int get priority;
+  set priority(int value);
+
+  // Core methods
+  void update(double dt);
   void initialize();
-  void update(double deltaTime);
-  void cleanup();
+  void dispose();
+  
+  // Entity management
+  void addEntity(Entity entity);
+  void removeEntity(Entity entity);
+  void initialize();
+  void dispose();
+  
+  // Entity management
+  void addEntity(Entity entity);
+  void removeEntity(Entity entity);
 }
 
-interface IGameEvent {
-  String eventType;
-  Map<String, dynamic> data;
+// BaseSystem extension points
+abstract class BaseSystem implements System {
+  // Entity filtering
+  bool canProcessEntity(Entity entity);
+  
+  // Entity processing
+  void processEntity(Entity entity, double dt);
+  
+  // System-wide processing
+  void processSystem(double dt);
+  
+  // Entity callbacks
+  void onEntityAdded(Entity entity);
+  void onEntityRemoved(Entity entity);
 }
 ```
 
-### Component Interfaces
+### Component Integration
 ```dart
-interface IUpdatable {
-  void update(double deltaTime);
-}
-
-interface IRenderable {
-  void render(Canvas canvas);
+// Components are added to entities
+class Entity {
+  // Add a component to this entity
+  void add(Component component);
+  
+  // Get components by type
+  T? getComponent<T extends Component>();
+  List<T> getComponents<T extends Component>();
 }
 ```
 

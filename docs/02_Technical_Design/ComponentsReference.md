@@ -1,10 +1,11 @@
 # Adventure Jumper - Components Reference
-*Last Updated: January 2025*
+*Last Updated: May 2025*
 
-This document outlines the core components used in Adventure Jumper's Entity-Component-System architecture, organized by the 11-module structure defined in Sprint 1 scaffolding. Each component supports our Design Cohesion principles and has a defined sprint delivery timeline.
+This document outlines the core components and systems used in Adventure Jumper's Entity-Component-System architecture, organized by the 11-module structure defined in Sprint 1 scaffolding. Each component supports our Design Cohesion principles and has a defined sprint delivery timeline.
 
 > **Related Documents:**
 > - [Architecture](Architecture.md) - System architecture overview and module structure
+> - [Systems Reference](SystemsReference.md) - System classes and processing details
 > - [Documentation Sync Plan](DocumentationSyncPlan.md) - Sprint alignment approach
 > - [Design Cohesion Guide](../04_Project_Management/DesignCohesionGuide.md) - Design principles
 > - [Agile Sprint Plan](../04_Project_Management/AgileSprintPlan.md) - Sprint details

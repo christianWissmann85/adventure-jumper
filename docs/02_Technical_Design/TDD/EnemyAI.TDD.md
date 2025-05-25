@@ -24,6 +24,35 @@ Defines the implementation of enemy artificial intelligence systems, including b
 ### Core AI Classes
 
 ```dart
+// Main AI system that coordinates all enemy AI behaviors
+class AISystem extends BaseSystem {
+  // AI entity management and coordination
+  // AI execution scheduling
+  // Target sharing and awareness
+  // Performance optimization
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has AI components
+    return entity.children.whereType<EnemyAI>().isNotEmpty ||
+           entity.hasTags(['enemy', 'npc', 'ai-controlled']);
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Update AI components on this entity
+    // Process behavior trees
+    // Update path finding and movement
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Handle global AI concerns
+    // Manage target visibility across enemies
+    // Optimize AI processing based on distance to player
+  }
+}
+
 // Base AI controller for all enemies
 abstract class EnemyAI extends GameComponent {
   // Behavior tree execution

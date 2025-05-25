@@ -19,7 +19,7 @@ Each TDD follows a consistent structure:
 ## Systems Overview
 
 ### Core Systems
-- [**SystemArchitecture.TDD**](SystemArchitecture.TDD.md) - Overall game architecture and component interactions
+- [**SystemArchitecture.TDD**](SystemArchitecture.TDD.md) - Overall game architecture and system base classes
 - [**PlayerCharacter.TDD**](PlayerCharacter.TDD.md) - Kael's character controller and abilities
 - [**AetherSystem.TDD**](AetherSystem.TDD.md) - Energy management and consumption mechanics
 

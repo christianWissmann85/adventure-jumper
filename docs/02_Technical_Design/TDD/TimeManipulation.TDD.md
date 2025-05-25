@@ -25,11 +25,32 @@ Defines the implementation of time manipulation mechanics for the Celestial Arch
 
 ```dart
 // Main time manipulation system
-class TimeManipulationSystem extends GameSystem {
+class TimeManipulationSystem extends BaseSystem {
   // Global time state management
   // Temporal effect coordination
   // Time zone management
   // Performance optimization
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has temporal components or is in a time zone
+    return entity.children.whereType<TemporalComponent>().isNotEmpty ||
+           entity.hasTags(['temporal', 'time-affected']);
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Apply time scale to entity updates
+    // Process temporal effects and state changes
+    // Record entity state history if needed
+  }
+  
+  @override
+  void processSystem(double dt) {
+    // Update global time state
+    // Manage time zones and their effects
+    // Process temporal ability activations
+  }
 }
 
 // Time-affected entity component

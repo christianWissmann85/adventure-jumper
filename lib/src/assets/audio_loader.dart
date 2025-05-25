@@ -1,5 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 
+import '../utils/logger.dart';
+
 /// Handles loading and management of audio assets for the game
 class AudioLoader {
   factory AudioLoader() => _instance;
@@ -31,7 +33,8 @@ class AudioLoader {
       Source audioSource;
 
       if (audioPath.startsWith('assets/')) {
-        audioSource = AssetSource(audioPath.substring(7)); // Remove 'assets/' prefix
+        audioSource =
+            AssetSource(audioPath.substring(7)); // Remove 'assets/' prefix
       } else {
         audioSource = AssetSource(audioPath);
       }
@@ -59,7 +62,10 @@ class AudioLoader {
         final String filename = audioPath.split('/').last.split('.').first;
         audioSources[filename] = audioSource;
       } catch (e) {
-        print('Warning: Failed to load audio in group $groupName: $audioPath');
+        logger.warning(
+          'Failed to load audio in group $groupName: $audioPath',
+          e,
+        );
       }
     }
 
@@ -188,7 +194,7 @@ class AudioLoader {
       await tempPlayer.setSource(audioSource);
       await tempPlayer.dispose();
     } catch (e) {
-      print('Warning: Failed to preload audio: $audioPath');
+      logger.warning('Failed to preload audio: $audioPath', e);
     }
   }
 
@@ -222,11 +228,16 @@ class AudioLoader {
   /// Setup predefined audio groups
   Future<void> _setupAudioGroups() async {
     // Initialize empty groups that will be populated when loaded
-    _audioGroups['sound_effects'] = AudioGroup(name: 'sound_effects', audioSources: <String, Source>{});
-    _audioGroups['music'] = AudioGroup(name: 'music', audioSources: <String, Source>{});
-    _audioGroups['ambient'] = AudioGroup(name: 'ambient', audioSources: <String, Source>{});
-    _audioGroups['voice'] = AudioGroup(name: 'voice', audioSources: <String, Source>{});
-    _audioGroups['ui'] = AudioGroup(name: 'ui', audioSources: <String, Source>{});
+    _audioGroups['sound_effects'] =
+        AudioGroup(name: 'sound_effects', audioSources: <String, Source>{});
+    _audioGroups['music'] =
+        AudioGroup(name: 'music', audioSources: <String, Source>{});
+    _audioGroups['ambient'] =
+        AudioGroup(name: 'ambient', audioSources: <String, Source>{});
+    _audioGroups['voice'] =
+        AudioGroup(name: 'voice', audioSources: <String, Source>{});
+    _audioGroups['ui'] =
+        AudioGroup(name: 'ui', audioSources: <String, Source>{});
   }
 
   /// Preload critical audio files
@@ -236,12 +247,11 @@ class AudioLoader {
       'audio/sfx/button_click.wav',
       'audio/music/main_theme.mp3',
     ];
-
     for (final String audioPath in criticalAudio) {
       try {
         await loadAudio(audioPath);
       } catch (e) {
-        print('Warning: Failed to preload critical audio: $audioPath');
+        logger.warning('Failed to preload critical audio: $audioPath', e);
       }
     }
   }
@@ -328,7 +338,8 @@ class AudioGroup {
   Source? getRandomAudio() {
     if (audioSources.isEmpty) return null;
     final List<String> keys = audioSources.keys.toList();
-    final String randomKey = keys[DateTime.now().millisecondsSinceEpoch % keys.length];
+    final String randomKey =
+        keys[DateTime.now().millisecondsSinceEpoch % keys.length];
     return audioSources[randomKey];
   }
 

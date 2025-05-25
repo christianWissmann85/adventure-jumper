@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import '../components/collision_component.dart';
 import '../entities/entity.dart';
 import '../player/player.dart';
+import '../utils/logger.dart';
 
 /// Save point functionality
 /// Allows players to save progress and respawn at checkpoints
@@ -99,12 +100,10 @@ class Checkpoint extends Entity {
     _isActivated = true;
 
     // Update visuals
-    _updateVisuals();
-
-    // Display activation message if enabled
+    _updateVisuals(); // Display activation message if enabled
     if (showMessage) {
       // Message display will be implemented in future sprints
-      print('Checkpoint: $activationMessage');
+      logger.info('Checkpoint: $activationMessage');
     }
 
     // Save game progress
@@ -118,8 +117,8 @@ class Checkpoint extends Entity {
   void _saveProgress(Player player) {
     // Save manager integration will be implemented in future sprints
 
-    // For now we just print a message
-    print('Checkpoint: Saved progress at checkpoint $checkpointId');
+    // Log checkpoint save progress
+    logger.info('Checkpoint: Saved progress at checkpoint $checkpointId');
   }
 
   /// Update visuals based on activation state

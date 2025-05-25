@@ -55,11 +55,27 @@ This audio system specifically supports all three Design Pillars:
 
 ```dart
 // Main audio system manager
-class AudioSystem extends GameSystem {
+class AudioSystem extends BaseSystem {
   // Music management
   // Sound effect coordination
   // Audio mixing
   // Audio state tracking
+  
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Check if entity has an audio component
+    return entity.children.whereType<AudioComponent>().isNotEmpty;
+  }
+  
+  @override
+  void processEntity(Entity entity, double dt) {
+    // Update spatial audio for entities with audio components
+    final audioComponents = entity.children.whereType<AudioComponent>();
+    for (final audio in audioComponents) {
+      // Update listener position and sound properties
+      audio.updateListenerPosition(_listenerPosition);
+    }
+  }
 }
 
 // Music management

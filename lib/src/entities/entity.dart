@@ -30,16 +30,17 @@ abstract class Entity extends PositionComponent {
   bool _isActive = true;
   String _id = '';
   String _type = 'entity';
-
   @override
   Future<void> onLoad() async {
-    await super.onLoad(); // Create and add required components
+    await super.onLoad();
+
+    // Create and add required components
     transformComponent = TransformComponent();
     collision = CollisionComponent();
-    add(transformComponent);
-    add(collision);
+    await add(transformComponent);
+    await add(collision);
 
-    // Setup entity-specific components
+    // Setup entity-specific components after components are added
     await setupEntity();
   }
 

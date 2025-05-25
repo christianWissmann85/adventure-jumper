@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import '../utils/error_handler.dart';
+import '../utils/logger.dart';
 import 'progress_tracker.dart';
 import 'save_data.dart';
 import 'settings.dart';
@@ -65,14 +66,15 @@ class SaveManager {
       final File file = File(_settingsFile);
       if (await file.exists()) {
         final String jsonString = await file.readAsString();
-        final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        final Map<String, dynamic> jsonData =
+            json.decode(jsonString) as Map<String, dynamic>;
         _settings = Settings.fromJson(jsonData);
       } else {
         _settings = Settings(); // Create default settings
         await _saveSettings();
       }
     } catch (e) {
-      print('Error loading settings: $e');
+      logger.warning('Error loading settings', e);
       _settings = Settings(); // Fallback to default
     }
   }
@@ -101,7 +103,8 @@ class SaveManager {
         final File file = File('$_saveDirectory/$progressFileName');
         if (await file.exists()) {
           final String jsonString = await file.readAsString();
-          final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+          final Map<String, dynamic> jsonData =
+              json.decode(jsonString) as Map<String, dynamic>;
           return ProgressTracker.fromJson(jsonData);
         } else {
           final ProgressTracker newTracker = ProgressTracker();
@@ -148,7 +151,8 @@ class SaveManager {
         final File saveFile = File('$_saveDirectory/save_slot_$slot.json');
         if (await saveFile.exists()) {
           final String jsonString = await saveFile.readAsString();
-          final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+          final Map<String, dynamic> jsonData =
+              json.decode(jsonString) as Map<String, dynamic>;
           _currentSave = SaveData.fromJson(jsonData);
           _currentSlot = slot;
           _isDirty = false;
@@ -199,7 +203,7 @@ class SaveManager {
       }
       return false;
     } catch (e) {
-      print('Error saving game: $e');
+      logger.warning('Error saving game', e);
       return false;
     }
   }
@@ -213,7 +217,8 @@ class SaveManager {
       if (await saveFile.exists()) {
         try {
           final String jsonString = await saveFile.readAsString();
-          final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+          final Map<String, dynamic> jsonData =
+              json.decode(jsonString) as Map<String, dynamic>;
           final SaveData saveData = SaveData.fromJson(jsonData);
           slots.add(
             SaveSlotInfo(
@@ -246,7 +251,7 @@ class SaveManager {
       }
       return false;
     } catch (e) {
-      print('Error deleting save: $e');
+      logger.warning('Error deleting save', e);
       return false;
     }
   }
@@ -283,7 +288,7 @@ class SaveManager {
       }
       return null;
     } catch (e) {
-      print('Error exporting save: $e');
+      logger.warning('Error exporting save', e);
       return null;
     }
   }
@@ -292,7 +297,8 @@ class SaveManager {
   Future<bool> importSave(String jsonData, int slot) async {
     try {
       // Validate JSON data
-      final Map<String, dynamic> decodedData = json.decode(jsonData) as Map<String, dynamic>;
+      final Map<String, dynamic> decodedData =
+          json.decode(jsonData) as Map<String, dynamic>;
       final SaveData saveData = SaveData.fromJson(decodedData);
 
       // Use saveData for validation purposes
@@ -306,7 +312,7 @@ class SaveManager {
 
       return true;
     } catch (e) {
-      print('Error importing save: $e');
+      logger.warning('Error importing save', e);
       return false;
     }
   }

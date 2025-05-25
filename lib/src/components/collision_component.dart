@@ -10,12 +10,24 @@ class CollisionComponent extends Component with CollisionCallbacks {
     bool? isActive,
     bool? isOneWay,
     List<String>? collisionTags,
+    bool createTestHitbox = true,
   }) {
     if (hitboxSize != null) _hitboxSize = hitboxSize;
     if (hitboxOffset != null) _hitboxOffset = hitboxOffset;
     if (isActive != null) _isActive = isActive;
     if (isOneWay != null) _isOneWay = isOneWay;
     if (collisionTags != null) _collisionTags = collisionTags;
+
+    // Create a hitbox immediately for testing if needed
+    if (createTestHitbox &&
+        hitboxSize != null &&
+        hitboxSize != Vector2.zero()) {
+      _hitbox = RectangleHitbox(
+        size: _hitboxSize,
+        position: _hitboxOffset,
+        isSolid: !_isOneWay,
+      );
+    }
   }
 
   // Collision properties
@@ -24,9 +36,8 @@ class CollisionComponent extends Component with CollisionCallbacks {
   bool _isActive = true;
   bool _isOneWay = false;
   List<String> _collisionTags = <String>['default'];
-
   // Hitbox components
-  late ShapeHitbox _hitbox;
+  ShapeHitbox? _hitbox;
 
   @override
   Future<void> onLoad() async {
@@ -49,7 +60,7 @@ class CollisionComponent extends Component with CollisionCallbacks {
       );
 
       // Add hitbox to parent
-      parentComp.add(_hitbox);
+      parentComp.add(_hitbox!);
     }
   }
 
@@ -58,7 +69,7 @@ class CollisionComponent extends Component with CollisionCallbacks {
     super.update(dt);
 
     // Update collision active state
-    if (_hitbox.isMounted) {
+    if (_hitbox != null && _hitbox!.isMounted) {
       // Note: Flame collision components manage their own active state
       // We can check isActive instead of setting it
     }
@@ -67,7 +78,8 @@ class CollisionComponent extends Component with CollisionCallbacks {
   /// Set hitbox size
   void setHitboxSize(Vector2 size) {
     _hitboxSize = size.clone();
-    if (_hitbox.isMounted) {
+    // Only update hitbox if it has been initialized and mounted
+    if (_hitbox != null && _hitbox!.isMounted) {
       (_hitbox as RectangleHitbox).size = size;
     }
   }
@@ -75,15 +87,16 @@ class CollisionComponent extends Component with CollisionCallbacks {
   /// Set hitbox offset from parent position
   void setHitboxOffset(Vector2 offset) {
     _hitboxOffset = offset.clone();
-    if (_hitbox.isMounted) {
-      _hitbox.position = offset;
+    // Only update hitbox if it has been initialized and mounted
+    if (_hitbox != null && _hitbox!.isMounted) {
+      _hitbox!.position = offset;
     }
   }
 
   /// Set collision active state
   void setActive(bool active) {
     _isActive = active;
-    if (_hitbox.isMounted) {
+    if (_hitbox != null && _hitbox!.isMounted) {
       // Note: ShapeHitbox doesn't have an active setter in current Flame version
       // Active state is managed internally by the collision system
     }
@@ -113,5 +126,20 @@ class CollisionComponent extends Component with CollisionCallbacks {
   set isOneWay(bool value) => _isOneWay = value;
   bool get isOneWay => _isOneWay;
   List<String> get collisionTags => _collisionTags;
-  ShapeHitbox get hitbox => _hitbox;
+  ShapeHitbox get hitbox {
+    if (_hitbox == null) {
+      // Create a test hitbox if not initialized yet (for tests)
+      if (_hitboxSize != Vector2.zero()) {
+        _hitbox = RectangleHitbox(
+          size: _hitboxSize,
+          position: _hitboxOffset,
+          isSolid: !_isOneWay,
+        );
+      } else {
+        throw StateError('Hitbox accessed before initialization. '
+            'In tests, make sure to provide a hitboxSize.');
+      }
+    }
+    return _hitbox!;
+  }
 }

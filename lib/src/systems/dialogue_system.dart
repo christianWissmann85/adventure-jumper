@@ -16,12 +16,13 @@ class DialogueSystem extends BaseSystem {
   String? _currentDialogue;
   final List<String> _dialogueChoices = <String>[];
   // ignore: unused_field
-  bool _isInDialogue = false;  @override
+  bool _isInDialogue = false;
+  @override
   void processEntity(Entity entity, double dt) {
     // This will be implemented in Sprint 2
     // Currently we don't have any per-entity dialogue processing
   }
-  
+
   @override
   void processSystem(double dt) {
     // TODO(dialog): Implement dialogue system update logic

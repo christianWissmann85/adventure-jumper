@@ -36,9 +36,10 @@ This directory contains all technical design documentation for Adventure Jumper,
 ## Core Technical Documents
 
 - [Architecture](Architecture.md) - High-level architecture of the game systems
+- [Systems Reference](SystemsReference.md) - Detailed documentation of system classes
+- [Components Reference](ComponentsReference.md) - Reference for game object components
 - [Asset Pipeline](AssetPipeline.md) - Documentation for the asset creation workflow
 - [Level Format](LevelFormat.md) - Specification for level files
-- [Components Reference](ComponentsReference.md) - Reference for game object components
 - [Save Game Format](SaveGameFormat.md) - Specification for the save game system
 
 ## Technical Design Documents (TDDs)

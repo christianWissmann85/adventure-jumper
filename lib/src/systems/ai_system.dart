@@ -34,15 +34,12 @@ class AISystem extends BaseSystem {
       final Vector2 playerPosition = _playerEntity!.position.clone();
 
       // Sort entities by distance to player
-      final List<Entity> sortedEntities =
-          _getSortedEntitiesByDistance(playerPosition);
+      final List<Entity> sortedEntities = _getSortedEntitiesByDistance(playerPosition);
 
       // Limit number of fully processed AI entities
       if (sortedEntities.length > _maxActiveAIEntities) {
         // Process only the closest entities
-        for (int i = 0;
-            i < _maxActiveAIEntities && i < sortedEntities.length;
-            i++) {
+        for (int i = 0; i < _maxActiveAIEntities && i < sortedEntities.length; i++) {
           final Entity entity = sortedEntities[i];
           if (entity.isActive) {
             processEntity(entity, dt);
@@ -71,8 +68,7 @@ class AISystem extends BaseSystem {
   /// Process AI for a single entity
   void processEntityAI(Entity entity, double dt, Vector2 playerPosition) {
     // Find AI component on the entity
-    final Iterable<AIComponent> aiComponents =
-        entity.children.whereType<AIComponent>();
+    final Iterable<AIComponent> aiComponents = entity.children.whereType<AIComponent>();
     if (aiComponents.isEmpty) return;
 
     final AIComponent aiComponent = aiComponents.first;
@@ -82,8 +78,7 @@ class AISystem extends BaseSystem {
 
     // Set target if entity is an enemy and player is within detection range
     if (entity is Enemy) {
-      final bool isPlayerDetected =
-          distanceToPlayer <= aiComponent.detectionRange;
+      final bool isPlayerDetected = distanceToPlayer <= aiComponent.detectionRange;
       aiComponent.setTarget(playerPosition, isPlayerDetected);
     }
 

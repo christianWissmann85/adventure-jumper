@@ -1,17 +1,16 @@
+// filepath: c:\Users\User\source\repos\Cascade\adventure-jumper\lib\src\systems\combat_system.dart
 import 'package:flame/components.dart';
 
 import '../components/health_component.dart';
 import '../entities/enemy.dart';
 import '../entities/entity.dart';
 import '../player/player.dart';
-import 'system.dart';
+import 'base_system.dart';
 
 /// System that manages combat interactions between entities
 /// Handles damage calculation, hit detection, and combat effects
-class CombatSystem extends System {
-  CombatSystem() : super();
-  // Entities processed by this system
-  final List<Entity> _entities = <Entity>[];
+class CombatSystem extends BaseSystem {
+  CombatSystem();
 
   // Configuration
   final double _globalDamageMultiplier = 1;
@@ -23,20 +22,17 @@ class CombatSystem extends System {
 
   // Player reference
   Player? _playerEntity;
+
   @override
-  void update(double dt) {
-    if (!isActive) return;
-
-    // Process combat for each entity
-    for (final Entity entity in _entities) {
-      if (!entity.isActive) continue;
-
-      processEntityCombat(entity, dt);
-    }
+  bool canProcessEntity(Entity entity) {
+    // A combat entity should have a health component or be able to deal damage
+    return entity.children.whereType<HealthComponent>().isNotEmpty ||
+        entity is Player ||
+        entity is Enemy;
   }
 
-  /// Process combat for a single entity
-  void processEntityCombat(Entity entity, double dt) {
+  @override
+  void processEntity(Entity entity, double dt) {
     // Combat system mainly responds to events rather than per-frame updates
     // Most combat logic is triggered by collisions or explicit attack commands
   }
@@ -117,7 +113,7 @@ class CombatSystem extends System {
     final Vector2 attackPos = attackerPos + (direction * range / 2);
 
     // Check distance to each entity
-    for (final Entity entity in _entities) {
+    for (final Entity entity in entities) {
       if (entity == attacker || !entity.isActive) continue;
 
       // Check if entity is within range
@@ -167,15 +163,16 @@ class CombatSystem extends System {
     _enableCombatLog = enabled;
   }
 
-  /// Set system active state
-  void setActive(bool active) {
-    isActive = active;
+  /// Helper method for backward compatibility
+  @override
+  void registerEntity(Entity entity) {
+    addEntity(entity);
   }
 
-  /// Clear all entities
-  void clearEntities() {
-    _entities.clear();
-    _playerEntity = null;
+  /// Helper method for backward compatibility
+  @override
+  void unregisterEntity(Entity entity) {
+    removeEntity(entity);
   }
 
   /// Clear combat log
@@ -184,30 +181,25 @@ class CombatSystem extends System {
   }
 
   // Getters
-  int get entityCount => _entities.length;
   double get damageMultiplier => _globalDamageMultiplier;
   List<CombatEvent> get combatLog => List.unmodifiable(_combatLog);
   bool get combatLogEnabled => _enableCombatLog;
 
   @override
-  void initialize() {}
+  void initialize() {
+    // Initialize combat system
+  }
 
   @override
-  void dispose() {}
-
-  @override
-  void addEntity(Entity entity) {
-    if (!_entities.contains(entity)) {
-      _entities.add(entity);
-    } // Track player entity for special handling
+  void onEntityAdded(Entity entity) {
+    // Track player entity for special handling
     if (entity is Player && _playerEntity == null) {
       _playerEntity = entity;
     }
   }
 
   @override
-  void removeEntity(Entity entity) {
-    _entities.remove(entity);
+  void onEntityRemoved(Entity entity) {
     if (entity == _playerEntity) {
       _playerEntity = null;
     }

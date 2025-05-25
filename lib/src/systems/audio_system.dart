@@ -3,6 +3,7 @@ import 'package:flame_audio/flame_audio.dart';
 
 import '../components/audio_component.dart';
 import '../entities/entity.dart';
+import '../utils/logger.dart';
 import 'system.dart';
 
 /// System that manages sound triggering and audio management
@@ -68,7 +69,8 @@ class AudioSystem extends System {
     for (final Entity entity in _entities) {
       if (!entity.isActive) continue;
 
-      final Iterable<AudioComponent> audioComponents = entity.children.whereType<AudioComponent>();
+      final Iterable<AudioComponent> audioComponents =
+          entity.children.whereType<AudioComponent>();
       for (final AudioComponent audio in audioComponents) {
         // Update listener position for spatial audio
         audio.updateListenerPosition(_listenerPosition);
@@ -95,7 +97,7 @@ class AudioSystem extends System {
       }
     } catch (e) {
       // Handle audio errors
-      print('Error playing sound $soundId: $e');
+      logger.severe('Error playing sound $soundId', e);
     }
   }
 
@@ -124,7 +126,8 @@ class AudioSystem extends System {
     }
 
     // Calculate final volume
-    final double finalVolume = distanceVolume * (volume ?? 1.0) * _sfxVolume * _masterVolume;
+    final double finalVolume =
+        distanceVolume * (volume ?? 1.0) * _sfxVolume * _masterVolume;
 
     if (finalVolume <= 0.01) return;
 
@@ -164,7 +167,7 @@ class AudioSystem extends System {
       _currentMusicTrack = trackId;
     } catch (e) {
       // Handle audio errors
-      print('Error playing music $trackId: $e');
+      logger.severe('Error playing music $trackId', e);
     }
   }
 
@@ -179,11 +182,10 @@ class AudioSystem extends System {
       } else {
         FlameAudio.bgm.stop();
       }
-
       _currentMusicTrack = '';
     } catch (e) {
       // Handle audio errors
-      print('Error stopping music: $e');
+      logger.severe('Error stopping music', e);
     }
   }
 
@@ -198,7 +200,7 @@ class AudioSystem extends System {
       // Would also pause other audio channels
     } catch (e) {
       // Handle audio errors
-      print('Error pausing audio: $e');
+      logger.severe('Error pausing audio', e);
     }
   }
 
@@ -213,19 +215,18 @@ class AudioSystem extends System {
       // Would also resume other audio channels
     } catch (e) {
       // Handle audio errors
-      print('Error resuming audio: $e');
+      logger.severe('Error resuming audio', e);
     }
   }
 
   /// Preload a sound for later use
   Future<void> preloadSound(String soundId) async {
     if (_preloadedSounds.containsKey(soundId)) return;
-
     try {
       await FlameAudio.audioCache.load(soundId);
       _preloadedSounds[soundId] = true;
     } catch (e) {
-      print('Error preloading sound $soundId: $e');
+      logger.severe('Error preloading sound $soundId', e);
       _preloadedSounds[soundId] = false;
     }
   }
@@ -256,7 +257,7 @@ class AudioSystem extends System {
         FlameAudio.bgm.audioPlayer.setVolume(finalVolume);
       } catch (e) {
         // Handle audio errors
-        print('Error setting music volume: $e');
+        logger.severe('Error setting music volume', e);
       }
     }
   }

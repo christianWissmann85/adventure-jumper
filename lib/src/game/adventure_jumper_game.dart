@@ -16,8 +16,7 @@ import 'game_world.dart';
 
 /// Main game class for Adventure Jumper
 /// Handles overall game state, system coordination, and scene management
-class AdventureJumperGame extends FlameGame
-    with TapDetector, HasKeyboardHandlerComponents {
+class AdventureJumperGame extends FlameGame with TapDetector, HasKeyboardHandlerComponents {
   late GameWorld gameWorld;
   late GameCamera gameCamera;
   late InputSystem inputSystem;
@@ -58,13 +57,11 @@ class AdventureJumperGame extends FlameGame
     _logger.fine('Game camera initialized'); // Initialize game world
     gameWorld = GameWorld();
     add(gameWorld);
-    _logger.fine(
-        'Game world initialized'); // Register player with input system once world is loaded
+    _logger.fine('Game world initialized'); // Register player with input system once world is loaded
     await gameWorld.loaded;
     if (gameWorld.player != null) {
       inputSystem.setFocusedEntity(gameWorld.player!);
-      _logger.fine(
-          'Player registered with input system'); // Register player with movement system
+      _logger.fine('Player registered with input system'); // Register player with movement system
       movementSystem.addEntity(gameWorld.player!);
       _logger.fine('Player registered with movement system');
 
@@ -115,8 +112,7 @@ class AdventureJumperGame extends FlameGame
   }
 
   @override
-  KeyEventResult onKeyEvent(
-      KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     // Call parent method first
     super.onKeyEvent(event, keysPressed);
 
