@@ -9,6 +9,7 @@ Please review our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing. We 
 ## 🚀 How to Contribute
 
 ### Reporting Issues
+
 - Check if the issue already exists in the [issue tracker](https://github.com/your-username/adventure-jumper/issues)
 - Provide a clear title and description
 - Include steps to reproduce the issue
@@ -16,12 +17,14 @@ Please review our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing. We 
 - Specify your device and OS version
 
 ### Suggesting Enhancements
+
 - Open an issue with the "enhancement" label
 - Clearly describe the proposed feature or improvement
 - Explain why this would be valuable for the game
 - Include any relevant references or examples
 
 ### Making Code Changes
+
 1. **Fork** the repository and create your branch from `main`
    ```bash
    git checkout -b feature/amazing-feature
@@ -55,17 +58,20 @@ Please review our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing. We 
 ### Getting Started
 
 1. **Fork and clone** the repository
+
    ```bash
    git clone https://github.com/your-username/adventure-jumper.git
    cd adventure-jumper
    ```
 
 2. **Install dependencies**
+
    ```bash
    flutter pub get
    ```
 
 3. **Run the app**
+
    ```bash
    flutter run
    ```
@@ -84,6 +90,7 @@ We follow the [Dart Style Guide](https://dart.dev/guides/language/effective-dart
 - **Linting**: Run `flutter analyze` to check for issues
 
 ### Commit Message Format
+
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
 ```
@@ -95,6 +102,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 ```
 
 Example:
+
 ```
 feat(player): add double jump ability
 
@@ -106,6 +114,7 @@ Closes #123
 ```
 
 ### Pull Request Guidelines
+
 - Keep PRs focused on a single feature or bug fix
 - Update documentation as needed
 - Ensure all tests pass
@@ -114,6 +123,54 @@ Closes #123
 - Run `dart format .` before committing
 - Keep lines under 80 characters
 - Use meaningful variable and function names
+
+### Logging Standards
+
+Adventure Jumper uses structured logging. Please follow these guidelines when adding logging to your code:
+
+#### When to Use Different Logging Methods
+
+- **Avoid `print()`** - Only acceptable for CLI scripts and bootstrap logging
+- **Use `developer.log()`** - For temporary debugging during development (should be removed)
+- **Use `logger.*()`** - For persistent logging in production code
+
+#### Log Levels Guide
+
+| Level     | Method             | Usage                                        |
+| --------- | ------------------ | -------------------------------------------- |
+| `SEVERE`  | `logger.severe()`  | Critical errors affecting functionality      |
+| `WARNING` | `logger.warning()` | Potential problems that don't halt execution |
+| `INFO`    | `logger.info()`    | Significant events and operations            |
+| `FINE`    | `logger.fine()`    | Detailed debugging information               |
+
+#### Example Usage
+
+```dart
+import '../utils/logger.dart';
+
+class MyGameSystem {
+  void performOperation() {
+    logger.info('Starting operation');
+
+    try {
+      // Operation code
+      logger.fine('Operation completed successfully');
+    } catch (e, stackTrace) {
+      logger.severe('Operation failed', e, stackTrace);
+    }
+  }
+}
+```
+
+#### Security Considerations
+
+Never log sensitive information:
+
+- Passwords or authentication tokens
+- Personal user data
+- API keys or secrets
+
+For detailed logging guidelines, see [Logging Style Guide](docs/05_Style_Guides/LoggingStyle.md).
 
 ## Testing
 
