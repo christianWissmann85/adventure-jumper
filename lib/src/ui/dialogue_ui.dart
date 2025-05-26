@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
@@ -15,12 +13,41 @@ class DialogueEntry {
     required this.text,
     this.portraitSprite,
     this.choices,
+    this.dialogueId,
+    this.nextDialogueId,
+    this.displayDuration = 0.0,
+    this.useTypewriter = true,
+    this.pauseAfterPunctuation = true,
+    this.canSkip = true,
   });
 
   final String speakerName;
   final String text;
   final Sprite? portraitSprite;
   final List<String>? choices;
+  final String? dialogueId; // Unique identifier for this dialogue entry
+  final String? nextDialogueId; // ID of next dialogue in conversation tree
+  final double displayDuration; // Auto-advance timer (0 for manual)
+  final bool useTypewriter; // Whether to use typewriter effect
+  final bool pauseAfterPunctuation; // Pause after periods, commas, etc.
+  final bool canSkip; // Whether player can skip this dialogue
+}
+
+/// Dialogue navigation node for conversation trees
+class DialogueNode {
+  DialogueNode({
+    required this.id,
+    required this.entry,
+    this.nextNodeId,
+    this.choiceNodeIds,
+    this.conditions,
+  });
+
+  final String id;
+  final DialogueEntry entry;
+  final String? nextNodeId; // Default next node
+  final Map<String, String>? choiceNodeIds; // Choice text -> node ID mapping
+  final Map<String, dynamic>? conditions; // Conditions for showing this node
 }
 
 /// NPC conversation interface
@@ -30,20 +57,29 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     required this.game,
     required this.screenSize,
     this.dialogueSpeed = 0.03, // seconds per character
+    this.punctuationPause = 0.15, // pause after punctuation
     this.padding = 20.0,
     this.portraitSize = 100.0,
     this.dialogueBoxHeight = 150.0,
+    this.cornerRadius = 12.0,
+    this.borderWidth = 2.0,
     this.font,
+    this.showContinueIndicator = true,
+    this.enableSmoothAnimations = true,
   }) : super(position: Vector2.zero());
-
   // References
   final AdventureJumperGame game;
   final Vector2 screenSize;
   final double dialogueSpeed;
+  final double punctuationPause;
   final double padding;
   final double portraitSize;
   final double dialogueBoxHeight;
-  final TextStyle? font; // Active dialogue
+  final double cornerRadius;
+  final double borderWidth;
+  final TextStyle? font;
+  final bool showContinueIndicator;
+  final bool enableSmoothAnimations; // Active dialogue state
   NPC? _activeNPC;
   String _currentSpeakerName = '';
   String _currentDialogueText = '';
@@ -55,6 +91,20 @@ class DialogueUI extends PositionComponent with TapCallbacks {
   bool _isVisible = false;
   int _currentDialogueIndex = 0;
   List<DialogueEntry> _dialogueSequence = <DialogueEntry>[];
+
+  // Enhanced dialogue navigation
+  final Map<String, DialogueNode> _dialogueNodes = <String, DialogueNode>{};
+  String? _currentNodeId;
+
+  // Enhanced typewriter state
+  double _typewriterTimer = 0.0;
+  double _punctuationTimer = 0.0;
+  bool _pausingForPunctuation = false;
+
+  // Animation state
+  double _showAnimationProgress = 0.0;
+  bool _isAnimatingIn = false;
+  bool _isAnimatingOut = false;
 
   // UI Components
   late final RectangleComponent _dialogueBox;
@@ -87,12 +137,33 @@ class DialogueUI extends PositionComponent with TapCallbacks {
   void update(double dt) {
     super.update(dt);
 
-    if (_isTyping && _isVisible) {
-      _updateTypewriterEffect(dt);
+    // Handle show/hide animations
+    if (_isAnimatingIn) {
+      _showAnimationProgress += dt * 3.0; // Animation speed
+      if (_showAnimationProgress >= 1.0) {
+        _showAnimationProgress = 1.0;
+        _isAnimatingIn = false;
+      }
+      _updateUIVisibility();
+    } else if (_isAnimatingOut) {
+      _showAnimationProgress -= dt * 4.0; // Slightly faster hide animation
+      if (_showAnimationProgress <= 0.0) {
+        _showAnimationProgress = 0.0;
+        _isAnimatingOut = false;
+        _isVisible = false;
+      }
+      _updateUIVisibility();
+    }
+
+    if (_isTyping && _isVisible && !_isAnimatingIn && !_isAnimatingOut) {
+      _updateEnhancedTypewriterEffect(dt);
     }
 
     // Animate continue indicator
-    if (!_isTyping && _isVisible && _choiceButtons.isEmpty) {
+    if (!_isTyping &&
+        _isVisible &&
+        _currentChoices.isEmpty &&
+        showContinueIndicator) {
       _animateContinueIndicator(dt);
     }
   }
@@ -102,10 +173,67 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     _activeNPC = npc;
     _dialogueSequence = dialogueSequence;
     _currentDialogueIndex = 0;
+
+    // Check if dialogue sequence is empty
+    if (_dialogueSequence.isEmpty) {
+      print(
+          'Warning: Attempted to start dialogue with empty sequence for NPC: ${npc.runtimeType}');
+      return;
+    }
+
     _isVisible = true;
+    _isAnimatingIn = true;
+    _showAnimationProgress = 0.0;
 
     // Display first dialogue entry
     _showDialogueEntry(_dialogueSequence[_currentDialogueIndex]);
+  }
+
+  /// Start a dialogue using conversation tree nodes
+  void startDialogueFromNode(
+    NPC npc,
+    Map<String, DialogueNode> nodes,
+    String startNodeId,
+  ) {
+    _activeNPC = npc;
+    _dialogueNodes.clear();
+    _dialogueNodes.addAll(nodes);
+    _currentNodeId = startNodeId;
+
+    // Check if nodes map is empty or start node doesn't exist
+    if (_dialogueNodes.isEmpty) {
+      print(
+          'Warning: Attempted to start dialogue with empty nodes map for NPC: ${npc.runtimeType}');
+      return;
+    }
+
+    _isVisible = true;
+    _isAnimatingIn = true;
+    _showAnimationProgress = 0.0;
+
+    // Display the starting node
+    final DialogueNode? startNode = _dialogueNodes[startNodeId];
+    if (startNode != null) {
+      _showDialogueFromNode(startNode);
+    } else {
+      print(
+          'Warning: Start node "$startNodeId" not found for NPC: ${npc.runtimeType}');
+    }
+  }
+
+  /// Navigate to a specific dialogue node
+  void navigateToNode(String nodeId) {
+    final DialogueNode? node = _dialogueNodes[nodeId];
+    if (node != null) {
+      _currentNodeId = nodeId;
+      _showDialogueFromNode(node);
+    }
+  }
+
+  /// Display dialogue from a dialogue node
+  void _showDialogueFromNode(DialogueNode node) {
+    _currentNodeId = node.id;
+    _showDialogueEntry(node.entry);
   }
 
   /// Show the next dialogue entry or end the dialogue
@@ -118,16 +246,35 @@ class DialogueUI extends PositionComponent with TapCallbacks {
       return;
     }
 
-    _currentDialogueIndex++;
-
-    // Check if dialogue is complete
-    if (_currentDialogueIndex >= _dialogueSequence.length) {
-      _endDialogue();
-      return;
+    // Handle node-based dialogue navigation
+    if (_currentNodeId != null && _dialogueNodes.isNotEmpty) {
+      final DialogueNode? currentNode = _dialogueNodes[_currentNodeId];
+      if (currentNode != null) {
+        // If no choices and has next node, navigate to it
+        if (_currentChoices.isEmpty && currentNode.nextNodeId != null) {
+          navigateToNode(currentNode.nextNodeId!);
+          return;
+        }
+        // If no next node and no choices, end dialogue
+        else if (_currentChoices.isEmpty) {
+          _endDialogue();
+          return;
+        }
+      }
     }
+    // Handle traditional sequence-based dialogue
+    else {
+      _currentDialogueIndex++;
 
-    // Show next dialogue entry
-    _showDialogueEntry(_dialogueSequence[_currentDialogueIndex]);
+      // Check if dialogue is complete
+      if (_currentDialogueIndex >= _dialogueSequence.length) {
+        _endDialogue();
+        return;
+      }
+
+      // Show next dialogue entry
+      _showDialogueEntry(_dialogueSequence[_currentDialogueIndex]);
+    }
   }
 
   /// Display a dialogue entry (text, speaker, portrait, choices)
@@ -163,8 +310,15 @@ class DialogueUI extends PositionComponent with TapCallbacks {
 
   /// Close the dialogue UI
   void _endDialogue() {
-    _isVisible = false;
+    if (enableSmoothAnimations) {
+      _isAnimatingOut = true;
+    } else {
+      _isVisible = false;
+    }
+
     _activeNPC = null;
+    _dialogueNodes.clear();
+    _currentNodeId = null;
 
     // Call completion callback if set
     onDialogueComplete?.call();
@@ -181,6 +335,19 @@ class DialogueUI extends PositionComponent with TapCallbacks {
         ..color = const Color(0xCC000000)
         ..style = PaintingStyle.fill,
     );
+
+    // Add border if specified
+    if (borderWidth > 0) {
+      final RectangleComponent border = RectangleComponent(
+        size: Vector2(boxWidth, dialogueBoxHeight),
+        position: Vector2.zero(),
+        paint: Paint()
+          ..color = Colors.white.withOpacity(0.3)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = borderWidth,
+      );
+      _dialogueBox.add(border);
+    }
 
     add(_dialogueBox);
   }
@@ -286,24 +453,113 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     // Will be populated when choices are available
   }
 
-  /// Update the typewriter effect for displaying dialogue text
-  void _updateTypewriterEffect(double dt) {
+  /// Update the enhanced typewriter effect for displaying dialogue text
+  void _updateEnhancedTypewriterEffect(double dt) {
+    if (_pausingForPunctuation) {
+      _punctuationTimer -= dt;
+      if (_punctuationTimer <= 0.0) {
+        _pausingForPunctuation = false;
+      }
+      return;
+    }
+
     if (_displayedText.length < _currentDialogueText.length) {
-      // Calculate how many characters to add
-      final int charsToAdd = (dt / dialogueSpeed).floor();
-      final int nextIndex = math.min(
-        _displayedText.length + charsToAdd,
-        _currentDialogueText.length,
-      );
+      _typewriterTimer += dt;
 
-      _displayedText = _currentDialogueText.substring(0, nextIndex);
-      _dialogueText.text = _displayedText;
+      // Check if it's time to add the next character
+      if (_typewriterTimer >= dialogueSpeed) {
+        final int nextIndex = _displayedText.length + 1;
+        _displayedText = _currentDialogueText.substring(0, nextIndex);
+        _dialogueText.text = _displayedText;
+        _typewriterTimer = 0.0;
 
-      // Check if finished typing
-      if (_displayedText.length >= _currentDialogueText.length) {
-        _isTyping = false;
+        // Check for punctuation pause
+        if (nextIndex <= _currentDialogueText.length) {
+          final String currentChar = _currentDialogueText[nextIndex - 1];
+          if (_isPunctuation(currentChar) &&
+              getCurrentDialogueEntry()?.pauseAfterPunctuation == true) {
+            _pausingForPunctuation = true;
+            _punctuationTimer = punctuationPause;
+          }
+        }
+
+        // Check if finished typing
+        if (_displayedText.length >= _currentDialogueText.length) {
+          _isTyping = false;
+        }
       }
     }
+  }
+
+  /// Check if a character is punctuation that should trigger a pause
+  bool _isPunctuation(String char) {
+    return char == '.' ||
+        char == '!' ||
+        char == '?' ||
+        char == ',' ||
+        char == ';' ||
+        char == ':';
+  }
+
+  /// Get current dialogue entry safely
+  DialogueEntry? getCurrentDialogueEntry() {
+    if (_currentDialogueIndex >= 0 &&
+        _currentDialogueIndex < _dialogueSequence.length) {
+      return _dialogueSequence[_currentDialogueIndex];
+    }
+    return null;
+  }
+
+  /// Update UI visibility based on animation progress
+  void _updateUIVisibility() {
+    if (!enableSmoothAnimations) {
+      return;
+    }
+
+    final double alpha = _showAnimationProgress;
+    final double scaleValue = 0.8 + (0.2 * _showAnimationProgress);
+
+    // Apply alpha to all UI components
+    _dialogueBox.paint = Paint()
+      ..color = Color(0xCC000000).withOpacity(alpha * 0.8)
+      ..style = PaintingStyle.fill;
+
+    // Apply scale using Flame's scale property
+    scale = Vector2.all(scaleValue);
+
+    // Update text opacity
+    _updateTextOpacity(alpha);
+  }
+
+  /// Update text component opacity
+  void _updateTextOpacity(double alpha) {
+    // Update speaker name opacity
+    final TextPaint nameStyle = TextPaint(
+      style: font?.copyWith(
+            color: Colors.white.withOpacity(alpha),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ) ??
+          TextStyle(
+            color: Colors.white.withOpacity(alpha),
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+    );
+    _speakerNameText.textRenderer = nameStyle;
+
+    // Update dialogue text opacity
+    final TextPaint dialogueStyle = TextPaint(
+      style: font?.copyWith(
+            color: Colors.white.withOpacity(alpha),
+            fontSize: 16,
+          ) ??
+          TextStyle(
+            color: Colors.white.withOpacity(alpha),
+            fontSize: 16,
+          ),
+    );
+    _dialogueText.textRenderer = dialogueStyle;
   }
 
   /// Animate the continue indicator
@@ -336,13 +592,37 @@ class DialogueUI extends PositionComponent with TapCallbacks {
         onPressed: (int index) {
           _selectedChoice = index;
           onChoiceSelected?.call(index);
-          advanceDialogue();
+          _handleChoiceSelection(index);
         },
       );
 
       add(button);
       _choiceButtons.add(button);
     }
+  }
+
+  /// Handle choice selection for both node-based and sequence-based dialogues
+  void _handleChoiceSelection(int choiceIndex) {
+    if (choiceIndex < 0 || choiceIndex >= _currentChoices.length) {
+      return;
+    }
+
+    final String selectedChoice = _currentChoices[choiceIndex];
+
+    // Handle node-based dialogue choices
+    if (_currentNodeId != null && _dialogueNodes.isNotEmpty) {
+      final DialogueNode? currentNode = _dialogueNodes[_currentNodeId];
+      if (currentNode?.choiceNodeIds != null) {
+        final String? nextNodeId = currentNode!.choiceNodeIds![selectedChoice];
+        if (nextNodeId != null) {
+          navigateToNode(nextNodeId);
+          return;
+        }
+      }
+    }
+
+    // Default behavior for sequence-based dialogues
+    advanceDialogue();
   }
 
   /// Hide all choice buttons
@@ -384,7 +664,9 @@ class ChoiceButton extends PositionComponent with TapCallbacks {
   final TextStyle? textStyle;
 
   late final RectangleComponent _background;
+  late final RectangleComponent _border;
   late final TextComponent _textComponent;
+  bool _isHovered = false;
 
   @override
   Future<void> onLoad() async {
@@ -399,6 +681,17 @@ class ChoiceButton extends PositionComponent with TapCallbacks {
     );
 
     add(_background);
+
+    // Create button border
+    _border = RectangleComponent(
+      size: size,
+      paint: Paint()
+        ..color = Colors.white.withOpacity(0.2)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0,
+    );
+
+    add(_border);
 
     // Create text
     final TextPaint style = TextPaint(
@@ -419,8 +712,53 @@ class ChoiceButton extends PositionComponent with TapCallbacks {
     add(_textComponent);
   }
 
+  void _updateHoverState() {
+    if (_isHovered) {
+      _background.paint = Paint()
+        ..color = const Color(0xCC333333)
+        ..style = PaintingStyle.fill;
+
+      _border.paint = Paint()
+        ..color = Colors.white.withOpacity(0.5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+    } else {
+      _background.paint = Paint()
+        ..color = const Color(0xAA000000)
+        ..style = PaintingStyle.fill;
+
+      _border.paint = Paint()
+        ..color = Colors.white.withOpacity(0.2)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0;
+    }
+  }
+
   @override
   void onTapDown(TapDownEvent event) {
+    _isHovered = true;
+    _updateHoverState();
+
+    // Add a brief press animation
+    add(
+      ScaleEffect.to(
+        Vector2.all(0.95),
+        EffectController(duration: 0.1, reverseDuration: 0.1),
+      ),
+    );
+
     onPressed(index);
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    _isHovered = false;
+    _updateHoverState();
+  }
+
+  @override
+  void onTapCancel(TapCancelEvent event) {
+    _isHovered = false;
+    _updateHoverState();
   }
 }

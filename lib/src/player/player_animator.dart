@@ -41,34 +41,62 @@ class PlayerAnimator extends Component {
       // Use SpriteLoader's test environment detection
       if (_spriteLoader.isInTestEnvironment) {
         // In tests, always use placeholder sprites to avoid asset loading issues
+        print(
+            '[PlayerAnimator] Test environment detected, using placeholder sprites');
         await _createPlaceholderAnimations();
       } else {
         // In normal runtime, try to load actual animations, fall back to placeholders
+        print('[PlayerAnimator] Attempting to load actual sprite assets...');
+        bool actualAnimationsLoaded = false;
+
         try {
           await _loadActualAnimations();
-        } catch (_) {
-          // If asset loading fails, fall back to placeholder animations
+          actualAnimationsLoaded = true;
+          print('[PlayerAnimator] Successfully loaded actual sprite assets');
+        } catch (e, stackTrace) {
+          // Log the specific asset loading error but continue with fallback
+          print('[PlayerAnimator] Asset loading failed: $e');
+          print('[PlayerAnimator] Falling back to placeholder animations');
+        }
+
+        // If actual animations failed to load, use placeholders
+        if (!actualAnimationsLoaded) {
           await _createPlaceholderAnimations();
+          print('[PlayerAnimator] Placeholder animations created successfully');
         }
       }
 
       // Set initial animation to player
       if (player.sprite != null && _sprites.containsKey(AnimationState.idle)) {
         player.sprite!.setSprite(_sprites[AnimationState.idle]!);
+        print('[PlayerAnimator] Initial idle animation set on player');
+      } else {
+        print(
+            '[PlayerAnimator] Warning: Could not set initial animation - missing idle sprite or player sprite component');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       // If everything fails, log the error but don't crash
-      print('Failed to load player animations: $e');
+      print(
+          '[PlayerAnimator] Critical error in _loadPlaceholderAnimations: $e');
+      print('[PlayerAnimator] Stack trace: $stackTrace');
 
-      // Create minimal fallback sprite
-      final fallbackSprite = await PlayerPlaceholder.createPlaceholderSprite(
-        player.size.x,
-        player.size.y,
-      );
-      _sprites[AnimationState.idle] = fallbackSprite;
+      try {
+        // Create minimal fallback sprite as last resort
+        final fallbackSprite = await PlayerPlaceholder.createPlaceholderSprite(
+          player.size.x,
+          player.size.y,
+        );
+        _sprites[AnimationState.idle] = fallbackSprite;
 
-      if (player.sprite != null) {
-        player.sprite!.setSprite(fallbackSprite);
+        if (player.sprite != null) {
+          player.sprite!.setSprite(fallbackSprite);
+          print(
+              '[PlayerAnimator] Emergency fallback sprite created and applied');
+        }
+      } catch (fallbackError) {
+        print(
+            '[PlayerAnimator] FATAL: Even fallback sprite creation failed: $fallbackError');
+        // At this point, we've done everything we can - the component will continue without sprites
       }
     }
   }
@@ -125,23 +153,54 @@ class PlayerAnimator extends Component {
 
   /// Load actual animations from assets
   Future<void> _loadActualAnimations() async {
-    // Try to load actual sprites from asset files
-    _sprites[AnimationState.idle] =
-        await _spriteLoader.loadSprite('characters/player/player_idle.png');
-    _sprites[AnimationState.run] =
-        await _spriteLoader.loadSprite('characters/player/player_run.png');
-    _sprites[AnimationState.jump] =
-        await _spriteLoader.loadSprite('characters/player/player_jump.png');
-    _sprites[AnimationState.fall] =
-        await _spriteLoader.loadSprite('characters/player/player_fall.png');
-    _sprites[AnimationState.landing] =
-        await _spriteLoader.loadSprite('characters/player/player_landing.png');
-    _sprites[AnimationState.attack] =
-        await _spriteLoader.loadSprite('characters/player/player_attack.png');
-    _sprites[AnimationState.damaged] =
-        await _spriteLoader.loadSprite('characters/player/player_damaged.png');
-    _sprites[AnimationState.death] =
-        await _spriteLoader.loadSprite('characters/player/player_death.png');
+    // List of all sprites we need to load
+    final Map<AnimationState, String> spritePaths = {
+      AnimationState.idle: 'characters/player/player_idle.png',
+      AnimationState.run: 'characters/player/player_run.png',
+      AnimationState.jump: 'characters/player/player_jump.png',
+      AnimationState.fall: 'characters/player/player_fall.png',
+      AnimationState.landing: 'characters/player/player_landing.png',
+      AnimationState.attack: 'characters/player/player_attack.png',
+      AnimationState.damaged: 'characters/player/player_damaged.png',
+      AnimationState.death: 'characters/player/player_death.png',
+    };
+
+    int successCount = 0;
+    int failureCount = 0;
+
+    // Try to load each sprite individually
+    for (final entry in spritePaths.entries) {
+      final state = entry.key;
+      final path = entry.value;
+
+      try {
+        _sprites[state] = await _spriteLoader.loadSprite(path);
+        successCount++;
+        print('[PlayerAnimator] Successfully loaded sprite: $path');
+      } catch (e) {
+        failureCount++;
+        print('[PlayerAnimator] Failed to load sprite: $path - $e');
+
+        // Create a placeholder for this specific sprite
+        try {
+          _sprites[state] =
+              await _createAnimatedPlaceholder(32, 64, state.name);
+          print('[PlayerAnimator] Created placeholder for: ${state.name}');
+        } catch (placeholderError) {
+          print(
+              '[PlayerAnimator] Failed to create placeholder for ${state.name}: $placeholderError');
+        }
+      }
+    }
+
+    print(
+        '[PlayerAnimator] Asset loading summary: $successCount succeeded, $failureCount failed');
+
+    // If we failed to load any critical sprites, throw an error to trigger fallback
+    if (failureCount > 0) {
+      throw Exception(
+          'Failed to load $failureCount out of ${spritePaths.length} sprite assets');
+    }
 
     // TODO: Load actual sprite animations when asset files are available
   }
