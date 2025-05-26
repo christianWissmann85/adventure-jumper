@@ -1,0 +1,129 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+header p {
+    font-size: 0.9rem;
+}
+
+main {
+    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.sprint {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.sprint h2 {
+    color: #333;
+    border-bottom: 2px solid #5cb85c;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+
+.microversion {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+.microversion h3 {
+    color: #555;
+    margin-top: 0;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #e9ecef;
+    border-radius: .25rem;
+    margin-bottom: 10px;
+    height: 20px; /* Fixed height for consistency */
+    display: flex; /* Use flex to align text inside */
+    align-items: center; /* Center text vertically */
+}
+
+.progress-bar {
+    background-color: #5cb85c;
+    color: white;
+    text-align: center;
+    line-height: 20px; /* Match container height */
+    border-radius: .25rem;
+    white-space: nowrap; /* Prevent text wrapping */
+    padding: 0 5px; /* Add some padding for text */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.sprint-summary {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.sprint-summary .progress-bar {
+    background-color: #0275d8; /* Different color for sprint summary */
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    padding: 8px 0;
+    border-bottom: 1px dotted #eee;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+.task-complete {
+    color: #28a745; /* Green for complete */
+}
+
+.task-complete::before {
+    content: '\2714\00a0'; /* Checkmark */
+    color: #28a745;
+}
+
+.task-open {
+    color: #dc3545; /* Red for open */
+}
+
+.task-open::before {
+    content: '\25A2\00a0'; /* Open square */
+    color: #dc3545;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 30px;
+}

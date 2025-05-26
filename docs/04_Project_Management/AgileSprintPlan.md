@@ -45,8 +45,6 @@ This document breaks down the Adventure Jumper development into granular, tracka
 
 ## 🚀 Sprint Breakdown (Overall Timeline TBD - Initial Sprints First)
 
-## Epic 0: Foundation (Project Genesis & Core Systems)
-
 ### ✅ **Sprint 1 (Weeks 1-2): Foundation - "Project Genesis & Architectural Skeleton"**
 
 Version: v0.1.0
@@ -69,8 +67,7 @@ Version: v0.1.0
 ##### ✅ **v0.1.0.1 - Project Setup & Core Engine Integration** (Days 1-2)
 
 **Goal**: Create the project, integrate Flame, and get a blank screen running.
-
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T1.1**: Initialize Flutter project for Adventure Jumper.
   - **Effort**: 2 hours
@@ -97,7 +94,7 @@ Version: v0.1.0
 
 **Goal**: Create the complete directory structure and initial sparse files for all 11 core modules and 65+ classes based on the detailed specifications in `Architecture.md`.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T1.5**: **(NEW)** Review `02TechnicalDesign/Architecture.md` and create comprehensive checklist of all 11 modules and 65+ core classes to be scaffolded.
 
@@ -293,8 +290,7 @@ Version: v0.1.0
 ##### ✅ **v0.1.0.2b - Error Resolution & Stabilization** (Additional Tasks)
 
 **Goal**: Address remaining compilation errors in non-System modules to achieve overall project stability.
-
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T1.27**: **(NEW)** **ASSETS MODULE ERROR RESOLUTION** - Fix compilation errors in asset management system.
 
@@ -560,8 +556,7 @@ Version: v0.1.0
 ##### **v0.1.0.3 - Player Entity & Basic Input** (Days 5-7) (Renumbered, was v0.1.0.2)
 
 **Goal**: Create a visual player entity and allow basic keyboard input for movement, utilizing the scaffolded architecture from the 11 modules.
-
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T1.19**: Implement a basic `Player` entity (using `lib/player/player.dart`) extending the scaffolded `Entity` base class from `lib/entities/entity.dart`.
 
@@ -593,9 +588,7 @@ Version: v0.1.0
   - **✅ Completion Notes**: Successfully implemented keyboard input handling system. InputSystem captures keyboard events (arrow keys, WASD, spacebar) and maintains input state tracking. InputComponent is properly integrated with Player entity. PlayerController processes input actions and updates player velocity accordingly. Runtime testing confirmed that keyboard input chain works correctly: KeyEvent → InputSystem → InputComponent → PlayerController → Player movement. Debug output shows proper velocity changes (±200.0 for left/right movement, -400.0 for jump).
 
 - [x] **T1.21**: Apply movement to the player entity using scaffolded `MovementSystem` from `lib/systems/movementsystem.dart` and `TransformComponent` from `lib/components/transformcomponent.dart`. - **Effort**: 4 hours - **Assignee**: Gameplay Dev - **Dependencies**: T1.20, T1.11.1, T1.10.1 (scaffolded MovementSystem and TransformComponent) - **Acceptance Criteria**: Player sprite moves left and right on screen using the component-system architecture. - **Granular Steps:** - [x] **T1.21.1**: Implement velocity application in MovementSystem - [x] **T1.21.2**: Integrate TransformComponent position updates - [x] **T1.21.3**: Add movement speed configuration in Player class - [x] **T1.21.4**: Implement smooth movement interpolation - [x] **T1.21.5**: Test player movement responsiveness and smoothness - **✅ Completion Notes**: Successfully integrated MovementSystem with Player entity. MovementSystem now extends Component and implements System interface, allowing it to be added to the game. Player is registered with MovementSystem after world initialization. Velocity application works correctly - PlayerController sets velocity on PhysicsComponent, MovementSystem applies velocity to position via TransformComponent. Added gravity (800 px/s²) and basic ground collision at y=400. Movement system processes all registered entities each frame, applying velocity\*dt to position. Game successfully initializes both InputSystem and MovementSystem as confirmed by console output.
-
-##### Art Tasks:
-
+      **Art Tasks:**
 - [ ] **A1.1**: Create a simple placeholder 2D sprite for Kael (e.g., a colored rectangle or basic silhouette).
   - **Effort**: 2 hours
   - **Assignee**: Artist
@@ -605,8 +598,7 @@ Version: v0.1.0
 ##### **v0.1.0.4 - Test Environment & Basic Camera** (Days 8-9) (Renumbered, was v0.1.0.3)
 
 **Goal**: Create a minimal static environment for the player and a camera that follows them using the scaffolded world and components modules.
-
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T1.22**: Create a simple `Platform` entity using `lib/entities/platform.dart` and ground tile components from the scaffolded world module.
 
@@ -642,9 +634,7 @@ Version: v0.1.0
     - [x] **T1.23.6**: Implement collision resolution to prevent platform penetration
 
 - [x] **T1.24**: Implement a basic camera system using `GameCamera` from `lib/game/gamecamera.dart` that follows the player horizontally. - **Effort**: 5 hours - **Assignee**: Gameplay Dev - **Dependencies**: T1.19, T1.7.3 (scaffolded GameCamera) - **Acceptance Criteria**: GameCamera follows player movement smoothly within defined world bounds using the scaffolded camera architecture. - **Granular Steps:** - [x] **T1.24.1**: Implement camera position tracking of player entity - [x] **T1.24.2**: Add smooth camera interpolation (lerp) functionality - [x] **T1.24.3**: Implement camera boundary constraints - [x] **T1.24.4**: Add camera offset configuration for better viewing - [x] **T1.24.5**: Test camera follow behavior and smoothness - **✅ Completion Notes**: Successfully implemented camera system that follows player horizontally. GameCamera has proper tracking of player position through the follow() method. Smooth interpolation with lerp functionality is implemented in the update() method. Camera boundary constraints work through the setBounds() method with Rectangle(-100, -100, 1200, 800). Configuration includes responsive follow speed (set to 8.0). Testing confirms the camera smoothly follows the player with appropriate bounds clamping.
-
-##### Art Tasks:
-
+      **Art Tasks:**
 - [x] **A1.2**: Create a simple placeholder 2D sprite for a ground tile.
   - **Effort**: 1 hour
   - **Assignee**: Artist
@@ -655,8 +645,7 @@ Version: v0.1.0
 ##### **v0.1.0.5 - Sprint Review & Refinement** (Day 10) (Renumbered, was v0.1.0.4)
 
 **Goal**: Test all implemented features, fix critical bugs, document, and prepare for Sprint 2.
-
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T1.25**: Code review and basic refactoring of Sprint 1 features, including scaffolded architecture.
   - **Effort**: 4 hours
@@ -742,7 +731,7 @@ Version: v0.2.0
 
 **Goal**: Enhance the existing PhysicsSystem and implement core jump mechanics using the scaffolded architecture.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T2.1**: ✅ Enhance `PhysicsSystem` from `lib/systems/physicssystem.dart` with gravity, velocity, and acceleration handling.
 
@@ -787,11 +776,11 @@ Version: v0.2.0
     - [x] **T2.3.4**: ✅ Implement jump cut-off for variable jump height (key for "Fluid & Expressive Movement").
     - [x] **T2.3.5**: ✅ Test jump feel and adjust parameters for responsiveness, referencing `PlayerCharacter.TDD.md`.
 
-##### ✅ **v0.2.0.2 - Enhanced Collision & Platform Interactions** (Days 3-4)
+##### **v0.2.0.2 - Enhanced Collision & Platform Interactions** (Days 3-4)
 
 **Goal**: Improve collision detection for better platform interaction, landing detection, and edge detection.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [x] **T2.4**: ✅ Enhance collision detection in `PhysicsSystem` for improved platform interactions.
 
@@ -823,7 +812,7 @@ Version: v0.2.0
     - [x] **T2.5.5**: ✅ Test landing detection reliability across various platform types and approach angles.
 
 - [x] **T2.6**: ✅ Implement basic edge detection for platform awareness.
-  - **Effort**: 3 hours
+  - \*\*Eff
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T2.4, T2.5, `PlayerCharacter.TDD.md`
   - **Acceptance Criteria**: Player can detect platform edges, future-proofing for edge-specific mechanics (e.g., to support future mechanics like ledge grabs, teeter animations, or specific visual effects as outlined in `PlayerCharacter.TDD.md` or GDD).
@@ -834,273 +823,188 @@ Version: v0.2.0
     - [x] **T2.6.4**: ✅ Test edge detection accuracy for various platform shapes and player positions.
   - **✅ Completion Notes**: Successfully implemented comprehensive edge detection system for platform awareness. Created EdgeDetectionUtils class with detectPlatformEdges() method using raycasts for edge detection and calculateEdgeProximity() method for precise distance calculation. Added edge detection properties to PhysicsComponent (isNearLeftEdge, isNearRightEdge, edgeDetectionThreshold, edgeDistance). Integrated edge detection processing into PhysicsSystem with the processEdgeDetection() method. Added PlayerNearEdgeEvent and PlayerLeftEdgeEvent events to notify when player approaches or leaves platform edges. Added \updateEdgeDetection() method to PlayerController to track edge state changes. Created comprehensive test suite in edgedetectiontest.dart that verifies platform boundary detection, edge proximity calculation, and event firing. All tests are passing, confirming the system works correctly with various platform shapes and player positions.
 
-##### ✅ **v0.2.0.3 - Aether System Foundation & Player Stats** (Days 5-6) - **COMPLETED**
+##### **v0.2.0.3 - Aether System Foundation & Player Stats** (Days 5-6)
 
 **Goal**: Implement the foundation of the Aether system with resource tracking and basic PlayerStats functionality.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
-- [x] **T2.7**: ✅ Implement `PlayerStats` class from `lib/player/playerstats.dart` with Aether resource tracking.
+- [ ] **T2.7**: Implement `PlayerStats` class from `lib/player/playerstats.dart` with Aether resource tracking.
 
   - **Effort**: 5 hours
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T1.8.4 (scaffolded PlayerStats), `PlayerCharacter.TDD.md`, `AetherSystem.TDD.md`
   - **Acceptance Criteria**: PlayerStats tracks Aether count, health (data structure), and experience (foundation), provides getter/setter methods with validation, and includes an event system for stat changes.
-  - **✅ Completion Notes**: Successfully implemented comprehensive PlayerStats system with complete Aether resource tracking, health/energy/experience systems, ability unlock mechanics, and event system integration. Created extensive test suite with 43 unit tests covering initialization, stat management, progression system, ability unlocks, event system integration, and edge cases. All tests pass, confirming proper integration with Player entity and event system. PlayerStats includes full validation and bounds checking, stat change events through PlayerEventBus, and support for level-based progression with stat increases.
   - **Granular Steps:**
-    - [x] **T2.7.1**: ✅ Implement Aether resource with current/maximum values.
-    - [x] **T2.7.2**: ✅ Add health system with current/maximum HP. (Note: This task focuses on establishing the health data structure within `PlayerStats`. The functional aspects of taking damage and health regeneration/loss will be implemented in Sprint 5).
-    - [x] **T2.7.3**: ✅ Implement experience/level tracking foundation.
-    - [x] **T2.7.4**: ✅ Add stat change event system for UI updates and other system listeners.
-    - [x] **T2.7.5**: ✅ Implement stat validation and bounds checking (e.g., Aether cannot go below 0 or above max).
-    - [x] **T2.7.6**: ✅ Test PlayerStats integration with Player entity and event system.
+    - [ ] **T2.7.1**: Implement Aether resource with current/maximum values.
+    - [ ] **T2.7.2**: Add health system with current/maximum HP. (Note: This task focuses on establishing the health data structure within `PlayerStats`. The functional aspects of taking damage and health regeneration/loss will be implemented in Sprint 5).
+    - [ ] **T2.7.3**: Implement experience/level tracking foundation.
+    - [ ] **T2.7.4**: Add stat change event system for UI updates and other system listeners.
+    - [ ] **T2.7.5**: Implement stat validation and bounds checking (e.g., Aether cannot go below 0 or above max).
+    - [ ] **T2.7.6**: Test PlayerStats integration with Player entity and event system.
 
-- [x] **T2.8**: ✅ Create basic `AetherComponent` implementation in `lib/components/aethercomponent.dart`.
+- [ ] **T2.8**: Create basic `AetherComponent` implementation in `lib/components/aethercomponent.dart`.
 
   - **Effort**: 3 hours
   - **Assignee**: Systems Dev
   - **Dependencies**: T1.10.5 (scaffolded AetherComponent), T2.7, `AetherSystem.TDD.md`, `ComponentsReference.md`
   - **Acceptance Criteria**: AetherComponent stores entity-specific Aether data (capacity, current value, parameters for regeneration/consumption), and can be read by AetherSystem. Actual regeneration/consumption logic is deferred to Sprint 6.
-  - **✅ Completion Notes**: Successfully implemented comprehensive AetherComponent with complete energy management functionality including current/maximum Aether values, regeneration/consumption parameters, ability activation with cooldowns, and event system integration. Fixed component lifecycle issues (removed problematic onLoad method that was causing circular dependencies), corrected event reporting in addAether method to report actual change amounts, and created extensive integration test suite. All 153 tests are passing, confirming proper Player entity integration, component mounting, energy management, ability activation, cooldown tracking, and event firing. AetherComponent is fully functional within the Player entity with proper component lifecycle management and comprehensive test coverage.
   - **Granular Steps:**
-    - [x] **T2.8.1**: ✅ Implement Aether capacity and current Aether value properties in the component.
-    - [x] **T2.8.2**: ✅ Define properties in `AetherComponent` for regeneration rate and timing (values to be utilized by `AetherSystem` in Sprint 6).
-    - [x] **T2.8.3**: ✅ Define properties in `AetherComponent` for Aether consumption amounts (values to be utilized by `AetherSystem` in Sprint 6).
-    - [x] **T2.8.4**: ✅ Add component event triggers (or link to PlayerStats events) for UI updates if Aether values change directly in component (consider if PlayerStats is the sole source of truth for UI).
-    - [x] **T2.8.5**: ✅ Test AetherComponent with Player entity integration, ensuring data storage and retrieval.
+    - [ ] **T2.8.1**: Implement Aether capacity and current Aether value properties in the component.
+    - [ ] **T2.8.2**: Define properties in `AetherComponent` for regeneration rate and timing (values to be utilized by `AetherSystem` in Sprint 6).
+    - [ ] **T2.8.3**: Define properties in `AetherComponent` for Aether consumption amounts (values to be utilized by `AetherSystem` in Sprint 6).
+    - [ ] **T2.8.4**: Add component event triggers (or link to PlayerStats events) for UI updates if Aether values change directly in component (consider if PlayerStats is the sole source of truth for UI).
+    - [ ] **T2.8.5**: Test AetherComponent with Player entity integration, ensuring data storage and retrieval.
 
-- [x] **T2.9**: ✅ Enhance `AetherSystem` from `lib/systems/aethersystem.dart` for basic resource management.
+- [ ] **T2.9**: Enhance `AetherSystem` from `lib/systems/aethersystem.dart` for basic resource management.
   - **Effort**: 4 hours
   - **Assignee**: Systems Dev
   - **Dependencies**: T1.11.7 (scaffolded AetherSystem), T2.8, `AetherSystem.TDD.md`
   - **Acceptance Criteria**: AetherSystem can read Aether parameters from AetherComponent/PlayerStats, update Aether values based on external triggers (e.g., collectible pickup), and prepare for future regeneration/consumption logic from Sprint 6. System can modify Aether values in relevant components/stats.
-  - **✅ Completion Notes**: Successfully implemented comprehensive AetherSystem with basic resource management functionality. System can read regeneration parameters from AetherComponent and PlayerStats, process requests to add/consume/modify Aether values, handle capacity modifications, and broadcast system events. Fixed critical synchronization mechanism between PlayerStats and AetherComponent for Player entities - AetherSystem now properly syncs PlayerStats values to AetherComponent during processing to maintain data consistency. Created extensive test suite with 16 comprehensive tests covering parameter reading, Aether modification requests, capacity changes, event broadcasting, system integration, and configuration management. All 169 tests in the entire test suite are passing, confirming proper integration with existing systems and robust error handling.
   - **Granular Steps:**
-    - [x] **T2.9.1**: ✅ Ensure `AetherSystem` can read regeneration parameters from `AetherComponent` and PlayerStats. (Actual timed regeneration logic will be implemented in Sprint 6).
-    - [x] **T2.9.2**: ✅ Ensure `AetherSystem` can process requests to consume/add Aether (e.g., from collectibles this sprint or future abilities) by modifying values in `AetherComponent` / `PlayerStats`. (Actual ability-triggered consumption logic in Sprint 6).
-    - [x] **T2.9.3**: ✅ Implement Aether capacity modification handling (e.g., if an upgrade increases max Aether).
-    - [x] **T2.9.4**: ✅ Add system event broadcasting or ensure PlayerStats events are sufficient for stat changes triggered by the AetherSystem.
-    - [x] **T2.9.5**: ✅ Test AetherSystem's ability to read data and modify Aether values in PlayerStats/AetherComponent based on simulated external events (like picking up an Aether Shard).
+    - [ ] **T2.9.1**: Ensure `AetherSystem` can read regeneration parameters from `AetherComponent` and PlayerStats. (Actual timed regeneration logic will be implemented in Sprint 6).
+    - [ ] **T2.9.2**: Ensure `AetherSystem` can process requests to consume/add Aether (e.g., from collectibles this sprint or future abilities) by modifying values in `AetherComponent` / `PlayerStats`. (Actual ability-triggered consumption logic in Sprint 6).
+    - [ ] **T2.9.3**: Implement Aether capacity modification handling (e.g., if an upgrade increases max Aether).
+    - [ ] **T2.9.4**: Add system event broadcasting or ensure PlayerStats events are sufficient for stat changes triggered by the AetherSystem.
+    - [ ] **T2.9.5**: Test AetherSystem's ability to read data and modify Aether values in PlayerStats/AetherComponent based on simulated external events (like picking up an Aether Shard).
 
 ##### **v0.2.0.4 - Collectibles & Basic UI Elements** (Days 7-8)
 
 **Goal**: Implement the first collectible type (Aether Shard) and basic HUD elements to display Aether count.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
-- [x] **T2.10**: ✅ Implement `AetherShard` collectible using `lib/entities/collectible.dart` base class.
+- [ ] **T2.10**: Implement `AetherShard` collectible using `lib/entities/collectible.dart` base class.
 
   - **Effort**: 5 hours
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T1.9.4 (scaffolded Collectible), T2.7 (PlayerStats for Aether value), A2.1 (Aether Shard sprite)
   - **Acceptance Criteria**: AetherShard entities can be placed in world, detected by player collision, trigger pickup events.
   - **Granular Steps:**
-    - [x] **T2.10.1**: ✅ Create AetherShard class extending Collectible base.
-    - [x] **T2.10.2**: ✅ Add AetherShard sprite rendering with SpriteComponent.
-    - [x] **T2.10.3**: ✅ Implement collision detection for player interaction.
-    - [x] **T2.10.4**: ✅ Add pickup animation and visual feedback (placeholder if full animation not ready).
-    - [x] **T2.10.5**: ✅ Implement Aether value assignment to AetherShard (e.g., how much Aether it gives).
-    - [x] **T2.10.6**: ✅ Test AetherShard placement and pickup mechanics.
+    - [ ] **T2.10.1**: Create AetherShard class extending Collectible base.
+    - [ ] **T2.10.2**: Add AetherShard sprite rendering with SpriteComponent.
+    - [ ] **T2.10.3**: Implement collision detection for player interaction.
+    - [ ] **T2.10.4**: Add pickup animation and visual feedback (placeholder if full animation not ready).
+    - [ ] **T2.10.5**: Implement Aether value assignment to AetherShard (e.g., how much Aether it gives).
+    - [ ] **T2.10.6**: Test AetherShard placement and pickup mechanics.
 
-- [x] **T2.11**: ✅ Implement pickup mechanics and PlayerStats integration.
+- [ ] **T2.11**: Implement pickup mechanics and PlayerStats integration.
 
   - **Effort**: 4 hours
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T2.10, T2.7 (PlayerStats), T1.11.2 (scaffolded PhysicsSystem for collision events)
   - **Acceptance Criteria**: Player collision with AetherShard increases Aether count in PlayerStats, collectible is removed from world.
   - **Granular Steps:**
-    - [x] **T2.11.1**: ✅ Add collision event handling in PhysicsSystem or Player for collectible pickup.
-    - [x] **T2.11.2**: ✅ Implement PlayerStats update (Aether increase) when AetherShard collected.
-    - [x] **T2.11.3**: ✅ Add collectible destruction or deactivation after pickup.
-    - [x] **T2.11.4**: ✅ Implement pickup sound trigger (placeholder, actual sound in later audio sprint).
-    - [x] **T2.11.5**: ✅ Test pickup mechanics and PlayerStats updates thoroughly.
+    - [ ] **T2.11.1**: Add collision event handling in PhysicsSystem or Player for collectible pickup.
+    - [ ] **T2.11.2**: Implement PlayerStats update (Aether increase) when AetherShard collected.
+    - [ ] **T2.11.3**: Add collectible destruction or deactivation after pickup.
+    - [ ] **T2.11.4**: Implement pickup sound trigger (placeholder, actual sound in later audio sprint).
+    - [ ] **T2.11.5**: Test pickup mechanics and PlayerStats updates thoroughly.
 
-- [x] **T2.12**: ✅ Create basic Aether HUD element using `lib/ui/gamehud.dart`.
+- [ ] **T2.12**: Create basic Aether HUD element using `lib/ui/gamehud.dart`.
   - **Effort**: 4 hours
   - **Assignee**: UI Dev
   - **Dependencies**: T1.13.1 (scaffolded GameHUD), T2.7 (PlayerStats for Aether count & events), `UISystem.TDD.md` (for design guidance), A2.2 (HUD Mockup)
   - **Acceptance Criteria**: GameHUD displays current Aether count from PlayerStats, updates in real-time when Aether changes, positioned appropriately on screen as per `UISystem.TDD.md` and mockup.
-  - **✅ Completion Notes**: Successfully implemented Aether HUD element with dynamic display of current Aether count and maximum. Enhanced AetherBar component with text display showing "AETHER" label and current/max values next to the progress bar. Added proper event listening using PlayerEventBus to update the HUD when Aether values change. Implemented smooth animations with \_displayedAether property that transitions gradually for better visual feedback. Fixed event handling to properly subscribe/unsubscribe from PlayerEventBus. The HUD now correctly updates in real-time when Aether changes either through direct updates or via the event system.
   - **Granular Steps:**
-    - [x] **T2.12.1**: ✅ Implement HUD layout based on A2.2 mockup and `UISystem.TDD.md` specifications.
-    - [x] **T2.12.2**: ✅ Implement text display for Aether count.
-    - [x] **T2.12.3**: ✅ Add event listening for PlayerStats Aether changes (from T2.7.4).
-    - [x] **T2.12.4**: ✅ Implement basic HUD update animations for value changes (e.g., fade in/out, subtle pulse).
-    - [x] **T2.12.5**: ✅ Test HUD responsiveness, accuracy, and visual alignment with design.
+    - [ ] **T2.12.1**: Implement HUD layout based on A2.2 mockup and `UISystem.TDD.md` specifications.
+    - [ ] **T2.12.2**: Implement text display for Aether count.
+    - [ ] **T2.12.3**: Add event listening for PlayerStats Aether changes (from T2.7.4).
+    - [ ] **T2.12.4**: Implement basic HUD update animations for value changes (e.g., fade in/out, subtle pulse).
+    - [ ] **T2.12.5**: Test HUD responsiveness, accuracy, and visual alignment with design.
 
-##### Art Tasks:
+**Art Tasks:**
 
-#### Core Player Character Assets
-
-- [ ] **A2.1**: Create Player Idle animation sprite (`character_player_idle.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: [Art Style Guide](../../05_Style_Guides/ArtStyle.md)
-  - **Acceptance Criteria**: 32x32 pixel sprite with 6 frames, seamless idle animation at 8-12 FPS
-
-- [ ] **A2.2**: Create Player Run animation sprite (`character_player_run.png`)
-
-  - **Effort**: 6 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A2.1
-  - **Acceptance Criteria**: 32x32 pixel sprite with 8 frames, fluid running motion at 8-12 FPS
-
-- [ ] **A2.3**: Create Player Jump animation sprite (`character_player_jump.png`)
-
-  - **Effort**: 3 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A2.1
-  - **Acceptance Criteria**: 32x32 pixel sprite with 3 frames, launch-to-air transition
-
-- [ ] **A2.4**: Create Player Fall animation sprite (`character_player_fall.png`)
+- [ ] **A2.1**: Create placeholder sprite for Aether Shard collectible.
 
   - **Effort**: 2 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A2.3
-  - **Acceptance Criteria**: 32x32 pixel sprite with 2 frames, mid-air falling state
+  - **Assignee**: Artist
+  - **Dependencies**: None
+  - **Acceptance Criteria**: Visually distinct collectible sprite (e.g., PNG) that clearly represents Aether energy, appropriate size for game scale.
 
-- [ ] **A2.5**: Create Player Land animation sprite (`character_player_land.png`)
-  - **Effort**: 3 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A2.4
-  - **Acceptance Criteria**: 32x32 pixel sprite with 3 frames, impact-to-idle transition
-
-#### Core Collectibles
-
-- [ ] **A2.6**: Create Aether Shard collectible sprite (`collectible_aether_shard.png`)
-  - **Effort**: 3 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: [Luminara Concept Art](../../01_Game_Design/Asset_Design/LuminaraConceptArt.md)
-  - **Acceptance Criteria**: 16x16 pixel sprite with 8 frames, pulsing crystal animation
-
-#### Core Visual Effects
-
-- [ ] **A2.7**: Create Aether Pickup effect (`effect_aether_pickup.png`)
-  - **Effort**: 4 hours
-  - **Assignee**: VFX Artist
-  - **Dependencies**: A2.6
-  - **Acceptance Criteria**: 32x32 pixel effect with 12 frames, sparkle dissolution animation
-
-#### Core HUD Elements
-
-- [ ] **A2.8**: Create Health Bar Frame (`ui_health_bar_frame.png`)
-
-  - **Effort**: 2 hours
-  - **Assignee**: UI Artist
-  - **Dependencies**: [Art Style Guide](../../05_Style_Guides/ArtStyle.md)
-  - **Acceptance Criteria**: 120x16 pixel frame, crystalline aesthetic
-
-- [ ] **A2.9**: Create Health Bar Fill (`ui_health_bar_fill.png`)
-
+- [ ] **A2.2**: Create basic HUD mockup design for Aether display.
   - **Effort**: 1 hour
   - **Assignee**: UI Artist
-  - **Dependencies**: A2.8
-  - **Acceptance Criteria**: 112x8 pixel fill, gradient from azure to teal
-
-- [ ] **A2.10**: Create Aether Counter Frame (`ui_aether_counter_frame.png`)
-
-  - **Effort**: 2 hours
-  - **Assignee**: UI Artist
-  - **Dependencies**: A2.8
-  - **Acceptance Criteria**: 80x24 pixel frame, matches health bar style
-
-- [ ] **A2.11**: Create Aether Counter Icon (`ui_aether_counter_icon.png`)
-  - **Effort**: 1 hour
-  - **Assignee**: UI Artist
-  - **Dependencies**: A2.10
-  - **Acceptance Criteria**: 16x16 pixel icon, miniature Aether Shard representation
-
-#### Documentation Updates
-
-- [ ] **A2.12**: Update Asset Manifest with Sprint 2 completion status
-  - **Effort**: 1 hour
-  - **Assignee**: Lead Artist
-  - **Dependencies**: All Sprint 2 art tasks
-  - **Acceptance Criteria**: All Sprint 2 assets marked as completed in [Asset Manifest](../../01_Game_Design/Asset_Design/AssetManifest.md)
+  - **Dependencies**: None
+  - **Acceptance Criteria**: Clean, readable design (e.g., image file or wireframe) that fits game aesthetic (as per `UISystem.TDD.md` if available, or general style guide), shows Aether count clearly.
 
 ##### **v0.2.0.5 - Physics Polish & Testing** (Days 9-10)
 
 **Goal**: Polish player physics feel, conduct comprehensive testing, and prepare for Sprint 3.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
-- [x] **T2.13**: ✅ Polish player movement physics for improved game feel.
+- [ ] **T2.13**: Polish player movement physics for improved game feel.
 
   - **Effort**: 5 hours
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T2.1, T2.3, T2.4, `PlayerCharacter.TDD.md`
   - **Acceptance Criteria**: Player movement feels responsive and satisfying, jump height and timing are well-tuned, landing feels natural. Aligns with "Fluid & Expressive Movement" pillar.
-  - **✅ Completion Notes**: Successfully polished player movement physics for optimal game feel. Enhanced gravity and jump force values for responsive movement (T2.13.1). Optimized horizontal movement acceleration and deceleration for fluid control (T2.13.2). Implemented enhanced air control for mid-jump movement adjustments with momentum preservation (T2.13.3). Added comprehensive movement smoothing system with velocity interpolation and input buffering to prevent jittery motion (T2.13.4). Completed comprehensive testing across platform layouts with performance validation - adjusted responsiveness target from sub-2-frame (33ms) to 4-frame (67ms) window at 60fps to align with actual GameConfig values while maintaining excellent gameplay feel (T2.13.5). All movement polish tests now passing successfully.
   - **Granular Steps:**
-    - [x] **T2.13.1**: ✅ Fine-tune gravity and jump force values for optimal feel based on `PlayerCharacter.TDD.md`.
-    - [x] **T2.13.2**: ✅ Adjust horizontal movement acceleration and deceleration.
-    - [x] **T2.13.3**: ✅ Implement air control for mid-jump movement adjustments.
-    - [x] **T2.13.4**: ✅ Add movement smoothing (e.g., by refining force application, ensuring consistent physics updates, or basic interpolation if necessary) to prevent jittery motion.
-    - [x] **T2.13.5**: ✅ Test movement feel across different platform layouts and against `PlayerCharacter.TDD.md` game feel descriptions.
+    - [ ] **T2.13.1**: Fine-tune gravity and jump force values for optimal feel based on `PlayerCharacter.TDD.md`.
+    - [ ] **T2.13.2**: Adjust horizontal movement acceleration and deceleration.
+    - [ ] **T2.13.3**: Implement air control for mid-jump movement adjustments.
+    - [ ] **T2.13.4**: Add movement smoothing (e.g., by refining force application, ensuring consistent physics updates, or basic interpolation if necessary) to prevent jittery motion.
+    - [ ] **T2.13.5**: Test movement feel across different platform layouts and against `PlayerCharacter.TDD.md` game feel descriptions.
 
-- [x] **T2.14**: ✅ Implement basic animation states for player actions.
+- [ ] **T2.14**: Implement basic animation states for player actions.
 
   - **Effort**: 4 hours
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T1.8.3 (scaffolded PlayerAnimator), T2.3, T2.5, A2.3 (placeholder animation frames for Kael)
   - **Acceptance Criteria**: PlayerAnimator manages basic states (idle, walking, jumping, falling, landing), integrates with player state changes. Placeholder visuals clearly differentiate states.
-  - **✅ Completion Notes**: Successfully implemented comprehensive PlayerAnimator system with complete animation state management including idle, run, jump, fall, landing, attack, damaged, and death states. Fixed critical animation state transition issues in player_animator_test.dart by adding controller.update() calls to sync the jump state machine with physics changes. Correctly implemented animation state detection from player controller's jump state machine. Added placeholder animations with visual differentiation between states and smooth transitions. All tests pass with proper animation state transitions verified for all movement scenarios including ground-based actions, airborne transitions, and landing detection.
   - **Granular Steps:**
-    - [x] **T2.14.1**: ✅ Define animation state enum (idle, walk, jump, fall, land) in `PlayerAnimator`.
-    - [x] **T2.14.2**: ✅ Implement state transition logic in PlayerAnimator based on player's physics state.
-    - [x] **T2.14.3**: ✅ Connect player physics state (from T2.3.2, T2.5) to animation state changes.
-    - [x] **T2.14.4**: ✅ Integrate placeholder animation frames (from A2.3) for each state.
-    - [x] **T2.14.5**: ✅ Test animation state transitions and timing are accurate with player actions.
+    - [ ] **T2.14.1**: Define animation state enum (idle, walk, jump, fall, land) in `PlayerAnimator`.
+    - [ ] **T2.14.2**: Implement state transition logic in PlayerAnimator based on player's physics state.
+    - [ ] **T2.14.3**: Connect player physics state (from T2.3.2, T2.5) to animation state changes.
+    - [ ] **T2.14.4**: Integrate placeholder animation frames (from A2.3) for each state.
+    - [ ] **T2.14.5**: Test animation state transitions and timing are accurate with player actions.
 
-- [x] **T2.15**: ✅ Code review and refactoring of Sprint 2 implementations.
+- [ ] **T2.15**: Code review and refactoring of Sprint 2 implementations.
 
   - **Effort**: 3 hours
   - **Assignee**: Dev Team
   - **Dependencies**: All Sprint 2 technical tasks
   - **Acceptance Criteria**: Code follows established patterns, proper error handling, performance considerations addressed.
-  - **✅ Completion Notes**: Completed full review and refactoring of Sprint 2 implementations. Fixed compilation errors in PhysicsSystem class by resolving method name inconsistencies, adding proper implementation of BaseFlameSystem methods, and removing duplicate code. Verified proper performance monitoring via frame time tracking and confirmed O(n²) collision detection with an optimized spatial partitioning option available. Comprehensive documentation was added to all systems, including architecture overviews, performance considerations, integration patterns, and usage examples. All 199 tests are now passing.
   - **Granular Steps:**
-    - [x] **T2.15.1**: ✅ Review physics system performance and accuracy.
-    - [x] **T2.15.2**: ✅ Validate component-system integration patterns for new mechanics.
-    - [x] **T2.15.3**: ✅ Check for proper null safety and error handling in new code.
-    - [x] **T2.15.4**: ✅ Refactor any duplicate code patterns identified.
-    - [x] **T2.15.5**: ✅ Ensure new systems are documented sufficiently for T2.16.
+    - [ ] **T2.15.1**: Review physics system performance and accuracy.
+    - [ ] **T2.15.2**: Validate component-system integration patterns for new mechanics.
+    - [ ] **T2.15.3**: Check for proper null safety and error handling in new code.
+    - [ ] **T2.15.4**: Refactor any duplicate code patterns identified.
+    - [ ] **T2.15.5**: Ensure new systems are documented sufficiently for T2.16.
 
-- [x] **T2.16**: ✅ Documentation update for Sprint 2 implementations.
+- [ ] **T2.16**: Documentation update for Sprint 2 implementations.
   - **Effort**: 2 hours
   - **Assignee**: Dev Team
-  - **Dependencies**: ✅ T2.15 (Completed)
+  - **Dependencies**: T2.15
   - **Acceptance Criteria**: All new classes and methods documented, architecture changes noted, Sprint 3 preparation notes added. Relevant TDDs updated.
-  - **✅ Completion Notes**: Successfully completed comprehensive documentation update for Sprint 2 implementations. Updated all relevant Technical Design Documents with implementation details, API changes, and architectural decisions. Enhanced ComponentsReference.md with new component capabilities. Created detailed Sprint 3 dependency analysis and preparation notes. All new systems are properly documented with code comments, usage examples, and integration patterns.
   - **Granular Steps:**
-    - [x] **T2.16.1**: ✅ Document PhysicsSystem enhancements and API changes.
-    - [x] **T2.16.2**: ✅ Add PlayerStats and AetherSystem foundational documentation.
-    - [x] **T2.16.3**: ✅ Document collectible system architecture and AetherShard implementation.
-    - [x] **T2.16.4**: ✅ Update HUD implementation notes and PlayerStats event integration.
-    - [x] **T2.16.5**: ✅ Create Sprint 3 dependency notes and identify any carry-over tasks.
-    - [x] **T2.16.6**: ✅ Update relevant TDDs (`PlayerCharacter.TDD.md`, `GravitySystem.TDD.md`, `AetherSystem.TDD.md`) and `ComponentsReference.md` with any design clarifications, decisions, or minor deviations made during implementation.
+    - [ ] **T2.16.1**: Document PhysicsSystem enhancements and API changes.
+    - [ ] **T2.16.2**: Add PlayerStats and AetherSystem foundational documentation.
+    - [ ] **T2.16.3**: Document collectible system architecture and AetherShard implementation.
+    - [ ] **T2.16.4**: Update HUD implementation notes and PlayerStats event integration.
+    - [ ] **T2.16.5**: Create Sprint 3 dependency notes and identify any carry-over tasks.
+    - [ ] **T2.16.6 (NEW)**: Update relevant TDDs (`PlayerCharacter.TDD.md`, `GravitySystem.TDD.md`, `AetherSystem.TDD.md`) and `ComponentsReference.md` with any design clarifications, decisions, or minor deviations made during implementation.
 
 **Art Tasks (Placeholder - assuming A2.3 was added in v0.2.0.4):**
 (No new art tasks specific to v0.2.0.5, but T2.14 depends on A2.3 from v0.2.0.4)
 
 **Testing Tasks:**
 
-- [x] **QA2.1**: ✅ Comprehensive Sprint 2 feature testing.
+- [ ] **QA2.1**: Comprehensive Sprint 2 feature testing.
   - **Effort**: 6 hours
-  - **✅ Completion Notes**: Successfully completed comprehensive physics and controller testing. All physics enhancement tests, player control tests, and physics/controller integration tests are now passing. Fixed critical physics system issues including ground state logic, gravity application, collision detection, controller input state management, movement direction changes, and jump buffering mechanisms. Validated physics improvements through rigorous testing with all 176 tests passing including previously failing asset loading tests. Physics system now correctly handles gravity when entities are on ground, friction-based stopping, collision with ground, and all controller input scenarios including key state changes, input state resets, and physics change translations. Jump buffering system properly handles players in air scenarios and executes buffered jumps when landing. **UPDATE (May 25, 2025)**: Asset loading test failures have been completely resolved - fixed SpriteLoader compilation issues, improved test environment detection in PlayerAnimator, corrected test file syntax errors, and replaced direct game.update() calls with proper tester.pump() async patterns. All end-to-end gameplay tests now pass successfully.
   - **Assignee**: QA/Dev Team
   - **Dependencies**: All Sprint 2 tasks
   - **Acceptance Criteria**: All Sprint 2 features work as specified, integration issues identified, performance acceptable.
   - **Granular Steps:**
     - [ ] **QA2.1.1**: Test jump mechanics (height, timing, responsiveness, variable jump, coyote time).
     - [ ] **QA2.1.2**: Test platform landing and collision accuracy (edges, surfaces, no penetration).
-    - [x] **QA2.1.3**: Test Aether Shard pickup and PlayerStats Aether tracking.
-    - [x] **QA2.1.4**: Test HUD updates for Aether count and accuracy.
-    - [x] **QA2.1.5**: Test edge cases (platform edges, rapid inputs, multiple collectibles).
-    - [x] **QA2.1.6**: Performance test with new physics systems and collectibles.
-    - [x] **QA2.1.7**: Integration test with Sprint 1 features (basic movement, camera).
-    - [x] **QA2.1.8**: Document bugs and create issue list for Sprint 3, and review against Sprint 2 Design Cohesion Checklist.
+    - [ ] **QA2.1.3**: Test Aether Shard pickup and PlayerStats Aether tracking.
+    - [ ] **QA2.1.4**: Test HUD updates for Aether count and accuracy.
+    - [ ] **QA2.1.5**: Test edge cases (platform edges, rapid inputs, multiple collectibles).
+    - [ ] **QA2.1.6**: Performance test with new physics systems and collectibles.
+    - [ ] **QA2.1.7**: Integration test with Sprint 1 features (basic movement, camera).
+    - [ ] **QA2.1.8**: Document bugs and create issue list for Sprint 3, and review against Sprint 2 Design Cohesion Checklist.
 
 #### 🏆 Sprint Success Criteria
 
@@ -1159,56 +1063,6 @@ Version: v0.2.0
 - **Animation**:
   - Placeholder animation states (idle, walk, jump, fall, land) trigger correctly and consistently with player actions (95% accuracy during observation).
 
----
-
-## ✅ **Sprint 2 Completion Summary & Analysis**
-
-**🎯 Sprint Goal Achievement: ✅ COMPLETED**
-
-Sprint 2 "Core Player Mechanics - First Leap" has been successfully completed with all major deliverables implemented and tested. The sprint achieved its primary objective of building upon the scaffolded architecture from Sprint 1 to implement Kael's core jump mechanic with physics-based movement, gravity, and landing mechanics.
-
-### **🏆 Key Achievements:**
-
-- **✅ Physics-Based Movement System**: Enhanced PhysicsSystem with comprehensive gravity, velocity, acceleration handling, and terminal velocity constraints
-- **✅ Jump Mechanics**: Complete single jump implementation with variable height, jump cut-off, air control, and coyote time
-- **✅ Platform Interaction**: Robust landing detection, edge detection, and collision response system
-- **✅ Aether System Foundation**: Comprehensive AetherComponent, PlayerStats, and AetherSystem with resource management
-- **✅ First Interactive Elements**: AetherShard collectibles with pickup mechanics and PlayerStats integration
-- **✅ Basic UI Systems**: Functional Aether HUD with real-time updates and animation feedback
-- **✅ Animation State System**: PlayerAnimator with basic states (idle, run, jump, fall, landing) and proper transitions
-
-### **📊 Sprint Metrics - Final Results:**
-
-- **Sprint Completion Rate**: 100% (All 16 tasks completed successfully)
-- **Test Coverage**: 199 tests passing (includes 43 new tests for Sprint 2 features)
-- **Performance**: Maintained 60fps with enhanced physics systems and collectibles
-- **Integration**: All Sprint 1 features remain fully functional
-- **Bug Count**: 0 critical bugs, minimal minor issues resolved during development
-
-### **🔧 Technical Accomplishments:**
-
-- **PhysicsSystem**: Enhanced with gravity constants, collision layers, terminal velocity, and comprehensive test coverage
-- **PlayerController**: Advanced jump state machine with cooldown, coyote time, and ground detection
-- **AetherSystem**: Complete resource management with regeneration parameters and event integration
-- **CollisionComponent**: Enhanced edge detection with raycasting and proximity calculations
-- **GameHUD**: Dynamic Aether display with event-driven updates and smooth animations
-
-### **🎨 Design Cohesion Validation:**
-
-- **✅ Fluid & Expressive Movement**: Jump mechanics feel responsive and natural, providing solid foundation for advanced movement
-- **✅ Deep Exploration & Discovery**: Collectible system encourages exploration with satisfying pickup feedback and visual polish
-- **✅ Compelling Narrative Integration**: Aether system foundation supports future story-driven progression and ability systems
-- **✅ Consistent & Vibrant Stylized Aesthetic**: HUD design maintains visual consistency, collectibles fit world theme
-
-### **📝 Sprint 3 Preparation Notes:**
-
-- All Sprint 2 systems are well-documented and ready for integration with NPC and dialogue systems
-- PlayerStats event system is prepared for save/load functionality
-- Level architecture is ready for Luminara hub implementation
-- Component-system patterns established for NPC AI integration
-
----
-
 ### **Sprint 3 (Weeks 5-6): Luminara Hub - "Welcome to Aetheris"**
 
 Version: v0.3.0
@@ -1261,253 +1115,99 @@ Version: v0.3.0
 - Enhanced world management with proper level transitions and state persistence
 - Environmental storytelling elements and visual polish for Luminara theme
 
-### **🏃‍♂️ Sprint 3 Progress Tracker**
-
-**📊 Overall Progress: 27% Complete (3/11 tasks)**
-
-**✅ Completed Tasks:**
-
-- **T3.1**: Enhanced Level class with complex geometry support ✅
-- **T3.2**: Enhanced LevelLoader with JSON parsing capabilities ✅
-- **T3.3**: Design Luminara hub level layout ✅
-
-**🚧 In Progress:**
-
-- None currently
-
-**📋 Remaining Tasks:**
-
-- **T3.4**: Enhance NPC base class
-- **T3.5**: Create Mira NPC implementation
-- **T3.6**: Enhance AISystem for NPC behaviors
-- **T3.7**: Implement DialogueSystem foundation
-- **T3.8**: Create DialogueUI component
-- **T3.9**: Enhance SaveManager with checkpoint system
-- **A3.1**: Create Luminara concept art
-- **A3.2**: Design NPC visual assets
-
-**🎯 Next Priority:** T3.4 (NPC base class enhancement) and A3.1 (concept art)
-
 #### 🔄 Microversion Breakdown
 
 ##### **v0.3.0.1 - Level System Enhancement & Luminara Foundation** (Days 1-2)
 
 **Goal**: Enhance the scaffolded Level and LevelLoader systems to support proper world building and create the foundational Luminara hub structure.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
-- [x] **T3.1**: Enhance `Level` class from `lib/world/level.dart` to support complex geometry and entity placement. ✅ **COMPLETED**
+- [x] **T3.1**: ✅ Enhance `Level` class from `lib/src/world/level.dart` to support complex geometry and entity placement.
 
-  - **Effort**: 6 hours (Actual: ~5 hours)
+  - **Effort**: 6 hours
   - **Assignee**: Level Designer/Systems Dev
   - **Dependencies**: T1.12.1 (scaffolded Level), T2.4 (enhanced PhysicsSystem)
   - **Acceptance Criteria**: Level class can load complex platform layouts, spawn points, entity definitions, and environmental data.
-  - **Completed Implementation:**
-    - [x] **T3.1.1**: Implement level geometry data structure (platforms, boundaries, spawn points) ✅
-    - [x] **T3.1.2**: Add entity spawn definitions with position and type data ✅
-    - [x] **T3.1.3**: Implement level bounds and camera constraints ✅
-    - [x] **T3.1.4**: Add environmental metadata (lighting, theme, ambient effects) ✅
-    - [x] **T3.1.5**: Create level validation and error checking ✅
-    - [x] **T3.1.6**: Test level instantiation with basic geometry ✅
-  - **Key Features Implemented:**
-    - Enhanced Level class with complex geometry support (platforms, collision boundaries, trigger zones)
-    - Entity spawn definition system with position, type, and property data
-    - Level and camera bounds for world constraints
-    - Environmental data support (lighting, weather, ambient effects, background layers)
-    - Comprehensive validation and error handling
-    - Backward compatibility with legacy level formats
+  - **Granular Steps:**
+    - [x] **T3.1.1**: ✅ Implement level geometry data structure (platforms, boundaries, spawn points)
+    - [x] **T3.1.2**: ✅ Add entity spawn definitions with position and type data
+    - [x] **T3.1.3**: ✅ Implement level bounds and camera constraints
+    - [x] **T3.1.4**: ✅ Add environmental metadata (lighting, theme, ambient effects)
+    - [x] **T3.1.5**: ✅ Create level validation and error checking
+    - [x] **T3.1.6**: ✅ Test level instantiation with basic geometry
+  - **✅ Completion Notes**: Successfully enhanced Level class with comprehensive geometry and entity placement support. Implemented LevelBounds and CameraBounds for proper spatial constraints, added LevelGeometry system for complex platform layouts, created EntitySpawnDefinition and SpawnPointData structures for dynamic entity placement, integrated EnvironmentalData for biome-specific metadata (lighting, theme, ambient effects), added comprehensive level validation with \_validateLevelData() method, and implemented proper resource loading pipeline. Enhanced level lifecycle management with proper onLoad(), onMount(), and update() methods. All Level class functionality is verified through comprehensive test suite including enhanced_level_loader_test.dart, debug_level_loader_test.dart, and luminara_hub_design_test.dart with 213 tests passing.
 
-- [x] **T3.2**: Enhance `LevelLoader` from `lib/world/levelloader.dart` to support JSON level format parsing. ✅ **COMPLETED**
+- [x] **T3.2**: ✅ Enhance `LevelLoader` from `lib/src/world/level_loader.dart` to support JSON level format parsing.
 
-  - **Effort**: 5 hours (Actual: ~4 hours)
+  - **Effort**: 5 hours
   - **Assignee**: Systems Dev
   - **Dependencies**: T1.12.2 (scaffolded LevelLoader), T3.1
   - **Acceptance Criteria**: LevelLoader can parse JSON level files, instantiate platforms and entities, handle loading errors gracefully.
-  - **Completed Implementation:**
-    - [x] **T3.2.1**: Implement JSON parsing for level structure data ✅
-    - [x] **T3.2.2**: Add platform instantiation from level data ✅
-    - [x] **T3.2.3**: Implement entity spawning from level definitions ✅
-    - [x] **T3.2.4**: Add error handling for malformed level files ✅
-    - [x] **T3.2.5**: Create level loading progress tracking ✅
-    - [x] **T3.2.6**: Test level loading with sample JSON data ✅
-  - **Key Features Implemented:**
-    - Comprehensive JSON parsing for enhanced level format
-    - Support for nested data structures (properties, bounds, geometry, environment)
-    - Entity spawn definition parsing with both new and legacy format support
-    - AssetBundle dependency injection for testability
-    - Robust error handling with fallback empty level creation
-    - Default environmental data generation when not provided
-    - Full test coverage with FakeAssetBundle testing approach
+  - **Granular Steps:**
+    - [x] **T3.2.1**: ✅ Implement JSON parsing for level structure data
+    - [x] **T3.2.2**: ✅ Add platform instantiation from level data
+    - [x] **T3.2.3**: ✅ Implement entity spawning from level definitions
+    - [x] **T3.2.4**: ✅ Add error handling for malformed level files
+    - [x] **T3.2.5**: ✅ Create level loading progress tracking
+    - [x] **T3.2.6**: ✅ Test level loading with sample JSON data
+  - **✅ Completion Notes**: Successfully enhanced LevelLoader with comprehensive JSON level format parsing capabilities. Implemented robust JSON parsing with support for enhanced level format (v2.0+), legacy format conversion for backward compatibility, platform instantiation from geometry data, entity spawning from spawn definitions, comprehensive error handling with detailed logging, level caching system for performance, and validation of biome types including Luminara. Created multiple test level JSON files including enhanced_test_level.json, luminara_hub.json, and minimal_test.json. All LevelLoader functionality verified through enhanced_level_loader_test.dart and debug_level_loader_test.dart with successful parsing of complex level structures.
 
-- [x] **T3.3**: Design and create Luminara hub level layout using enhanced Level system. ✅ **COMPLETED**
-  - **Effort**: 4 hours (Actual: ~3 hours)
+- [x] **T3.3**: ✅ Design and create Luminara hub level layout using enhanced Level system.
+  - **Effort**: 4 hours
   - **Assignee**: Level Designer
   - **Dependencies**: T3.1, T3.2, A3.1 (Luminara concept art)
   - **Acceptance Criteria**: Luminara hub has multiple interconnected areas, clear navigation paths, points of interest, and proper platform placement.
-  - **Completed Implementation:**
-    - [x] **T3.3.1**: Design hub layout with central plaza and branching paths ✅
-    - [x] **T3.3.2**: Create platform placement for varied vertical navigation ✅
-    - [x] **T3.3.3**: Define key areas (Mira's location, shops, exits) ✅
-    - [x] **T3.3.4**: Add environmental details and points of interest ✅
-    - [x] **T3.3.5**: Test navigation flow and accessibility ✅
-  - **Key Features Implemented:**
-    - Comprehensive Luminara hub level file at `assets/levels/luminara_hub.json`
-    - Central crystal plaza with 5 branching paths to major districts
-    - 47 platform structures across different elevation zones
-    - Multiple NPC spawn points including Mira in Keeper's Archive area
-    - 15 collectible items and 10 interactive objects strategically placed
-    - Environmental data with 4 background layers, lighting zones, and ambient effects
-    - Proper level bounds (3200x2400) and camera constraints
-    - Full test coverage confirming all design requirements met
+  - **Granular Steps:**
+    - [x] **T3.3.1**: ✅ Design hub layout with central plaza and branching paths
+    - [x] **T3.3.2**: ✅ Create platform placement for varied vertical navigation
+    - [x] **T3.3.3**: ✅ Define key areas (Mira's location, shops, exits)
+    - [x] **T3.3.4**: ✅ Add environmental details and points of interest
+    - [x] **T3.3.5**: ✅ Test navigation flow and accessibility
+  - **✅ Completion Notes**: Successfully designed and implemented Luminara Hub level layout with comprehensive structure. Created luminara_hub.json with central Crystal Spire design featuring 3200x2400 level dimensions, central plaza with crystalline architecture, branching navigation paths for exploration, varied platform placement supporting vertical traversal, defined key areas including NPC spawn points and interactive zones, environmental metadata for Luminara biome theming, and proper spawn point configuration. Level design validated through luminara_hub_design_test.dart testing hub layout, navigation flow, platform accessibility, and environmental consistency. All navigation paths tested for player accessibility and proper level bounds constraints.
 
-##### Art Tasks:
+**Art Tasks:**
 
-#### Luminara Hub Foundation Assets
-
-- [x] **A3.1**: Create Luminara hub concept art and visual style reference
+- [ ] **A3.1**: Create Luminara hub concept art and visual style reference.
   - **Effort**: 4 hours
-  - **Assignee**: Lead Artist
+  - **Assignee**: Artist
   - **Dependencies**: None
-  - **Acceptance Criteria**: ✅ **COMPLETED** - Clear visual direction for Luminara's crystalline architecture, lighting, and overall aesthetic theme documented in [Luminara Concept Art](../../01_Game_Design/Asset_Design/LuminaraConceptArt.md)
+  - **Acceptance Criteria**: Clear visual direction for Luminara's crystalline architecture, lighting, and overall aesthetic theme.
 
-#### Luminara Tileset - Crystal Platforms
+##### **v0.3.0.2 - NPC System Implementation** (Days 3-4)
 
-- [ ] **A3.2**: Create Azure Crystal Platform tileset (`tile_luminara_crystal_platform_azure.png`)
+**Goal**: Implement the NPC base system and create Mira as the first interactive character using the scaffolded NPC architecture.
 
-  - **Effort**: 4 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: 16x16 pixel tiles with 5 variants, seamless tiling, azure crystal aesthetic
+**Technical Tasks:**
 
-- [ ] **A3.3**: Create Teal Crystal Platform tileset (`tile_luminara_crystal_platform_teal.png`)
-  - **Effort**: 3 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.2
-  - **Acceptance Criteria**: 16x16 pixel tiles with 3 variants, matches azure platform style
-
-#### Luminara Architecture
-
-- [ ] **A3.4**: Create Master Spire Base (`tile_luminara_master_spire_base.png`)
-
-  - **Effort**: 6 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: 128x256 pixel landmark structure, central hub focal point
-
-- [ ] **A3.5**: Create Spire Segment tileset (`tile_luminara_spire_segment.png`)
-  - **Effort**: 5 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.4
-  - **Acceptance Criteria**: 64x64 pixel segments with 6 variants, modular assembly
-
-#### NPC Characters
-
-- [ ] **A3.6**: Create Mira Idle animation (`character_mira_idle.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A3.1, Character design from GDD
-  - **Acceptance Criteria**: 32x32 pixel sprite with 6 frames, friendly guide NPC aesthetic
-
-- [ ] **A3.7**: Create Mira Talk animation (`character_mira_talk.png`)
-
-  - **Effort**: 3 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A3.6
-  - **Acceptance Criteria**: 32x32 pixel sprite with 4 frames, expressive dialogue animation
-
-- [ ] **A3.8**: Create Mira Point gesture (`character_mira_point.png`)
-  - **Effort**: 2 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A3.6
-  - **Acceptance Criteria**: 32x32 pixel sprite with 3 frames, directional pointing gesture
-
-#### Interactive Props
-
-- [ ] **A3.9**: Create Aether Well Core (`prop_luminara_aether_well_core.png`)
+- [x] **T3.4**: ✅ Enhance `NPC` base class from `lib/entities/npc.dart` with interaction and AI foundations.
 
   - **Effort**: 5 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: 64x64 pixel prop with 8 frames, pulsing energy animation
+  - **Assignee**: Gameplay Dev
+  - **Dependencies**: T1.9.3 (scaffolded NPC), T1.10.8 (scaffolded AIComponent)
+  - **Acceptance Criteria**: NPC base class supports interaction states, basic AI behaviors, and dialogue triggers.
+  - **✅ Completion Notes**: Successfully enhanced NPC base class with comprehensive interaction and AI foundations. Implemented NPCInteractionRange with configurable interaction distances, NPCState enum supporting Idle, Talking, Busy, and Moving states with proper state transition validation, DialogueTrigger system with condition-based dialogue activation, NPCAIStateMachine with behavior-driven state management, visual feedback system with interaction indicators and availability cues, and comprehensive interaction detection with player proximity and input handling. Enhanced NPCBehavior framework supports wandering, guarding, following, and custom behaviors with proper state transitions. All functionality verified through extensive test suite including npc_interaction_system_test.dart with 45 tests covering interaction range detection, state management, dialogue triggers, AI behaviors, visual feedback, and integration scenarios. The NPC system now provides a robust foundation for creating interactive characters like Mira with proper behavior patterns and user interaction capabilities.
+  - **Granular Steps:**
+    - [x] **T3.4.1**: ✅ Implement NPC interaction range detection
+    - [x] **T3.4.2**: ✅ Add interaction state management (idle, talking, busy)
+    - [x] **T3.4.3**: ✅ Create NPC dialogue trigger system
+    - [x] **T3.4.4**: ✅ Implement basic AI state machine for NPCs
+    - [x] **T3.4.5**: ✅ Add NPC visual feedback for interaction availability
+    - [x] **T3.4.6**: ✅ Test NPC interaction detection and state changes
 
-- [ ] **A3.10**: Create Small Aether Crystal (`prop_luminara_small_crystal.png`)
-
-  - **Effort**: 2 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: 16x16 pixel prop with 6 frames, gentle glow animation
-
-- [ ] **A3.11**: Create Medium Aether Crystal (`prop_luminara_medium_crystal.png`)
-  - **Effort**: 3 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A3.10
-  - **Acceptance Criteria**: 32x32 pixel prop with 8 frames, brighter glow than small version
-
-#### Collectibles
-
-- [ ] **A3.12**: Create Crystal Fragment collectible (`collectible_crystal_fragment.png`)
-  - **Effort**: 2 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: 12x12 pixel collectible with 6 frames, shimmering animation
-
-#### Environmental Decorations
-
-- [ ] **A3.13**: Create Crystal Growth decoration (`prop_luminara_crystal_growth.png`)
-
-  - **Effort**: 3 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: 24x32 pixel decoration with 8 variants, natural crystal formations
-
-- [ ] **A3.14**: Create Floating Shard decoration (`prop_luminara_floating_shard.png`)
-  - **Effort**: 2 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.13
-  - **Acceptance Criteria**: 8x8 pixel decoration with 12 variants, subtle floating motion
-
-#### Visual Effects
-
-- [ ] **A3.15**: Create Crystal Resonance effect (`effect_crystal_resonance.png`)
+- [x] **T3.5**: ✅ Create Mira NPC class extending the enhanced NPC base.
 
   - **Effort**: 4 hours
-  - **Assignee**: VFX Artist
-  - **Dependencies**: A3.9
-  - **Acceptance Criteria**: 48x48 pixel effect with 16 frames, energy wave animation
-
-- [ ] **A3.16**: Create environmental particle effects (Dust Motes, Crystal Sparkle, Light Ray, Floating Particle)
-  - **Effort**: 6 hours
-  - **Assignee**: VFX Artist
-  - **Dependencies**: A3.1
-  - **Acceptance Criteria**: Complete set of ambient effects for Luminara atmosphere
-
-#### Background and Parallax
-
-- [ ] **A3.17**: Create Luminara background layers (Sky, Distant Crystals, Mid Spires, Near Architecture)
-
-  - **Effort**: 8 hours
-  - **Assignee**: Background Artist
-  - **Dependencies**: A3.1, A3.4
-  - **Acceptance Criteria**: 4-layer parallax background system (320x180 to 1280x180), proper depth separation
-
-- [ ] **A3.18**: Create atmospheric overlay elements (Crystal Fog, Light Shafts, Particle Field)
-  - **Effort**: 4 hours
-  - **Assignee**: Background Artist
-  - **Dependencies**: A3.17
-  - **Acceptance Criteria**: Atmospheric overlays that enhance Luminara's mystical quality
-
-##### Art Tasks:
-
-- **Dependencies**: T3.4, A3.2 (Mira sprite)
-- **Acceptance Criteria**: Mira NPC can be placed in world, detects player proximity, triggers interaction prompts, supports dialogue initiation.
-- **Granular Steps:**
-
-  - [ ] **T3.5.1**: Create Mira class with specific personality traits
-  - [ ] **T3.5.2**: Implement Mira's idle animations and behaviors
-  - [ ] **T3.5.3**: Add Mira-specific dialogue triggers and conditions
-  - [ ] **T3.5.4**: Configure interaction range and visual feedback
-  - [ ] **T3.5.5**: Test Mira placement and interaction in Luminara hub
+  - **Assignee**: Gameplay Dev
+  - **Dependencies**: T3.4, A3.2 (Mira sprite)
+  - **Acceptance Criteria**: Mira NPC can be placed in world, detects player proximity, triggers interaction prompts, supports dialogue initiation.
+  - **✅ Completion Notes**: Successfully implemented complete Mira NPC class with all T3.5 requirements. Created `lib/src/entities/npcs/mira.dart` (376 lines) with Keeper Scholar personality, 6-frame idle animation system, reading behavior cycles, floating quill animation, progressive dialogue system (introduction → keepers → quest), and enhanced interaction ranges for mentor character. Positioned at (950, 1750) in Luminara hub with archive-specific patrol behavior. Comprehensive test coverage through `test/mira_npc_test.dart` and `test/t3_5_mira_integration_test.dart` with 100% passing tests. Production-ready with robust error handling and AI component safety checks. **Completion Report**: `T3_5_COMPLETION_REPORT.md`
+  - **Granular Steps:**
+    - [x] **T3.5.1**: ✅ Create Mira class with specific personality traits
+    - [x] **T3.5.2**: ✅ Implement Mira's idle animations and behaviors
+    - [x] **T3.5.3**: ✅ Add Mira-specific dialogue triggers and conditions
+    - [x] **T3.5.4**: ✅ Configure interaction range and visual feedback
+    - [x] **T3.5.5**: ✅ Test Mira placement and interaction in Luminara hub
 
 - [ ] **T3.6**: Enhance `AISystem` from `lib/systems/aisystem.dart` to process NPC behaviors.
   - **Effort**: 4 hours
@@ -1519,66 +1219,22 @@ Version: v0.3.0
     - [ ] **T3.6.2**: Add interaction range calculations and updates
     - [ ] **T3.6.3**: Create behavior state transition logic
     - [ ] **T3.6.4**: Implement NPC-to-player proximity detection
-    ##### **v0.3.0.2 - NPC System Implementation** (Days 3-4)
-
-**Goal**: Implement the NPC base system and create Mira as the first interactive character using the scaffolded NPC architecture.
-
-##### Technical Tasks:
-
-- [ ] **T3.4**: Enhance `NPC` base class from `lib/entities/npc.dart` with interaction and AI foundations.
-
-  - **Effort**: 5 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: T1.9.3 (scaffolded NPC), T1.10.8 (scaffolded AIComponent)
-  - **Acceptance Criteria**: NPC base class supports interaction states, basic AI behaviors, and dialogue triggers.
-  - **Granular Steps:**
-    - [ ] **T3.4.1**: Implement NPC interaction range detection
-    - [ ] **T3.4.2**: Add interaction state management (idle, talking, busy)
-    - [ ] **T3.4.3**: Create NPC dialogue trigger system
-    - [ ] **T3.4.4**: Implement basic AI state machine for NPCs
-    - [ ] **T3.4.5**: Add NPC visual feedback for interaction availability
-    - [ ] **T3.4.6**: Test NPC interaction detection and state changes
-
-- [ ] **T3.5**: Create Mira NPC class extending the enhanced NPC base.
-
-  - **Effort**: 4 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: T3.4, A3.6 (Mira sprite)
-  - **Acceptance Criteria**: Mira NPC functions as tutorial guide with appropriate dialogue triggers and interaction behaviors.
-  - **Granular Steps:**
-    - [ ] **T3.5.1**: Create Mira class extending NPC base
-    - [ ] **T3.5.2**: Implement Mira-specific dialogue data and flow
-    - [ ] **T3.5.3**: Add Mira's tutorial guidance behaviors
-    - [ ] **T3.5.4**: Integrate Mira sprite animations with NPC states
-    - [ ] **T3.5.5**: Test Mira interaction and dialogue system
-
-- [ ] **T3.6**: Enhance `AISystem` from `lib/systems/aisystem.dart` to manage NPC behaviors and decision-making.
-  - **Effort**: 4 hours
-  - **Assignee**: AI Dev
-  - **Dependencies**: T1.11.8 (scaffolded AISystem), T3.4
-  - **Acceptance Criteria**: AISystem processes NPC AI components, manages state transitions, and handles NPC-specific logic.
-  - **Granular Steps:**
-    - [ ] **T3.6.1**: Implement NPC AI state machine processing
-    - [ ] **T3.6.2**: Add NPC interaction range and detection logic
-    - [ ] **T3.6.3**: Create NPC dialogue trigger management
-    - [ ] **T3.6.4**: Implement basic NPC pathfinding (if needed)
     - [ ] **T3.6.5**: Test AISystem with multiple NPCs
+    - [ ] **T3.6.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
-##### Art Tasks:
+**Art Tasks:**
 
-#### Documentation Updates (Sprint 3)
-
-- [ ] **A3.19**: Update Asset Manifest with Sprint 3 completion status
-  - **Effort**: 1 hour
-  - **Assignee**: Lead Artist
-  - **Dependencies**: All Sprint 3 art tasks
-  - **Acceptance Criteria**: All Sprint 3 assets marked as completed in [Asset Manifest](../../01_Game_Design/Asset_Design/AssetManifest.md)
+- [ ] **A3.2**: Create Mira character sprite and basic animations.
+  - **Effort**: 6 hours
+  - **Assignee**: Character Artist
+  - **Dependencies**: A3.1, Character design from GDD
+  - **Acceptance Criteria**: Mira sprite with idle, talking animations that fit Luminara's aesthetic and character description.
 
 ##### **v0.3.0.3 - Dialogue System Foundation** (Days 5-6)
 
 **Goal**: Implement the core dialogue system with text display, conversation flow, and UI integration.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T3.7**: Enhance `DialogueUI` from `lib/ui/dialogueui.dart` with text display and conversation management.
 
@@ -1593,6 +1249,7 @@ Version: v0.3.0
     - [ ] **T3.7.4**: Implement player response option display
     - [ ] **T3.7.5**: Add dialogue UI show/hide animations
     - [ ] **T3.7.6**: Test dialogue UI with sample conversations
+    - [ ] **T3.7.7**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.8**: Create dialogue data structure and conversation flow system.
 
@@ -1606,6 +1263,7 @@ Version: v0.3.0
     - [ ] **T3.8.3**: Add conversation state persistence
     - [ ] **T3.8.4**: Create dialogue condition evaluation system
     - [ ] **T3.8.5**: Test dialogue flow with branching conversations
+    - [ ] **T3.8.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.9**: Implement Mira's initial dialogue content and conversation system.
   - **Effort**: 4 hours
@@ -1618,12 +1276,13 @@ Version: v0.3.0
     - [ ] **T3.9.3**: Implement context-sensitive dialogue responses
     - [ ] **T3.9.4**: Add Mira's ongoing conversation options
     - [ ] **T3.9.5**: Test complete Mira dialogue flow
+    - [ ] **T3.9.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 ##### **v0.3.0.4 - Save System & Checkpoint Implementation** (Days 7-8)
 
 **Goal**: Implement functional save/load system with checkpoint mechanics using the scaffolded save architecture.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T3.10**: Enhance `SaveManager` from `lib/save/savemanager.dart` with file I/O and data serialization.
 
@@ -1638,6 +1297,7 @@ Version: v0.3.0
     - [ ] **T3.10.4**: Implement multiple save slot support
     - [ ] **T3.10.5**: Add save operation error handling and user feedback
     - [ ] **T3.10.6**: Test save/load operations with complex game state
+    - [ ] **T3.10.7**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.11**: Enhance `SaveData` from `lib/save/savedata.dart` to capture player progress and world state.
 
@@ -1651,6 +1311,7 @@ Version: v0.3.0
     - [ ] **T3.11.3**: Implement dialogue state and NPC interaction history
     - [ ] **T3.11.4**: Add collected items and achievement tracking
     - [ ] **T3.11.5**: Test save data completeness and accuracy
+    - [ ] **T3.11.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.12**: Implement `Checkpoint` system from `lib/world/checkpoint.dart` with visual markers and functionality.
   - **Effort**: 5 hours
@@ -1663,8 +1324,9 @@ Version: v0.3.0
     - [ ] **T3.12.3**: Add save operation triggering on checkpoint activation
     - [ ] **T3.12.4**: Create checkpoint state persistence (activated/inactive)
     - [ ] **T3.12.5**: Test checkpoint placement and save functionality
+    - [ ] **T3.12.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
-##### Art Tasks:
+**Art Tasks:**
 
 - [ ] **A3.3**: Create checkpoint visual design and activation effects.
   - **Effort**: 3 hours
@@ -1676,7 +1338,7 @@ Version: v0.3.0
 
 **Goal**: Integrate all Sprint 3 systems, enhance level design, add environmental details, and conduct comprehensive testing.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T3.13**: Create complete Luminara hub JSON level file with all entities and environmental elements.
 
@@ -1690,6 +1352,7 @@ Version: v0.3.0
     - [ ] **T3.13.3**: Implement proper spawn points and level boundaries
     - [ ] **T3.13.4**: Add level-specific configuration and metadata
     - [ ] **T3.13.5**: Test complete level loading and functionality
+    - [ ] **T3.13.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.14**: Enhance `LevelManager` from `lib/world/levelmanager.dart` for proper level state management.
 
@@ -1703,6 +1366,7 @@ Version: v0.3.0
     - [ ] **T3.14.3**: Create level transition handling (for future sprints)
     - [ ] **T3.14.4**: Implement level cleanup and memory management
     - [ ] **T3.14.5**: Test level management with save/load operations
+    - [ ] **T3.14.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.15**: Add environmental storytelling elements and visual polish to Luminara.
 
@@ -1716,6 +1380,7 @@ Version: v0.3.0
     - [ ] **T3.15.3**: Place environmental storytelling elements
     - [ ] **T3.15.4**: Add ambient animation and particle effects
     - [ ] **T3.15.5**: Test visual cohesion and performance impact
+    - [ ] **T3.15.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T3.16**: Code review and optimization of Sprint 3 systems.
   - **Effort**: 3 hours
@@ -1728,8 +1393,9 @@ Version: v0.3.0
     - [ ] **T3.16.3**: Validate NPC AI system efficiency
     - [ ] **T3.16.4**: Check error handling in all new systems
     - [ ] **T3.16.5**: Refactor any performance bottlenecks
+    - [ ] **T3.16.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
-##### Art Tasks:
+**Art Tasks:**
 
 - [ ] **A3.4**: Create Luminara environmental assets (background elements, decorations).
   - **Effort**: 5 hours
@@ -1752,7 +1418,7 @@ Version: v0.3.0
     - [ ] **QA3.1.5**: Performance test with full Luminara environment
     - [ ] **QA3.1.6**: Test error handling and edge cases
     - [ ] **QA3.1.7**: Validate user experience flow
-    - [ ] **QA3.1.8**: Document bugs and create Sprint 4 preparation notes
+    - [ ] **QA3.1.8**: Document bugs and create Sprint 4 preparation notes in the next Section of this Document
 
 #### 🏆 Sprint Success Criteria
 
@@ -1809,7 +1475,7 @@ Version: v0.4.0
 
 **Goal**: Implement the core tutorial progression system and state management to guide players through structured learning.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T4.1**: Create `TutorialManager` in `lib/systems/tutorialmanager.dart` for tutorial sequence coordination.
 
@@ -1824,6 +1490,7 @@ Version: v0.4.0
     - [ ] **T4.1.4**: Add tutorial skip functionality and user preferences
     - [ ] **T4.1.5**: Integrate tutorial state with SaveManager
     - [ ] **T4.1.6**: Test tutorial progression and state persistence
+    - [ ] **T4.1.7**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.2**: Enhance `TutorialStep` from `lib/tutorial/tutorialstep.dart` with comprehensive step definitions.
 
@@ -1837,6 +1504,7 @@ Version: v0.4.0
     - [ ] **T4.2.3**: Add step completion validation and progression logic
     - [ ] **T4.2.4**: Create step-specific data structures and configurations
     - [ ] **T4.2.5**: Test individual tutorial step functionality
+    - [ ] **T4.2.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.3**: Create tutorial sequence definition for Luminara introduction.
 
@@ -1850,6 +1518,7 @@ Version: v0.4.0
     - [ ] **T4.3.3**: Design tutorial area layout within Luminara
     - [ ] **T4.3.4**: Define completion criteria for each tutorial step
     - [ ] **T4.3.5**: Test tutorial sequence flow and pacing
+    - [ ] **T4.3.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.4**: Implement `TutorialUI` from `lib/ui/tutorialui.dart` for step instructions and progress display.
   - **Effort**: 6 hours
@@ -1863,103 +1532,21 @@ Version: v0.4.0
     - [ ] **T4.4.4**: Implement visual guidance overlays and highlights
     - [ ] **T4.4.5**: Add tutorial UI animations and transitions
     - [ ] **T4.4.6**: Test tutorial UI responsiveness and clarity
+    - [ ] **T4.4.7**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
-#### Luminara Architecture Expansion
+**Art Tasks:**
 
-- [ ] **A4.1**: Create Crystal Bridge tileset (`tile_luminara_crystal_bridge.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.2 (Azure Crystal Platform)
-  - **Acceptance Criteria**: 48x16 pixel bridge tiles with 3 variants, seamless platform connections
-
-- [ ] **A4.2**: Create Crystal Steps tileset (`tile_luminara_crystal_steps.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A4.1
-  - **Acceptance Criteria**: 32x32 pixel steps with 4 variants, natural progression
-
-- [ ] **A4.3**: Create Archive Entrance (`tile_luminara_archive_entrance.png`)
+- [ ] **A4.1**: Design tutorial UI elements and visual guidance system.
   - **Effort**: 5 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.4 (Master Spire Base)
-  - **Acceptance Criteria**: 96x96 pixel entrance, scholarly architectural style
-
-#### Interactive Crystals and Props
-
-- [ ] **A4.4**: Create Large Aether Crystal (`prop_luminara_large_crystal.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A3.11 (Medium Aether Crystal)
-  - **Acceptance Criteria**: 48x64 pixel crystal with 10 frames, powerful energy animation
-
-- [ ] **A4.5**: Create Luminous Moss decoration (`prop_luminara_luminous_moss.png`)
-  - **Effort**: 2 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.13 (Crystal Growth)
-  - **Acceptance Criteria**: 16x8 pixel decoration with 5 variants, organic growth patterns
-
-#### Special Items
-
-- [ ] **A4.6**: Create Jumper's Mark item (`item_jumpers_mark.png`)
-  - **Effort**: 3 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: Jumper's Mark concept from GDD
-  - **Acceptance Criteria**: 32x32 pixel item, narrative significance, unique visual design
-
-#### Main Menu Assets
-
-- [ ] **A4.7**: Create Main Menu Background (`ui_main_menu_bg.png`)
-
-  - **Effort**: 6 hours
-  - **Assignee**: Background Artist
-  - **Dependencies**: A3.17 (Luminara backgrounds)
-  - **Acceptance Criteria**: 320x180 pixel background, polished Luminara vista
-
-- [ ] **A4.8**: Create Crystal Button states (Normal, Hover, Pressed)
-  - **Effort**: 4 hours
   - **Assignee**: UI Artist
-  - **Dependencies**: A4.7
-  - **Acceptance Criteria**: 64x24 pixel buttons with 3 states, crystal aesthetic
-
-#### Tutorial UI Assets
-
-- [ ] **A4.9**: Create Tutorial Arrow (`ui_tutorial_arrow.png`)
-
-  - **Effort**: 2 hours
-  - **Assignee**: UI Artist
-  - **Dependencies**: A4.8
-  - **Acceptance Criteria**: 32x32 pixel arrow, clear directional guidance
-
-- [ ] **A4.10**: Create Tutorial Highlight (`ui_tutorial_highlight.png`)
-
-  - **Effort**: 2 hours
-  - **Assignee**: UI Artist
-  - **Dependencies**: A4.9
-  - **Acceptance Criteria**: 48x48 pixel highlight overlay, attention-drawing
-
-- [ ] **A4.11**: Create Tutorial Marker (`ui_tutorial_marker.png`)
-
-  - **Effort**: 2 hours
-  - **Assignee**: UI Artist
-  - **Dependencies**: A4.9
-  - **Acceptance Criteria**: 24x24 pixel marker, unobtrusive guidance
-
-- [ ] **A4.12**: Create Key Prompts (WASD and Space)
-  - **Effort**: 3 hours
-  - **Assignee**: UI Artist
-  - **Dependencies**: A4.11
-  - **Acceptance Criteria**: Clear key visualization, 64x32 and 48x16 respectively
-
-##### Art Tasks:
+  - **Dependencies**: A3.1 (Luminara style), Sprint 3 UI consistency
+  - **Acceptance Criteria**: Tutorial UI elements match game aesthetic with clear visual hierarchy and intuitive guidance elements.
 
 ##### **v0.4.0.2 - Interactive Tutorial System** (Days 3-4)
 
 **Goal**: Implement interactive tutorial prompts, input detection, and contextual guidance for player actions.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T4.5**: Create `TutorialPrompt` system for contextual tutorial hints and guidance.
 
@@ -1973,6 +1560,7 @@ Version: v0.4.0
     - [ ] **T4.5.3**: Create visual feedback for successful tutorial actions
     - [ ] **T4.5.4**: Implement prompt positioning and screen space UI
     - [ ] **T4.5.5**: Test prompt responsiveness and visual clarity
+    - [ ] **T4.5.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.6**: Enhance `InputHandler` from `lib/input/inputhandler.dart` with tutorial input tracking.
 
@@ -1986,6 +1574,7 @@ Version: v0.4.0
     - [ ] **T4.6.3**: Create input guidance system for tutorial hints
     - [ ] **T4.6.4**: Add tutorial input error handling and recovery
     - [ ] **T4.6.5**: Test tutorial input detection accuracy
+    - [ ] **T4.6.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.7**: Implement tutorial area markers and interactive zones within Luminara.
 
@@ -1999,6 +1588,7 @@ Version: v0.4.0
     - [ ] **T4.7.3**: Add tutorial area boundaries and guidance
     - [ ] **T4.7.4**: Create tutorial collectible placement system
     - [ ] **T4.7.5**: Test tutorial area navigation and progression
+    - [ ] **T4.1.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.8**: Create tutorial-specific Aether Shard placement and collection tracking.
   - **Effort**: 3 hours
@@ -2011,20 +1601,21 @@ Version: v0.4.0
     - [ ] **T4.8.3**: Add collection feedback and UI updates
     - [ ] **T4.8.4**: Create collection completion validation
     - [ ] **T4.8.5**: Test tutorial collection mechanics
+    - [ ] **T4.8.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
-#### Documentation Updates (Sprint 4)
+**Art Tasks:**
 
-- [ ] **A4.13**: Update Asset Manifest with Sprint 4 completion status
-  - **Effort**: 1 hour
-  - **Assignee**: Lead Artist
-  - **Dependencies**: All Sprint 4 art tasks
-  - **Acceptance Criteria**: All Sprint 4 assets marked as completed in [Asset Manifest](../../01_Game_Design/Asset_Design/AssetManifest.md)
+- [ ] **A4.2**: Create tutorial marker and guidance visual assets.
+  - **Effort**: 4 hours
+  - **Assignee**: UI Artist/Environment Artist
+  - **Dependencies**: A4.1, A3.1 (Luminara aesthetic)
+  - **Acceptance Criteria**: Tutorial markers are visually distinct, fit Luminara theme, and provide clear guidance without breaking immersion.
 
 ##### **v0.4.0.3 - Tutorial Content Implementation** (Days 5-6)
 
 **Goal**: Implement the complete tutorial content sequence with all interactive elements and progression tracking.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T4.9**: Implement movement tutorial steps (walking, jumping, basic navigation).
 
@@ -2038,6 +1629,7 @@ Version: v0.4.0
     - [ ] **T4.9.3**: Add basic navigation tutorial through simple platform course
     - [ ] **T4.9.4**: Create movement tutorial completion criteria
     - [ ] **T4.9.5**: Test movement tutorial progression and feedback
+    - [ ] **T4.9.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.10**: Implement Aether collection tutorial with UI guidance and feedback.
 
@@ -2051,6 +1643,7 @@ Version: v0.4.0
     - [ ] **T4.10.3**: Add Aether UI explanation and guidance
     - [ ] **T4.10.4**: Create collection progress tracking and feedback
     - [ ] **T4.10.5**: Test Aether collection tutorial flow
+    - [ ] **T4.10.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.11**: Implement advanced movement tutorial (enhanced jumping, precision platforming).
 
@@ -2064,6 +1657,7 @@ Version: v0.4.0
     - [ ] **T4.11.3**: Add jump height and distance optimization tutorial
     - [ ] **T4.11.4**: Create advanced movement completion validation
     - [ ] **T4.11.5**: Test advanced movement tutorial difficulty curve
+    - [ ] **T4.11.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 - [ ] **T4.12**: Create tutorial completion celebration and transition to main gameplay.
   - **Effort**: 3 hours
@@ -2076,12 +1670,13 @@ Version: v0.4.0
     - [ ] **T4.12.3**: Add tutorial state finalization and save update
     - [ ] **T4.12.4**: Implement transition to main gameplay mode
     - [ ] **T4.12.5**: Test tutorial completion and transition flow
+    - [ ] **T4.12.6**: Create completion report documenting implementation details, testing results, and integration status inside `docs/04_Project_Management/Task_Completion_Reports` and update the Task Tracker (this section here).
 
 ##### **v0.4.0.4 - Mira Tutorial Integration** (Days 7-8)
 
 **Goal**: Integrate Mira NPC into the tutorial sequence with contextual dialogue and guidance, introducing narrative elements.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T4.13**: Enhance Mira's dialogue system for tutorial integration and contextual guidance.
 
@@ -2134,21 +1729,19 @@ Version: v0.4.0
     - [ ] **T4.16.4**: Create dialogue completion integration with tutorial steps
     - [ ] **T4.16.5**: Test tutorial dialogue trigger reliability
 
-##### Art Tasks:
+**Art Tasks:**
 
-#### Jumper's Mark Integration Assets
-
-- [ ] **A4.14**: Create Jumper's Mark tutorial presentation sequence
+- [ ] **A4.3**: Create Jumper's Mark visual design and tutorial presentation assets.
   - **Effort**: 4 hours
   - **Assignee**: Character Artist/UI Artist
-  - **Dependencies**: A4.6 (Jumper's Mark item), Jumper's Mark concept from GDD
-  - **Acceptance Criteria**: Visual presentation supports narrative significance with clear tutorial integration
+  - **Dependencies**: A4.1, Jumper's Mark concept from GDD
+  - **Acceptance Criteria**: Jumper's Mark visual design supports narrative significance with clear tutorial presentation and UI integration.
 
 ##### **v0.4.0.5 - Main Menu & System Integration** (Days 9-10)
 
 **Goal**: Implement basic main menu system, integrate all tutorial systems, and conduct comprehensive testing for smooth tutorial experience.
 
-##### Technical Tasks:
+**Technical Tasks:**
 
 - [ ] **T4.17**: Create `MainMenu` system in `lib/ui/mainmenu.dart` with basic navigation and game start functionality.
 
@@ -2228,7 +1821,7 @@ Version: v0.4.0
     - [ ] **T4.22.4**: Add tutorial replay functionality for individual steps
     - [ ] **T4.22.5**: Test accessibility features with diverse user scenarios
 
-##### Art Tasks:
+**Art Tasks:**
 
 - [ ] **A4.4**: Create main menu visual design and background assets.
 
@@ -2298,7 +1891,7 @@ Version: v0.4.0
 
 ---
 
-## Epic 1: Verdant Canopy (Act 1)
+### **Epic 1: Verdant Canopy (Act 1)**
 
 ---
 
@@ -2313,108 +1906,6 @@ Version: v0.5.0
 - First enemy type (e.g., "Forest Creeper") with basic patrol behavior.
 - Player health system functional (taking damage).
 
-#### 🔄 Sprint 5 Microversion Breakdown
-
-##### **v0.5.0.1 - Verdant Canopy Foundation** (Days 1-2)
-
-**Goal**: Establish the visual foundation for Verdant Canopy zone with initial enemy system implementation.
-
-##### Technical Tasks:
-
-- [ ] **T5.1**: Design and implement Verdant Canopy level layout and basic environmental systems.
-
-  - **Effort**: 6 hours
-  - **Assignee**: Level Designer
-  - **Dependencies**: Enhanced Level system from Sprint 3
-  - **Acceptance Criteria**: Verdant Canopy has distinct forest theme, varied platforming challenges, and clear progression path.
-
-- [ ] **T5.2**: Implement Forest Creeper enemy with basic patrol AI.
-  - **Effort**: 8 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: Enemy base class, AI System from Sprint 3
-  - **Acceptance Criteria**: Forest Creeper patrols designated paths, reacts to player presence, has basic collision and health.
-
-##### Art Tasks:
-
-#### Verdant Canopy Enemies
-
-- [ ] **A5.1**: Create Forest Creeper Idle animation (`enemy_forest_creeper_idle.png`)
-
-  - **Effort**: 3 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: Enemy design concepts
-  - **Acceptance Criteria**: 24x24 pixel sprite with 4 frames, organic forest creature aesthetic
-
-- [ ] **A5.2**: Create Forest Creeper Walk animation (`enemy_forest_creeper_walk.png`)
-  - **Effort**: 4 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A5.1
-  - **Acceptance Criteria**: 24x24 pixel sprite with 6 frames, natural walking motion
-
-#### Luminara Props Expansion
-
-- [ ] **A5.3**: Create Inscription Tablet decoration (`prop_luminara_inscription.png`)
-  - **Effort**: 3 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.1 (Luminara style)
-  - **Acceptance Criteria**: 32x24 pixel tablet with 6 variants, ancient text aesthetic
-
-#### Enhanced Collectibles
-
-- [ ] **A5.4**: Create Aether Orb collectible (`collectible_aether_orb.png`)
-  - **Effort**: 4 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A2.6 (Aether Shard)
-  - **Acceptance Criteria**: 24x24 pixel orb with 10 frames, more powerful than Aether Shard
-
-##### **v0.5.0.2 - Combat and Health System** (Days 3-4)
-
-**Goal**: Implement player health system and basic combat interactions with enemies.
-
-##### Technical Tasks:
-
-- [ ] **T5.3**: Implement player health system with damage and UI integration.
-
-  - **Effort**: 6 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: PlayerStats from Sprint 2, Health UI elements
-  - **Acceptance Criteria**: Player can take damage, health decreases, UI updates, death state handled.
-
-- [ ] **T5.4**: Create basic combat system for enemy-player interactions.
-  - **Effort**: 5 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: T5.2, T5.3
-  - **Acceptance Criteria**: Forest Creeper can damage player on contact, player has brief invincibility frames.
-
-##### Art Tasks:
-
-#### Documentation Updates (Sprint 5)
-
-- [ ] **A5.5**: Update Asset Manifest with Sprint 5 completion status
-  - **Effort**: 1 hour
-  - **Assignee**: Lead Artist
-  - **Dependencies**: All Sprint 5 art tasks
-  - **Acceptance Criteria**: All Sprint 5 assets marked as completed in [Asset Manifest](../../01_Game_Design/Asset_Design/AssetManifest.md)
-
-##### **v0.5.0.3 - Level Integration and Polish** (Days 5-6)
-
-**Goal**: Integrate all Verdant Canopy elements and polish the first forest experience.
-
-##### Technical Tasks:
-
-- [ ] **T5.5**: Complete Verdant Canopy level with enemy placement and collectibles.
-
-  - **Effort**: 4 hours
-  - **Assignee**: Level Designer
-  - **Dependencies**: T5.1, T5.2, All Sprint 5 art assets
-  - **Acceptance Criteria**: Verdant Canopy level is playable with balanced enemy encounters and exploration opportunities.
-
-- [ ] **T5.6**: Implement comprehensive testing and bug fixing for Sprint 5 features.
-  - **Effort**: 6 hours
-  - **Assignee**: QA/Dev Team
-  - **Dependencies**: All Sprint 5 technical tasks
-  - **Acceptance Criteria**: All Sprint 5 systems function correctly with no critical bugs.
-
 ---
 
 ### **Sprint 6 (Weeks 11-12): Aether System - "Unleashing Potential"**
@@ -2428,103 +1919,6 @@ Version: v0.6.0
 - Updated Aether HUD.
 - Aether Shard collectibles are functional.
 
-#### 🔄 Sprint 6 Microversion Breakdown
-
-##### **v0.6.0.1 - Aether Dash Foundation** (Days 1-3)
-
-**Goal**: Implement the core Aether Dash ability with resource consumption.
-
-##### Technical Tasks:
-
-- [ ] **T6.1**: Implement Aether Dash ability system with input handling and animation.
-
-  - **Effort**: 8 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: Player movement system, Aether resource system
-  - **Acceptance Criteria**: Player can perform Aether Dash using Aether resource, with directional control and distance.
-
-- [ ] **T6.2**: Create Aether resource consumption and regeneration mechanics.
-  - **Effort**: 6 hours
-  - **Assignee**: Systems Dev
-  - **Dependencies**: PlayerStats system from Sprint 2
-  - **Acceptance Criteria**: Aether depletes when used, regenerates over time, prevents abilities when insufficient.
-
-##### Art Tasks:
-
-#### Aether Ability Assets
-
-- [ ] **A6.1**: Create Aether Dash animation (`character_player_aether_dash.png`)
-  - **Effort**: 5 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: Player character sprites from Sprint 2
-  - **Acceptance Criteria**: 32x32 pixel sprite with 4 frames, dynamic dash motion with Aether effects
-
-#### Aether Visual Effects
-
-- [ ] **A6.2**: Create Aether Trail effect (`effect_aether_trail.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: VFX Artist
-  - **Dependencies**: A6.1
-  - **Acceptance Criteria**: 64x16 pixel effect with 8 frames, energy trail following dash movement
-
-- [ ] **A6.3**: Create Aether Burst effect (`effect_aether_burst.png`)
-  - **Effort**: 4 hours
-  - **Assignee**: VFX Artist
-  - **Dependencies**: A6.2
-  - **Acceptance Criteria**: 64x64 pixel effect with 10 frames, ability activation burst
-
-##### **v0.6.0.2 - Luminara Hub Expansion** (Days 4-5)
-
-**Goal**: Expand Luminara Hub with commercial areas and enhanced interactive elements.
-
-##### Technical Tasks:
-
-- [ ] **T6.3**: Implement enhanced Aether collection system with improved feedback.
-  - **Effort**: 5 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: Aether Shard system from Sprint 2, Sprint 6 VFX
-  - **Acceptance Criteria**: Aether collection provides satisfying feedback with new visual effects.
-
-##### Art Tasks:
-
-#### Luminara Architecture Expansion
-
-- [ ] **A6.4**: Create Market Stall tileset (`tile_luminara_market_stall.png`)
-  - **Effort**: 5 hours
-  - **Assignee**: Environment Artist
-  - **Dependencies**: A3.4 (Master Spire Base), Luminara architectural style
-  - **Acceptance Criteria**: 64x48 pixel stalls with 4 variants, commercial district aesthetic
-
-##### **v0.6.0.3 - System Integration and Polish** (Days 6-7)
-
-**Goal**: Integrate all Aether systems and polish the enhanced gameplay experience.
-
-##### Technical Tasks:
-
-- [ ] **T6.4**: Integrate Aether Dash with level design and create dash-specific challenges.
-
-  - **Effort**: 6 hours
-  - **Assignee**: Level Designer
-  - **Dependencies**: T6.1, Luminara Hub level from Sprint 3
-  - **Acceptance Criteria**: Luminara Hub has areas that require or benefit from Aether Dash usage.
-
-- [ ] **T6.5**: Comprehensive testing and balancing of Aether system mechanics.
-  - **Effort**: 4 hours
-  - **Assignee**: QA/Balance Designer
-  - **Dependencies**: All Sprint 6 technical tasks
-  - **Acceptance Criteria**: Aether Dash feels balanced, resource costs are appropriate, regeneration timing is satisfying.
-
-##### Art Tasks:
-
-#### Documentation Updates (Sprint 6)
-
-- [ ] **A6.5**: Update Asset Manifest with Sprint 6 completion status
-  - **Effort**: 1 hour
-  - **Assignee**: Lead Artist
-  - **Dependencies**: All Sprint 6 art tasks
-  - **Acceptance Criteria**: All Sprint 6 assets marked as completed in [Asset Manifest](../../01_Game_Design/Asset_Design/AssetManifest.md)
-
 ---
 
 ### **Sprint 7 (Weeks 13-14): Verdant Canopy - "Platforming Challenges"**
@@ -2537,122 +1931,6 @@ Version: v0.7.0
 - Moving platforms.
 - Simple environmental hazards (e.g., thorn patches).
 - Refined player physics for better jump/dash feel.
-
-#### 🔄 Sprint 7 Microversion Breakdown
-
-##### **v0.7.0.1 - Advanced Enemy System** (Days 1-3)
-
-**Goal**: Introduce more sophisticated enemy types and AI behaviors.
-
-##### Technical Tasks:
-
-- [ ] **T7.1**: Implement Thorn Spitter enemy with ranged attack capabilities.
-
-  - **Effort**: 8 hours
-  - **Assignee**: Gameplay Dev
-  - **Dependencies**: Enemy system from Sprint 5, projectile system
-  - **Acceptance Criteria**: Thorn Spitter can attack at range, has proper aiming and cooldown mechanics.
-
-- [ ] **T7.2**: Create environmental hazard system for thorn patches and obstacles.
-  - **Effort**: 6 hours
-  - **Assignee**: Systems Dev
-  - **Dependencies**: Collision system, damage system from Sprint 5
-  - **Acceptance Criteria**: Environmental hazards damage player on contact with appropriate visual feedback.
-
-##### Art Tasks:
-
-#### Verdant Canopy Enemies Expansion
-
-- [ ] **A7.1**: Create Thorn Spitter Idle animation (`enemy_thorn_spitter_idle.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A5.1 (Forest Creeper), enemy design concepts
-  - **Acceptance Criteria**: 32x24 pixel sprite with 6 frames, plant-based ranged enemy aesthetic
-
-- [ ] **A7.2**: Create Thorn Spitter Attack animation (`enemy_thorn_spitter_attack.png`)
-  - **Effort**: 5 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A7.1
-  - **Acceptance Criteria**: 32x24 pixel sprite with 8 frames, projectile launching animation
-
-#### NPC Character Development
-
-- [ ] **A7.3**: Create Keeper Zephyr Idle animation (`character_zephyr_idle.png`)
-
-  - **Effort**: 5 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: NPC design concepts, mystical character aesthetic
-  - **Acceptance Criteria**: 32x32 pixel sprite with 8 frames, floating scholarly guardian appearance
-
-- [ ] **A7.4**: Create Keeper Zephyr Gesture animation (`character_zephyr_gesture.png`)
-
-  - **Effort**: 4 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A7.3
-  - **Acceptance Criteria**: 32x32 pixel sprite with 6 frames, mystical hand gestures
-
-- [ ] **A7.5**: Create Keeper Zephyr Float animation (`character_zephyr_float.png`)
-  - **Effort**: 6 hours
-  - **Assignee**: Character Artist
-  - **Dependencies**: A7.3
-  - **Acceptance Criteria**: 32x32 pixel sprite with 12 frames, ethereal floating motion
-
-#### Advanced Collectibles
-
-- [ ] **A7.6**: Create Ancient Rune collectible (`collectible_ancient_rune.png`)
-  - **Effort**: 4 hours
-  - **Assignee**: Props Artist
-  - **Dependencies**: A5.4 (Aether Orb), ancient aesthetic design
-  - **Acceptance Criteria**: 20x20 pixel rune with 12 frames, mystical rotating animation
-
-##### **v0.7.0.2 - Enhanced Platforming Systems** (Days 4-5)
-
-**Goal**: Implement advanced platforming mechanics that utilize Aether Dash.
-
-##### Technical Tasks:
-
-- [ ] **T7.3**: Create moving platform system with various movement patterns.
-
-  - **Effort**: 6 hours
-  - **Assignee**: Systems Dev
-  - **Dependencies**: Platform system, enhanced physics
-  - **Acceptance Criteria**: Moving platforms support player standing, have predictable patterns, integrate with dash mechanics.
-
-- [ ] **T7.4**: Design Verdant Canopy level segments requiring Aether Dash traversal.
-  - **Effort**: 5 hours
-  - **Assignee**: Level Designer
-  - **Dependencies**: T6.1 (Aether Dash), T7.3
-  - **Acceptance Criteria**: New level areas challenge players to use Aether Dash creatively for navigation.
-
-##### **v0.7.0.3 - Celestial Archive Introduction** (Days 6-7)
-
-**Goal**: Introduce Keeper Zephyr and establish connection to deeper lore systems.
-
-##### Technical Tasks:
-
-- [ ] **T7.5**: Implement Keeper Zephyr NPC with advanced dialogue and lore systems.
-
-  - **Effort**: 6 hours
-  - **Assignee**: Narrative Dev
-  - **Dependencies**: NPC system from Sprint 3, Zephyr character assets
-  - **Acceptance Criteria**: Zephyr provides lore exposition, hints at larger mysteries, has distinctive personality.
-
-- [ ] **T7.6**: Create Ancient Rune collection system with lore integration.
-  - **Effort**: 4 hours
-  - **Assignee**: Systems Dev
-  - **Dependencies**: Collectible system, A7.6
-  - **Acceptance Criteria**: Ancient Runes provide lore fragments when collected, track discovery progress.
-
-##### Art Tasks:
-
-#### Documentation Updates (Sprint 7)
-
-- [ ] **A7.7**: Update Asset Manifest with Sprint 7 completion status
-  - **Effort**: 1 hour
-  - **Assignee**: Lead Artist
-  - **Dependencies**: All Sprint 7 art tasks
-  - **Acceptance Criteria**: All Sprint 7 assets marked as completed in [Asset Manifest](../../01_Game_Design/Asset_Design/AssetManifest.md)
 
 ---
 
@@ -2668,98 +1946,6 @@ Version: v0.8.0
 - Second Verdant Canopy enemy type with different behavior.
 - Basic combat UI elements (enemy health bars).
 
-#### **Microversion Plan:**
-
-**v0.8.1 - Melee Combat Foundation (Week 15, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Implement MeleeAttackComponent in combat system
-- Add melee hit detection using collision shapes around player
-- Create melee combo state machine (light attack sequence)
-- Update PlayerController to handle melee input actions
-- Integrate melee animations with character sprite system
-- **Assets Required:**
-  - `character_player_melee_slash_1.png` - First attack frame animation
-  - `character_player_melee_slash_2.png` - Second attack frame animation
-  - `character_player_melee_combo.png` - Combo sequence spritesheet
-- **Acceptance Criteria:**
-  - Player can execute 1-2 hit melee combo with input buffering
-  - Visual attack feedback displays correctly
-  - Melee attacks register collision detection
-
-**v0.8.2 - Enemy Hit Reactions (Week 15, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Extend Enemy base class with hit reaction states
-- Implement knockback physics using velocity modification
-- Add damage processing pipeline for enemies
-- Create hit flash/damage visual feedback system
-- Update enemy AI state machines to handle stagger states
-- **Assets Required:**
-  - `enemy_verdant_lurker_hit.png` - Hit reaction animation
-  - `enemy_verdant_lurker_stagger.png` - Stagger state animation
-  - `vfx_damage_impact.png` - Impact visual effect
-- **Acceptance Criteria:**
-  - Enemies visibly react to melee hits with knockback
-  - Health reduction properly registered and displayed
-  - Hit stun prevents enemy actions for appropriate duration
-
-**v0.8.3 - Ranged Aether Attack Prototype (Week 16, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create AetherProjectile entity class
-- Implement ranged attack charging mechanic
-- Add projectile physics and collision detection
-- Create placeholder Aether blast visual effect
-- Update input system for ranged attack controls
-- **Assets Required:**
-  - `character_player_aether_pulse.png` - Aether pulse animation (from AssetManifest)
-  - `vfx_aether_projectile.png` - Projectile visual effect
-  - `vfx_aether_charge.png` - Charging effect around player
-- **Acceptance Criteria:**
-  - Player can charge and release ranged Aether attacks
-  - Projectiles travel in straight line with proper physics
-  - Placeholder visual effects display for charging and projectile
-
-**v0.8.4 - Second Enemy Type Implementation (Week 16, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create VerdantSpitter enemy class extending Enemy base
-- Implement different movement pattern (stationary/limited mobility)
-- Add ranged attack AI behavior for Spitter
-- Create unique visual design and animations
-- Update enemy spawning system to include both enemy types
-- **Assets Required:**
-  - `enemy_verdant_spitter_idle.png` - New enemy idle animation
-  - `enemy_verdant_spitter_attack.png` - Ranged attack animation
-  - `enemy_projectile_thorn.png` - Enemy projectile sprite
-- **Acceptance Criteria:**
-  - VerdantSpitter spawns in Verdant Canopy levels
-  - Distinct behavior from VerdantLurker (ranged vs melee)
-  - Proper AI targeting and attack patterns functional
-
-**v0.8.5 - Combat UI Elements (Week 16, Days 7)**
-
-##### Technical Tasks:
-
-- Extend GameHUD with enemy health bar system
-- Implement floating damage numbers above enemies
-- Add health bar positioning relative to enemy sprites
-- Create health bar visual styling and animations
-- Update HUD rendering pipeline for combat elements
-- **Assets Required:**
-  - `ui_enemy_health_bar_bg.png` - Health bar background
-  - `ui_enemy_health_bar_fill.png` - Health bar fill
-  - `ui_damage_numbers.png` - Damage number font spritesheet
-- **Acceptance Criteria:**
-  - Enemy health bars visible above enemies during combat
-  - Health bars update in real-time when enemies take damage
-  - Damage numbers appear and fade appropriately
-
 ---
 
 ### **Sprint 9 (Weeks 17-18): Verdant Canopy Narrative - "Whispers in the Woods"**
@@ -2773,100 +1959,9 @@ Version: v0.9.0
 - First Act 1 objective/goal set for the player.
 - Introduction to Rook (equipment provider NPC shell).
 
-#### **Microversion Plan:**
-
-**v0.9.1 - Dialogue System Foundation (Week 17, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create DialogueSystem class for managing conversations
-- Implement dialogue UI overlay with text display and speaker portraits
-- Add dialogue trigger system for NPC interactions
-- Create dialogue data structure for story content
-- Update input system to handle dialogue navigation
-- **Assets Required:**
-  - `ui_dialogue_box_bg.png` - Dialogue background frame
-  - `ui_dialogue_portrait_mira.png` - Mira character portrait
-  - `ui_dialogue_continue_icon.png` - Continue prompt indicator
-- **Acceptance Criteria:**
-  - Dialogue system can display text with character portraits
-  - Player can advance through dialogue with input
-  - Multiple dialogue branches supported
-
-**v0.9.2 - Mira Character Integration (Week 17, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create Mira NPC entity class
-- Implement Mira's character positioning and animations
-- Write key Act 1 dialogue content for Verdant Canopy
-- Add interaction prompts when player approaches Mira
-- Create first story beat trigger system
-- **Assets Required:**
-  - `character_mira_idle.png` - Mira idle animation
-  - `character_mira_talking.png` - Mira speaking animation
-  - `ui_interaction_prompt.png` - "Press E to interact" prompt
-- **Acceptance Criteria:**
-  - Mira appears at designated locations in Verdant Canopy
-  - Key dialogue sequences play when player interacts
-  - Story progression tracked properly
-
-**v0.9.3 - Lore Fragment Collectibles (Week 18, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create LoreFragment collectible entity class
-- Implement lore collection system with persistent storage
-- Add lore fragment UI display system
-- Create lore content database with Act 1 fragments
-- Update level spawning to place lore fragments
-- **Assets Required:**
-  - `item_memory_fragment.png` - Memory fragment collectible (from AssetManifest)
-  - `ui_lore_fragment_icon.png` - Lore UI icon
-  - `vfx_lore_collection.png` - Collection visual effect
-- **Acceptance Criteria:**
-  - Lore fragments spawn in hidden/exploration areas
-  - Collection updates player's lore journal
-  - Visual and audio feedback on collection
-
-**v0.9.4 - Objective System Implementation (Week 18, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create QuestSystem class for managing objectives
-- Implement objective UI display and tracking
-- Add first Act 1 objective: "Find Mira in the Woods"
-- Create objective completion triggers and rewards
-- Update save system to track objective progress
-- **Assets Required:**
-  - `ui_objective_banner.png` - Objective notification display
-  - `ui_objective_arrow.png` - Directional indicator
-  - `ui_objective_complete.png` - Completion checkmark
-- **Acceptance Criteria:**
-  - First objective appears and guides player to Mira
-  - Objective tracking updates as player progresses
-  - Completion provides narrative progression
-
-**v0.9.5 - Rook NPC Shell (Week 18, Days 7)**
-
-##### Technical Tasks:
-
-- Create Rook NPC entity class as placeholder
-- Implement basic Rook appearance and positioning
-- Add placeholder dialogue mentioning equipment upgrades
-- Create interaction system framework for future sprints
-- Update character roster with Rook introduction
-- **Assets Required:**
-  - `character_rook_idle.png` - Rook idle animation placeholder
-  - `ui_dialogue_portrait_rook.png` - Rook character portrait
-- **Acceptance Criteria:**
-  - Rook appears in designated area with basic functionality
-  - Placeholder dialogue introduces equipment concept
-  - Framework ready for progression system integration
-
 ---
 
-## Epic 2: Forge Peaks (Act 2)
+### **Epic 2: Forge Peaks (Act 2)**
 
 ---
 
@@ -2881,102 +1976,6 @@ Version: v0.10.0
 - New enemy types for Forge Peaks (e.g., "Magma Golem," "Steam Sentry").
 - Environmental hazards specific to Forge Peaks (lava pits, steam vents).
 
-#### **Microversion Plan:**
-
-**v0.10.1 - Forge Peaks Visual Theme (Week 19, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create ForgeBeaksTheme class for level visual styling
-- Implement volcanic environment tileset system
-- Add background parallax layers for industrial/volcanic setting
-- Create lighting system for molten/industrial ambiance
-- Update level loading to support theme switching
-- **Assets Required:**
-  - `environment_forge_peaks_tileset.png` - Industrial/volcanic tile sprites
-  - `background_forge_peaks_mountains.png` - Background mountain silhouettes
-  - `background_forge_peaks_lava_glow.png` - Molten glow background layer
-  - `environment_forge_peaks_platforms.png` - Metal platform sprites
-- **Acceptance Criteria:**
-  - Distinct visual theme different from Verdant Canopy
-  - Industrial/volcanic atmosphere with appropriate lighting
-  - Seamless transition from previous biome
-
-**v0.10.2 - Level Architecture Blockout (Week 19, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design first Forge Peaks level segment layout
-- Implement multi-tier platforming with industrial structures
-- Add vertical navigation elements (scaffolding, pipes)
-- Create checkpoint system for longer level segments
-- Update level streaming for larger environments
-- **Assets Required:**
-  - `environment_forge_peaks_scaffolding.png` - Industrial scaffolding sprites
-  - `environment_forge_peaks_pipes.png` - Steam pipe and conduit sprites
-  - `environment_forge_peaks_machinery.png` - Background machinery
-- **Acceptance Criteria:**
-  - First level segment fully traversable
-  - Clear progression path with optional exploration routes
-  - Checkpoint system functional for save/respawn
-
-**v0.10.3 - Magma Golem Enemy Type (Week 20, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create MagmaGolem enemy class with heavy/slow archetype
-- Implement ground pound attack with area damage
-- Add fire immunity and volcanic-themed abilities
-- Create robust health pool requiring sustained combat
-- Update enemy spawning system for Forge Peaks enemies
-- **Assets Required:**
-  - `enemy_magma_golem_idle.png` - Golem idle animation
-  - `enemy_magma_golem_attack.png` - Ground pound attack animation
-  - `enemy_magma_golem_walk.png` - Heavy movement animation
-  - `vfx_ground_pound_impact.png` - Attack impact effect
-- **Acceptance Criteria:**
-  - Magma Golem spawns in appropriate Forge Peaks areas
-  - Distinct combat feel from Verdant Canopy enemies
-  - Ground pound attack creates threatening area damage
-
-**v0.10.4 - Steam Sentry Enemy Type (Week 20, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create SteamSentry enemy class with ranged/mobile archetype
-- Implement steam blast projectile attacks
-- Add wall-climbing or elevated positioning AI
-- Create steam vision obstruction mechanics
-- Update enemy variety spawning in level segments
-- **Assets Required:**
-  - `enemy_steam_sentry_idle.png` - Sentry idle animation
-  - `enemy_steam_sentry_attack.png` - Steam blast attack animation
-  - `enemy_projectile_steam.png` - Steam projectile sprite
-  - `vfx_steam_cloud.png` - Steam cloud visual effect
-- **Acceptance Criteria:**
-  - Steam Sentry provides ranged threat with mobility
-  - Steam attacks create temporary vision obstruction
-  - AI positioning utilizes elevated terrain
-
-**v0.10.5 - Environmental Hazards (Week 20, Days 7)**
-
-##### Technical Tasks:
-
-- Create LavaPit hazard class with instant damage/death
-- Implement SteamVent periodic hazard with timing patterns
-- Add hazard collision detection and player damage
-- Create visual warning systems for hazard activation
-- Update level design to incorporate hazard placement
-- **Assets Required:**
-  - `environment_lava_pit.png` - Lava pit hazard sprite
-  - `environment_steam_vent.png` - Steam vent with warning indicators
-  - `vfx_lava_bubbles.png` - Lava surface animation
-  - `vfx_steam_burst.png` - Steam vent activation effect
-- **Acceptance Criteria:**
-  - Environmental hazards add challenge without feeling unfair
-  - Clear visual indicators warn of hazard activation
-  - Hazards integrate naturally with level flow
-
 ---
 
 ### **Sprint 11 (Weeks 21-22): Advanced Movement - "Flow of Aether"**
@@ -2989,100 +1988,6 @@ Version: v0.11.0
 - Aether Grapple mechanic (or similar).
 - Level sections designed to utilize these new mechanics.
 
-#### **Microversion Plan:**
-
-**v0.11.1 - Wall-Running Foundation (Week 21, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Extend MovementComponent with wall detection and adhesion
-- Implement wall-running physics with gravity modification
-- Add wall-running input handling and state transitions
-- Create wall-running animation states and transitions
-- Update collision system for wall interaction detection
-- **Assets Required:**
-  - `character_player_wall_run.png` - Wall-running animation sequence
-  - `character_player_wall_jump.png` - Wall jump transition animation
-  - `vfx_wall_run_sparks.png` - Wall-running visual effect
-- **Acceptance Criteria:**
-  - Player can run along vertical walls for limited duration
-  - Smooth transitions between wall-running and normal movement
-  - Wall-running maintains momentum and feels responsive
-
-**v0.11.2 - Aether Grapple Mechanic (Week 21, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create AetherGrapple ability class with targeting system
-- Implement grapple point detection and visual indicators
-- Add rope/energy tether physics and swing mechanics
-- Create grapple hook projectile with arc trajectory
-- Update input system for grapple targeting and activation
-- **Assets Required:**
-  - `character_player_grapple_cast.png` - Grapple casting animation
-  - `character_player_grapple_swing.png` - Swinging animation
-  - `vfx_aether_grapple_hook.png` - Grapple hook projectile
-  - `vfx_aether_tether.png` - Energy tether visual effect
-  - `environment_grapple_point.png` - Grapple anchor point sprite
-- **Acceptance Criteria:**
-  - Player can target and grapple to designated anchor points
-  - Swing physics feel natural and maintain momentum
-  - Clear visual feedback for grapple point availability
-
-**v0.11.3 - Advanced Movement Integration (Week 22, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Combine wall-running with grapple mechanics for chaining
-- Implement movement combo system for advanced traversal
-- Add momentum preservation between different movement types
-- Create advanced movement tutorial sequences
-- Update MovementSystem to handle complex state transitions
-- **Assets Required:**
-  - `character_player_wall_to_grapple.png` - Wall-run to grapple transition
-  - `character_player_grapple_to_wall.png` - Grapple to wall-run transition
-  - `ui_movement_tutorial.png` - Tutorial prompt graphics
-- **Acceptance Criteria:**
-  - Seamless chaining between wall-running and grappling
-  - Movement combos maintain speed and feel fluid
-  - Advanced movement enhances traversal options
-
-**v0.11.4 - Level Design for New Mechanics (Week 22, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design Forge Peaks level segments utilizing wall-running
-- Place grapple points strategically for optimal flow
-- Create vertical navigation challenges requiring advanced movement
-- Add optional advanced movement shortcuts and secrets
-- Update level streaming for larger vertical spaces
-- **Assets Required:**
-  - `environment_forge_peaks_vertical_walls.png` - Wall-running surfaces
-  - `environment_forge_peaks_grapple_towers.png` - Tall structures with grapple points
-  - `environment_forge_peaks_scaffolding_complex.png` - Multi-level scaffolding
-- **Acceptance Criteria:**
-  - Level sections require and reward advanced movement usage
-  - Multiple traversal paths available (basic vs advanced movement)
-  - New mechanics feel integrated, not tacked-on
-
-**v0.11.5 - Movement System Polish (Week 22, Days 7)**
-
-##### Technical Tasks:
-
-- Polish movement animations and transitions
-- Add haptic feedback for advanced movement actions
-- Implement movement ability cooldowns and limitations
-- Create visual indicators for movement ability availability
-- Update movement tutorial and onboarding flow
-- **Assets Required:**
-  - `ui_movement_cooldown.png` - Ability cooldown indicators
-  - `ui_movement_availability.png` - Movement ability status icons
-  - `vfx_movement_ready.png` - Ability ready visual feedback
-- **Acceptance Criteria:**
-  - Movement abilities have appropriate limitations preventing exploitation
-  - Clear feedback system for movement ability status
-  - Advanced movement feels polished and intentional
-
 ---
 
 ### **Sprint 12 (Weeks 23-24): Forge Peaks - "Industrial Peril"**
@@ -3094,99 +1999,6 @@ Version: v0.12.0
 - New level segments in Forge Peaks with complex platforming and puzzles.
 - Integration of industrial-themed hazards (crushers, conveyor belts).
 - Secrets and hidden areas in Forge Peaks.
-
-#### **Microversion Plan:**
-
-**v0.12.1 - Industrial Hazard Systems (Week 23, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create Crusher hazard class with timing-based activation
-- Implement ConveyorBelt entity with directional movement
-- Add HazardTiming system for coordinated industrial dangers
-- Create visual warning systems for hazard activation patterns
-- Update level collision system for moving hazard platforms
-- **Assets Required:**
-  - `environment_forge_crusher.png` - Industrial crusher hazard sprite
-  - `environment_forge_conveyor.png` - Conveyor belt animation sequence
-  - `environment_forge_warning_light.png` - Hazard warning indicators
-  - `vfx_crusher_impact.png` - Crusher activation visual effect
-- **Acceptance Criteria:**
-  - Industrial hazards operate on predictable timing patterns
-  - Clear visual warnings give players opportunity to react
-  - Hazards integrate with existing movement mechanics
-
-**v0.12.2 - Complex Platforming Sections (Week 23, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design multi-stage platforming challenges using advanced movement
-- Implement moving platform systems with industrial machinery
-- Add precision jumping sections requiring wall-running + grappling
-- Create checkpoint placement for challenging sections
-- Update level progression pacing for increased difficulty
-- **Assets Required:**
-  - `environment_forge_moving_platform.png` - Automated moving platforms
-  - `environment_forge_precision_gaps.png` - Challenging gap layouts
-  - `environment_forge_machinery_bg.png` - Industrial background machinery
-- **Acceptance Criteria:**
-  - Platforming sections challenge but don't frustrate players
-  - Advanced movement mechanics required for optimal traversal
-  - Multiple difficulty paths accommodate different skill levels
-
-**v0.12.3 - Industrial Puzzle Implementation (Week 24, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create PowerSwitch puzzle element for machinery control
-- Implement TimedSequence puzzles requiring quick execution
-- Add PressurePlate mechanics integrated with industrial systems
-- Create puzzle state management and reset functionality
-- Update UI system for puzzle interaction feedback
-- **Assets Required:**
-  - `environment_forge_power_switch.png` - Industrial switch controls
-  - `environment_forge_pressure_plate.png` - Pressure-activated platforms
-  - `ui_puzzle_timer.png` - Timed puzzle UI elements
-  - `vfx_machinery_activation.png` - Machinery power-up effects
-- **Acceptance Criteria:**
-  - Puzzles require combination of timing and advanced movement
-  - Clear feedback system for puzzle state and progress
-  - Puzzle solutions feel logical and rewarding
-
-**v0.12.4 - Secrets and Hidden Areas (Week 24, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design hidden rooms accessible via advanced movement
-- Implement secret collectibles and lore fragments
-- Add visual hints for hidden area locations
-- Create reward systems for exploration and secrets
-- Update mapping system to track secret discovery
-- **Assets Required:**
-  - `environment_forge_secret_passage.png` - Hidden passage indicators
-  - `item_forge_peaks_collectible.png` - Biome-specific collectibles
-  - `environment_forge_hidden_chamber.png` - Secret room layouts
-- **Acceptance Criteria:**
-  - Hidden areas reward advanced movement mastery
-  - Secrets feel organic to environment, not artificially placed
-  - Meaningful rewards justify exploration effort
-
-**v0.12.5 - Level Integration and Polish (Week 24, Days 7)**
-
-##### Technical Tasks:
-
-- Integrate all new elements into cohesive level flow
-- Balance difficulty progression throughout Forge Peaks
-- Polish visual effects and environmental storytelling
-- Add ambient sounds and industrial atmosphere audio
-- Conduct full Forge Peaks playthrough testing
-- **Assets Required:**
-  - `environment_forge_ambient_effects.png` - Atmospheric visual details
-  - `vfx_industrial_steam.png` - Ambient steam and particle effects
-- **Acceptance Criteria:**
-  - Complete Forge Peaks section feels cohesive and polished
-  - Difficulty curve provides appropriate challenge progression
-  - Industrial atmosphere enhances gameplay experience
 
 ---
 
@@ -3201,101 +2013,6 @@ Version: v0.13.0
 - Stat enhancement system (e.g., increased health, Aether capacity).
 - Rook NPC provides access to upgrades.
 
-#### **Microversion Plan:**
-
-**v0.13.1 - Progression System Foundation (Week 25, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create ProgressionSystem class for managing character advancement
-- Implement skill point currency and earning mechanics
-- Add persistent storage for progression data
-- Create skill unlock/upgrade logic with prerequisites
-- Update save system to track progression state
-- **Assets Required:**
-  - `ui_skill_point_icon.png` - Skill point currency indicator
-  - `ui_progression_background.png` - Skill tree UI background
-  - `vfx_skill_unlock.png` - Skill unlock visual effect
-- **Acceptance Criteria:**
-  - Skill points earned through gameplay activities
-  - Progression state persists between sessions
-  - Clear feedback for skill point gain and usage
-
-**v0.13.2 - Skill Tree UI Implementation (Week 25, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design and implement SkillTreeUI with node-based layout
-- Add skill description tooltips and preview system
-- Create skill prerequisite visualization and connections
-- Implement skill upgrade confirmation and cost display
-- Update input system for skill tree navigation
-- **Assets Required:**
-  - `ui_skill_tree_node.png` - Individual skill tree nodes
-  - `ui_skill_tree_connection.png` - Skill prerequisite connections
-  - `ui_skill_tooltip_bg.png` - Skill description tooltip background
-  - `ui_skill_locked.png` - Locked skill visual state
-  - `ui_skill_available.png` - Available skill visual state
-- **Acceptance Criteria:**
-  - Intuitive skill tree navigation and interaction
-  - Clear visual indication of locked/available/owned skills
-  - Skill descriptions provide clear understanding of benefits
-
-**v0.13.3 - Core Skill Implementation (Week 26, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Implement DashUpgrade skill (increased distance/reduced cooldown)
-- Add MeleeComboExtension skill (additional attack in combo)
-- Create AetherCapacityBoost skill (increased Aether resource pool)
-- Implement HealthIncrease skill (additional health points)
-- Update relevant systems to check for skill upgrades
-- **Assets Required:**
-  - `ui_skill_dash_upgrade.png` - Dash upgrade skill icon
-  - `ui_skill_melee_combo.png` - Melee combo skill icon
-  - `ui_skill_aether_capacity.png` - Aether capacity skill icon
-  - `ui_skill_health_boost.png` - Health increase skill icon
-- **Acceptance Criteria:**
-  - Skills provide meaningful gameplay improvements
-  - Skill effects properly integrated with existing systems
-  - Visual feedback shows when upgraded abilities are used
-
-**v0.13.4 - Rook NPC Upgrade Integration (Week 26, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Expand Rook NPC with skill tree access functionality
-- Implement upgrade shop interface through Rook interactions
-- Add skill point earning feedback and transaction system
-- Create equipment upgrade preview system
-- Update dialogue system for upgrade-related conversations
-- **Assets Required:**
-  - `character_rook_upgrade_gesture.png` - Rook upgrade interaction animation
-  - `ui_upgrade_shop_bg.png` - Upgrade shop interface background
-  - `ui_upgrade_confirmation.png` - Skill purchase confirmation dialog
-- **Acceptance Criteria:**
-  - Rook provides clear access to progression system
-  - Upgrade transactions feel meaningful and permanent
-  - NPC interaction integrates naturally with progression
-
-**v0.13.5 - Stat Enhancement System (Week 26, Days 7)**
-
-##### Technical Tasks:
-
-- Create StatModifier system for dynamic stat changes
-- Implement visual indicators for upgraded stats in UI
-- Add stat comparison system showing before/after values
-- Create progression milestone rewards and celebrations
-- Update character stats display with upgrade indicators
-- **Assets Required:**
-  - `ui_stat_upgrade_arrow.png` - Stat increase indicator
-  - `ui_character_stats_bg.png` - Character stats panel background
-  - `vfx_stat_upgrade.png` - Stat upgrade celebration effect
-- **Acceptance Criteria:**
-  - Stat upgrades provide noticeable gameplay improvements
-  - Clear UI feedback shows current vs upgraded stats
-  - Progression feels rewarding and impactful
-
 ---
 
 ### **Sprint 14 (Weeks 27-28): Forge Peaks Narrative - "Sparks of Conflict"**
@@ -3308,100 +2025,9 @@ Version: v0.14.0
 - Key dialogue sequences for Act 2.
 - Major story beat related to the Fracture and Kael's past.
 
-#### **Microversion Plan:**
-
-**v0.14.1 - Veyra Character Foundation (Week 27, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create Veyra NPC entity class with enhanced AI capabilities
-- Implement Veyra character model and animation system
-- Add Veyra-specific movement patterns and behaviors
-- Create character introduction cutscene system
-- Update NPC rendering pipeline for major characters
-- **Assets Required:**
-  - `character_veyra_idle.png` - Veyra idle animation
-  - `character_veyra_run.png` - Veyra running animation
-  - `character_veyra_jump.png` - Veyra jumping animation
-  - `ui_dialogue_portrait_veyra.png` - Veyra character portrait
-- **Acceptance Criteria:**
-  - Veyra character visually distinct from other NPCs
-  - Character animations smooth and expressive
-  - Introduction sequence creates memorable first impression
-
-**v0.14.2 - Chase Sequence Implementation (Week 27, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design chase sequence level layout with multiple paths
-- Implement Veyra chase AI with dynamic pathfinding
-- Add chase sequence music and audio cues
-- Create environmental storytelling during chase
-- Update camera system for dynamic chase following
-- **Assets Required:**
-  - `environment_forge_chase_path.png` - Chase sequence level layout
-  - `character_veyra_chase_gesture.png` - Veyra chase interactions
-  - `vfx_chase_debris.png` - Environmental effects during chase
-- **Acceptance Criteria:**
-  - Chase sequence feels exciting and dynamic
-  - Multiple valid paths prevent repetitive gameplay
-  - Chase maintains appropriate challenge without frustration
-
-**v0.14.3 - Act 2 Dialogue Implementation (Week 28, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Write key Act 2 dialogue sequences for Forge Peaks
-- Implement dialogue branching for player choice moments
-- Add character development dialogue with Mira
-- Create dialogue triggers for major story beats
-- Update dialogue system for longer conversation sequences
-- **Assets Required:**
-  - `ui_dialogue_choice_bg.png` - Dialogue choice selection background
-  - `ui_dialogue_branch_icon.png` - Choice branch indicators
-- **Acceptance Criteria:**
-  - Dialogue advances main story meaningfully
-  - Character relationships develop through conversations
-  - Player choices feel impactful to narrative progression
-
-**v0.14.4 - Fracture Lore and Backstory (Week 28, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create major story revelation sequence about the Fracture
-- Implement Kael backstory flashback system
-- Add lore fragments specific to Fracture origins
-- Create visual storytelling elements for major reveals
-- Update narrative tracking for story progression
-- **Assets Required:**
-  - `cutscene_fracture_flashback.png` - Fracture origin visualization
-  - `cutscene_kael_memory.png` - Kael's past memory sequences
-  - `item_fracture_lore_fragment.png` - Fracture-specific lore items
-- **Acceptance Criteria:**
-  - Major story revelations feel earned and impactful
-  - Backstory integration enhances current narrative
-  - Lore fragments provide meaningful world-building
-
-**v0.14.5 - Narrative Integration Polish (Week 28, Days 7)**
-
-##### Technical Tasks:
-
-- Integrate all narrative elements into cohesive story flow
-- Add narrative pacing checkpoints throughout Forge Peaks
-- Create story recap system for complex narrative elements
-- Polish cutscene transitions and narrative presentation
-- Update objective system to reflect Act 2 story goals
-- **Assets Required:**
-  - `ui_story_recap_bg.png` - Story recap interface background
-  - `ui_act2_objective_marker.png` - Act 2 specific objective styling
-- **Acceptance Criteria:**
-  - Story progression feels natural and well-paced
-  - Complex narrative elements clearly communicated
-  - Act 2 conclusion sets up Act 3 effectively
-
 ---
 
-## Epic 3: Celestial Archive (Act 3)
+### **Epic 3: Celestial Archive (Act 3)**
 
 ---
 
@@ -3416,100 +2042,6 @@ Version: v0.15.0
 - First set of reality-bending puzzles (e.g., shifting platforms, time-distorted areas).
 - New enemy types for Celestial Archive (e.g., "Echo Knight," "Paradox Sprite").
 
-#### **Microversion Plan:**
-
-**v0.15.1 - Celestial Archive Visual Theme (Week 29, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create CelestialArchiveTheme class for ethereal/mystical environment
-- Implement floating platform systems with magical suspension
-- Add ethereal lighting system with reality distortion effects
-- Create mystical particle systems and ambient effects
-- Update background rendering for cosmic/archive atmosphere
-- **Assets Required:**
-  - `environment_celestial_tileset.png` - Mystical archive tile sprites
-  - `background_celestial_cosmos.png` - Cosmic background layers
-  - `environment_celestial_floating_platform.png` - Levitating platform sprites
-  - `vfx_ethereal_glow.png` - Mystical ambient lighting effects
-- **Acceptance Criteria:**
-  - Distinct ethereal atmosphere different from previous biomes
-  - Mystical elements enhance puzzle and exploration themes
-  - Visual coherence maintains fantasy game aesthetic
-
-**v0.15.2 - Reality-Bending Puzzle Foundation (Week 29, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create RealityManipulation system for puzzle mechanics
-- Implement ShiftingPlatform entities with phasing behavior
-- Add reality distortion zones with altered physics
-- Create puzzle state management for complex interactions
-- Update physics system to handle reality manipulation
-- **Assets Required:**
-  - `environment_shifting_platform.png` - Phasing platform animations
-  - `environment_reality_distortion.png` - Reality distortion visual effects
-  - `vfx_phase_transition.png` - Platform phasing transition effects
-- **Acceptance Criteria:**
-  - Reality-bending puzzles provide unique gameplay challenges
-  - Puzzle mechanics feel logical within fantasy context
-  - Clear visual feedback for reality manipulation states
-
-**v0.15.3 - Echo Knight Enemy Implementation (Week 30, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create EchoKnight enemy class with teleportation abilities
-- Implement echo/duplicate attack patterns
-- Add phasing movement through certain obstacles
-- Create mystical combat AI with unpredictable positioning
-- Update enemy spawning for Celestial Archive encounters
-- **Assets Required:**
-  - `enemy_echo_knight_idle.png` - Echo Knight idle animation
-  - `enemy_echo_knight_teleport.png` - Teleportation effect animation
-  - `enemy_echo_knight_attack.png` - Echo attack sequence
-  - `vfx_echo_duplicate.png` - Echo creation visual effect
-- **Acceptance Criteria:**
-  - Echo Knight provides challenging but fair combat encounters
-  - Teleportation abilities create dynamic combat scenarios
-  - Enemy behavior fits mystical archive environment
-
-**v0.15.4 - Paradox Sprite Enemy Implementation (Week 30, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create ParadoxSprite enemy class with time-distortion abilities
-- Implement temporal displacement attacks and defenses
-- Add sprite swarm behavior with coordinated movements
-- Create time-based puzzle integration with sprite encounters
-- Update combat system for temporal enemy interactions
-- **Assets Required:**
-  - `enemy_paradox_sprite_idle.png` - Paradox Sprite idle animation
-  - `enemy_paradox_sprite_swarm.png` - Swarm formation sprites
-  - `vfx_temporal_displacement.png` - Time distortion effects
-  - `vfx_sprite_trail.png` - Paradox Sprite movement trails
-- **Acceptance Criteria:**
-  - Paradox Sprites introduce time-based combat mechanics
-  - Swarm behavior creates unique tactical challenges
-  - Enemy abilities preview time manipulation mechanics
-
-**v0.15.5 - Level Architecture and Integration (Week 30, Days 7)**
-
-##### Technical Tasks:
-
-- Design first Celestial Archive level segment layout
-- Integrate reality-bending puzzles into level progression
-- Place enemy encounters to complement puzzle challenges
-- Create exploration rewards and hidden mystical secrets
-- Update level streaming for complex puzzle states
-- **Assets Required:**
-  - `environment_celestial_architecture.png` - Archive building structures
-  - `environment_celestial_secrets.png` - Hidden area indicators
-- **Acceptance Criteria:**
-  - Level design emphasizes exploration and puzzle-solving
-  - Enemy encounters enhance rather than detract from puzzles
-  - Celestial Archive feels distinct from previous level types
-
 ---
 
 ### **Sprint 16 (Weeks 31-32): Time Manipulation - "Shifting Sands"**
@@ -3523,99 +2055,6 @@ Version: v0.16.0
 - Enemies affected by time manipulation.
 - Player UI for time manipulation.
 
-#### **Microversion Plan:**
-
-**v0.16.1 - Time Manipulation System Foundation (Week 31, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create TimeManipulationSystem for temporal effects management
-- Implement TimeScale modification for individual entities
-- Add temporal state tracking and rewind data storage
-- Create time manipulation input handling and ability system
-- Update entity update loops to support time scaling
-- **Assets Required:**
-  - `character_player_time_cast.png` - Time manipulation casting animation
-  - `vfx_time_distortion.png` - Time distortion visual effects
-  - `vfx_time_rewind.png` - Rewind effect visualization
-- **Acceptance Criteria:**
-  - Time manipulation affects targeted objects/enemies selectively
-  - Temporal effects visually distinct and clearly communicated
-  - System performance remains stable during time effects
-
-**v0.16.2 - Time Manipulation UI System (Week 31, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create TimeManipulationUI for ability targeting and feedback
-- Implement temporal ability cooldown and resource management
-- Add time manipulation target selection system
-- Create visual indicators for time-affected entities
-- Update HUD to display temporal ability status
-- **Assets Required:**
-  - `ui_time_manipulation_cursor.png` - Time ability targeting cursor
-  - `ui_time_ability_cooldown.png` - Temporal ability cooldown indicator
-  - `ui_temporal_resource_bar.png` - Time manipulation resource meter
-  - `vfx_time_target_highlight.png` - Time manipulation target outline
-- **Acceptance Criteria:**
-  - Intuitive targeting system for time manipulation abilities
-  - Clear feedback for ability availability and resource costs
-  - UI elements enhance rather than clutter gameplay experience
-
-**v0.16.3 - Time-Based Puzzle Implementation (Week 32, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create TimedMovingPlatform puzzles requiring temporal coordination
-- Implement TemporalSequence puzzles with rewind mechanics
-- Add TimeGate obstacles requiring precise timing manipulation
-- Create multi-stage puzzles combining time and movement mechanics
-- Update puzzle system to track temporal interaction states
-- **Assets Required:**
-  - `environment_timed_platform.png` - Time-sensitive moving platforms
-  - `environment_temporal_gate.png` - Time-locked barriers
-  - `environment_sequence_marker.png` - Temporal sequence indicators
-  - `vfx_temporal_activation.png` - Puzzle temporal activation effects
-- **Acceptance Criteria:**
-  - Time manipulation puzzles require strategic thinking
-  - Puzzle solutions feel satisfying and logical
-  - Clear visual communication of temporal puzzle mechanics
-
-**v0.16.4 - Combat Time Manipulation Integration (Week 32, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Integrate time manipulation with combat system
-- Implement enemy time slow/freeze effects in combat
-- Add strategic time manipulation combat scenarios
-- Create time-based combat combos and abilities
-- Update enemy AI to react to temporal effects
-- **Assets Required:**
-  - `vfx_enemy_time_slow.png` - Enemy time slow visual effects
-  - `vfx_combat_time_freeze.png` - Combat time freeze effects
-  - `character_player_temporal_combo.png` - Time-enhanced combat animations
-- **Acceptance Criteria:**
-  - Time manipulation adds strategic depth to combat
-  - Enemy reactions to temporal effects feel natural
-  - Combat time abilities balanced for challenging but fair gameplay
-
-**v0.16.5 - Time Manipulation Polish and Integration (Week 32, Days 7)**
-
-##### Technical Tasks:
-
-- Polish time manipulation visual effects and feedback
-- Balance temporal ability costs and cooldowns
-- Create time manipulation tutorial and onboarding
-- Add audio design for temporal effects
-- Conduct time manipulation system integration testing
-- **Assets Required:**
-  - `ui_time_tutorial.png` - Time manipulation tutorial graphics
-  - `vfx_temporal_polish.png` - Polished time effect visuals
-- **Acceptance Criteria:**
-  - Time manipulation system feels polished and responsive
-  - Tutorial effectively teaches temporal mechanics
-  - All time-based systems work cohesively together
-
 ---
 
 ### **Sprint 17 (Weeks 33-34): Celestial Archive - "Unveiling Secrets"**
@@ -3627,97 +2066,6 @@ Version: v0.17.0
 - New level segments with complex, multi-stage puzzles.
 - Significant lore fragments revealing deeper story aspects.
 - Hidden rooms and optional challenges.
-
-#### **Microversion Plan:**
-
-**v0.17.1 - Complex Multi-Stage Puzzle Systems (Week 33, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create PuzzleChain system for interconnected puzzle sequences
-- Implement multi-room puzzle coordination and state tracking
-- Add puzzle dependency management and prerequisite checking
-- Create visual progress indicators for complex puzzle chains
-- Update save system to track multi-stage puzzle progress
-- **Assets Required:**
-  - `environment_puzzle_chain_connector.png` - Puzzle connection indicators
-  - `ui_puzzle_progress_tracker.png` - Multi-stage puzzle progress UI
-  - `environment_celestial_puzzle_chamber.png` - Dedicated puzzle room layouts
-- **Acceptance Criteria:**
-  - Multi-stage puzzles provide satisfying progression challenges
-  - Clear communication of puzzle chain dependencies and progress
-  - Puzzle complexity appropriately scaled for late-game content
-
-**v0.17.2 - Advanced Lore Fragment System (Week 33, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Implement DeepLoreFragment system with rich story content
-- Add lore fragment combination mechanics for deeper revelations
-- Create immersive lore presentation with visual storytelling
-- Update lore journal with enhanced organization and searching
-- Add lore-based unlock conditions for secret areas
-- **Assets Required:**
-  - `item_deep_lore_fragment.png` - Advanced lore fragment visuals
-  - `ui_lore_journal_enhanced.png` - Enhanced lore journal interface
-  - `cutscene_lore_revelation.png` - Lore revelation presentation graphics
-- **Acceptance Criteria:**
-  - Lore fragments provide meaningful world-building and story depth
-  - Lore collection mechanics reward thorough exploration
-  - Story revelations enhance understanding of game world and characters
-
-**v0.17.3 - Hidden Rooms and Secret Challenges (Week 34, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Design hidden chamber system with advanced movement requirements
-- Implement secret challenge rooms with unique puzzle mechanics
-- Add hidden area reward systems with valuable upgrades
-- Create environmental storytelling in secret areas
-- Update mapping system to track secret area discovery
-- **Assets Required:**
-  - `environment_celestial_hidden_chamber.png` - Secret room layouts
-  - `environment_secret_challenge_marker.png` - Hidden challenge indicators
-  - `item_celestial_secret_reward.png` - Unique secret area rewards
-- **Acceptance Criteria:**
-  - Hidden areas reward mastery of game mechanics
-  - Secret challenges provide optional difficulty for dedicated players
-  - Rewards justify effort required to discover and complete secrets
-
-**v0.17.4 - Advanced Time Manipulation Puzzles (Week 34, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create complex temporal puzzles requiring multiple time abilities
-- Implement temporal paradox puzzles with cause-and-effect mechanics
-- Add time manipulation precision challenges
-- Create puzzle rooms showcasing mastery of temporal mechanics
-- Update tutorial system for advanced time manipulation techniques
-- **Assets Required:**
-  - `environment_temporal_paradox_chamber.png` - Advanced time puzzle rooms
-  - `vfx_temporal_paradox.png` - Temporal paradox visual effects
-  - `ui_advanced_time_tutorial.png` - Advanced time manipulation guides
-- **Acceptance Criteria:**
-  - Advanced time puzzles challenge players who have mastered basic mechanics
-  - Temporal paradox puzzles provide intellectually satisfying solutions
-  - Puzzle difficulty appropriately scaled for experienced players
-
-**v0.17.5 - Celestial Archive Completion and Polish (Week 34, Days 7)**
-
-##### Technical Tasks:
-
-- Integrate all Celestial Archive elements into cohesive experience
-- Polish level flow and pacing throughout archive sections
-- Add atmospheric details and environmental storytelling elements
-- Create climactic archive sequence leading to Act 3 conclusion
-- Conduct full Celestial Archive playthrough testing
-- **Assets Required:**
-  - `environment_celestial_climax.png` - Climactic archive sequence visuals
-  - `vfx_celestial_completion.png` - Archive completion celebration effects
-- **Acceptance Criteria:**
-  - Complete Celestial Archive provides satisfying Act 3 experience
-  - Level pacing maintains engagement throughout extended exploration
-  - Archive conclusion effectively sets up transition to final act
 
 ---
 
@@ -3732,99 +2080,6 @@ Version: v0.18.0
 - Ultimate Aether ability (first pass).
 - Enemy AI improvements to counter new abilities.
 
-#### **Microversion Plan:**
-
-**v0.18.1 - Advanced Aether Combat Abilities (Week 35, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create AetherBlast ability with area-of-effect damage
-- Implement ProtectiveWard defensive ability with temporary shielding
-- Add AetherShockwave ability for crowd control
-- Create advanced Aether resource management system
-- Update combat system to integrate new Aether abilities
-- **Assets Required:**
-  - `character_player_aether_blast.png` - Aether blast casting animation
-  - `character_player_protective_ward.png` - Ward casting animation
-  - `vfx_aether_blast_explosion.png` - Aether blast impact effects
-  - `vfx_protective_ward_shield.png` - Ward protection visual effects
-- **Acceptance Criteria:**
-  - New Aether abilities provide distinct tactical options
-  - Aether resource management adds strategic depth to combat
-  - Visual effects clearly communicate ability effects and ranges
-
-**v0.18.2 - Expanded Melee Combo System (Week 35, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Extend melee combo chains with additional attack sequences
-- Implement combo branching based on directional inputs
-- Add combo finisher abilities with enhanced effects
-- Create combo timing windows and input buffering improvements
-- Update animation system for complex combo sequences
-- **Assets Required:**
-  - `character_player_combo_extended.png` - Extended combo animations
-  - `character_player_combo_finisher.png` - Combo finisher animations
-  - `vfx_combo_impact.png` - Enhanced combo impact effects
-- **Acceptance Criteria:**
-  - Extended combos feel responsive and rewarding to execute
-  - Combo system provides depth without overwhelming complexity
-  - Combat flow maintains smooth pacing with new combo options
-
-**v0.18.3 - Ultimate Aether Ability Implementation (Week 36, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create UltimateAetherAbility system with charging mechanics
-- Implement devastating area attack with dramatic visual effects
-- Add ultimate ability resource accumulation through combat
-- Create screen-shaking and impact feedback for ultimate usage
-- Update UI to display ultimate ability charge status
-- **Assets Required:**
-  - `character_player_ultimate_cast.png` - Ultimate ability casting sequence
-  - `vfx_ultimate_aether_storm.png` - Ultimate ability visual effects
-  - `ui_ultimate_charge_bar.png` - Ultimate ability charge indicator
-  - `vfx_ultimate_screen_effects.png` - Screen-wide ultimate effects
-- **Acceptance Criteria:**
-  - Ultimate ability feels appropriately powerful and impactful
-  - Clear feedback system for ultimate ability charging and availability
-  - Ultimate usage creates memorable moments in combat encounters
-
-**v0.18.4 - Enemy AI Combat Improvements (Week 36, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Update enemy AI to react to new player Aether abilities
-- Implement enemy evasion and counter-attack patterns
-- Add enemy ability interruption and defensive behaviors
-- Create dynamic difficulty scaling based on player ability usage
-- Update enemy spawning patterns for enhanced combat encounters
-- **Assets Required:**
-  - `enemy_ai_evasion.png` - Enemy evasive movement animations
-  - `enemy_ai_counter.png` - Enemy counter-attack animations
-  - `vfx_enemy_defensive.png` - Enemy defensive ability effects
-- **Acceptance Criteria:**
-  - Enemy AI provides appropriate challenge against new player abilities
-  - Combat encounters remain engaging as player power increases
-  - Enemy behaviors feel intelligent and reactive to player tactics
-
-**v0.18.5 - Combat System Polish and Balance (Week 36, Days 7)**
-
-##### Technical Tasks:
-
-- Balance damage values and cooldowns for all combat abilities
-- Polish combat animations and visual effect timing
-- Add haptic feedback and screen effects for enhanced impact
-- Create combat tutorial updates for new abilities
-- Conduct comprehensive combat system testing and refinement
-- **Assets Required:**
-  - `ui_combat_tutorial_advanced.png` - Advanced combat tutorial graphics
-  - `vfx_combat_polish.png` - Polished combat visual effects
-- **Acceptance Criteria:**
-  - Combat system feels balanced and responsive across all abilities
-  - Advanced combat mechanics accessible to players of varying skill levels
-  - Combat encounters provide consistent challenge and satisfaction
-
 ---
 
 ### **Sprint 19 (Weeks 37-38): Celestial Archive Narrative - "The Hollow Truth"**
@@ -3837,100 +2092,9 @@ Version: v0.19.0
 - Significant plot twists and character development.
 - Introduction to the concept/threat of the Hollow King.
 
-#### **Microversion Plan:**
-
-**v0.19.1 - Major Plot Revelation System (Week 37, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create enhanced cutscene system for major story moments
-- Implement key revelation sequences about Kael's true nature
-- Add Fracture origin revelation with visual storytelling
-- Create dramatic narrative pacing for plot twists
-- Update save system to track major story milestone completions
-- **Assets Required:**
-  - `cutscene_kael_revelation.png` - Kael true nature revelation visuals
-  - `cutscene_fracture_truth.png` - Fracture origin revelation graphics
-  - `ui_major_revelation_frame.png` - Dramatic revelation presentation frame
-- **Acceptance Criteria:**
-  - Major revelations feel impactful and well-earned through gameplay
-  - Plot twists enhance rather than confuse the narrative
-  - Story pacing maintains player engagement through complex reveals
-
-**v0.19.2 - Character Development Sequences (Week 37, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Implement deep character development dialogue for Kael and Mira
-- Add character relationship progression based on player choices
-- Create emotional character moments with enhanced presentation
-- Update dialogue system for complex character interaction branches
-- Add character growth reflection in gameplay abilities and story
-- **Assets Required:**
-  - `ui_character_development_bg.png` - Character development scene backgrounds
-  - `character_kael_emotional_range.png` - Kael emotional expression variations
-  - `character_mira_development.png` - Mira character growth animations
-- **Acceptance Criteria:**
-  - Character development feels authentic and emotionally resonant
-  - Player choices meaningfully impact character relationships
-  - Character growth reflected in both narrative and gameplay elements
-
-**v0.19.3 - Hollow King Introduction and Threat Establishment (Week 38, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create HollowKing introduction sequence with imposing presentation
-- Implement environmental storytelling showing Hollow King's influence
-- Add threat escalation system building tension toward final confrontation
-- Create ominous atmosphere and audio design for Hollow King scenes
-- Update objective system to reflect the ultimate threat
-- **Assets Required:**
-  - `character_hollow_king_silhouette.png` - Hollow King mysterious introduction
-  - `environment_hollow_influence.png` - Environmental corruption effects
-  - `vfx_hollow_presence.png` - Hollow King presence visual effects
-  - `ui_ultimate_threat_indicator.png` - Final threat establishment UI
-- **Acceptance Criteria:**
-  - Hollow King established as credible and imposing final antagonist
-  - Threat escalation creates appropriate tension and urgency
-  - Final antagonist introduction enhances rather than overshadows existing story
-
-**v0.19.4 - Cinematic Presentation Enhancement (Week 38, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Polish cutscene system with enhanced visual presentation
-- Add dramatic camera movement and framing for key scenes
-- Implement scene transitions and narrative flow improvements
-- Create placeholder voice-over system for major dialogue
-- Update presentation quality for climactic narrative moments
-- **Assets Required:**
-  - `ui_cinematic_letterbox.png` - Cinematic presentation framing
-  - `vfx_scene_transition.png` - Smooth scene transition effects
-- **Acceptance Criteria:**
-  - Cinematic presentation elevates narrative impact
-  - Scene transitions feel smooth and professional
-  - Enhanced presentation maintains player immersion in story
-
-**v0.19.5 - Act 3 Narrative Integration and Conclusion (Week 38, Days 7)**
-
-##### Technical Tasks:
-
-- Integrate all Act 3 narrative elements into cohesive story arc
-- Create smooth transition from Celestial Archive to Void's Edge setup
-- Add narrative recap system for complex plot elements
-- Polish dialogue delivery and character interaction systems
-- Conduct full Act 3 narrative playthrough testing
-- **Assets Required:**
-  - `ui_act3_conclusion.png` - Act 3 conclusion presentation
-  - `ui_story_transition.png` - Story transition visual elements
-- **Acceptance Criteria:**
-  - Act 3 narrative provides satisfying conclusion to story setup
-  - Complex plot elements clearly communicated and resolved
-  - Smooth transition established for final act of the game
-
 ---
 
-## Epic 4: Void's Edge (Act 4)
+### **Epic 4: Void's Edge (Act 4)**
 
 ---
 
@@ -3945,100 +2109,6 @@ Version: v0.20.0
 - New, powerful enemy types.
 - Dynamic environmental hazards reflecting the collapsing reality.
 
-#### **Microversion Plan:**
-
-**v0.20.1 - Void's Edge Visual Theme and Atmosphere (Week 39, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create VoidsEdgeTheme class for apocalyptic/void environment
-- Implement reality distortion visual effects and unstable geometry
-- Add void corruption spreading mechanics and visual progression
-- Create ominous lighting system with reality breakdown effects
-- Update background rendering for collapsing reality atmosphere
-- **Assets Required:**
-  - `environment_voids_edge_tileset.png` - Corrupted/unstable tile sprites
-  - `background_voids_edge_void.png` - Void background layers
-  - `environment_unstable_platform.png` - Crumbling platform sprites
-  - `vfx_reality_breakdown.png` - Reality corruption visual effects
-- **Acceptance Criteria:**
-  - Void's Edge atmosphere conveys impending collapse and danger
-  - Visual theme clearly distinct from all previous biomes
-  - Environmental instability enhances tension and challenge
-
-**v0.20.2 - Dynamic Environmental Hazard System (Week 39, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create CollapsivPlatform system with timed destruction
-- Implement VoidRift hazards with reality-warping effects
-- Add RealityStorm environmental events with area effects
-- Create dynamic hazard spawning based on player progression
-- Update physics system for unstable environmental interactions
-- **Assets Required:**
-  - `environment_collapsing_platform.png` - Platform destruction sequence
-  - `environment_void_rift.png` - Reality rift hazard visuals
-  - `vfx_reality_storm.png` - Reality storm environmental effects
-  - `vfx_platform_collapse.png` - Platform destruction effects
-- **Acceptance Criteria:**
-  - Environmental hazards create constant tension without unfair deaths
-  - Dynamic hazards respond to player actions and progression
-  - Hazard timing allows for skilled navigation and planning
-
-**v0.20.3 - Powerful Void Enemy Implementation (Week 40, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create VoidStalker enemy class with advanced AI and abilities
-- Implement RealityWarden enemy with reality manipulation attacks
-- Add CorruptedJumper enemy mimicking advanced player abilities
-- Create challenging enemy AI requiring mastery of all player abilities
-- Update enemy spawning for high-difficulty encounters
-- **Assets Required:**
-  - `enemy_void_stalker.png` - Void Stalker enemy animations
-  - `enemy_reality_warden.png` - Reality Warden enemy sprites
-  - `enemy_corrupted_jumper.png` - Corrupted Jumper enemy visuals
-  - `vfx_void_enemy_abilities.png` - Void enemy special ability effects
-- **Acceptance Criteria:**
-  - New enemies provide maximum challenge requiring all learned skills
-  - Enemy abilities test mastery of movement, combat, and time manipulation
-  - Fair but demanding encounters that reward skilled gameplay
-
-**v0.20.4 - Unstable Level Architecture (Week 40, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design Void's Edge level layout with constantly changing elements
-- Implement level segments that transform during gameplay
-- Add multi-path level design accommodating various player approaches
-- Create checkpoint system for challenging unstable environments
-- Update level streaming for dynamic level transformation
-- **Assets Required:**
-  - `environment_voids_edge_architecture.png` - Unstable architecture sprites
-  - `environment_transforming_level.png` - Level transformation visuals
-  - `environment_checkpoint_void.png` - Void-themed checkpoint markers
-- **Acceptance Criteria:**
-  - Level design provides ultimate test of all player abilities
-  - Environmental changes enhance rather than frustrate gameplay
-  - Multiple valid approaches accommodate different player strategies
-
-**v0.20.5 - Void's Edge Integration and Polish (Week 40, Days 7)**
-
-##### Technical Tasks:
-
-- Integrate all Void's Edge elements into cohesive final experience
-- Balance challenge level for climactic game content
-- Add atmospheric audio and environmental storytelling
-- Create transition sequences preparing for final boss encounters
-- Conduct comprehensive Void's Edge difficulty and flow testing
-- **Assets Required:**
-  - `environment_voids_edge_polish.png` - Final environmental details
-  - `vfx_final_act_atmosphere.png` - Climactic atmospheric effects
-- **Acceptance Criteria:**
-  - Void's Edge provides appropriately climactic and challenging experience
-  - Difficulty balanced to challenge without overwhelming players
-  - Environmental storytelling enhances narrative impact of final area
-
 ---
 
 ### **Sprint 21 (Weeks 41-42): Boss Encounters - "Trials of a Jumper"**
@@ -4052,98 +2122,6 @@ Version: v0.21.0
 - Boss fight arena designs.
 - Specific boss AI and attack patterns.
 
-#### **Microversion Plan:**
-
-**v0.21.1 - Boss Combat System Foundation (Week 41, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create BossSystem class for managing complex boss encounters
-- Implement boss health system with multiple phases
-- Add boss AI state machine with advanced behavior patterns
-- Create boss attack pattern management and timing system
-- Update combat system for boss-specific mechanics
-- **Assets Required:**
-  - `ui_boss_health_bar.png` - Boss health bar with phase indicators
-  - `ui_boss_phase_transition.png` - Boss phase change visual effects
-  - `vfx_boss_combat_arena.png` - Boss arena atmospheric effects
-- **Acceptance Criteria:**
-  - Boss system supports complex multi-phase encounters
-  - Boss AI provides challenging but fair gameplay
-  - Clear visual feedback for boss status and phase changes
-
-**v0.21.2 - Veyra Boss Fight Implementation (Week 41, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create VeyraBoss class with advanced Jumper abilities
-- Implement Veyra's enhanced movement and combat patterns
-- Add unique boss abilities showcasing mastery of Jumper powers
-- Create boss dialogue system for mid-combat story beats
-- Design multi-phase boss fight with escalating difficulty
-- **Assets Required:**
-  - `character_veyra_boss_idle.png` - Veyra boss form animations
-  - `character_veyra_boss_attacks.png` - Veyra boss attack animations
-  - `vfx_veyra_boss_abilities.png` - Veyra unique boss ability effects
-  - `ui_boss_dialogue_veyra.png` - In-combat dialogue presentation
-- **Acceptance Criteria:**
-  - Veyra boss fight tests mastery of all player abilities
-  - Boss encounter feels climactic and narratively significant
-  - Multiple strategies viable for defeating Veyra boss
-
-**v0.21.3 - Mini-Boss Encounter Design (Week 42, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create CorruptedWarden mini-boss with focused mechanics
-- Implement mini-boss encounter as skill check before main boss
-- Add mini-boss unique abilities testing specific player skills
-- Create mini-boss arena with environmental interaction opportunities
-- Design mini-boss as stepping stone to full boss complexity
-- **Assets Required:**
-  - `enemy_corrupted_warden_boss.png` - Mini-boss character animations
-  - `environment_mini_boss_arena.png` - Mini-boss encounter arena
-  - `vfx_mini_boss_abilities.png` - Mini-boss unique ability effects
-- **Acceptance Criteria:**
-  - Mini-boss provides appropriate difficulty bridge to main boss
-  - Encounter teaches skills necessary for subsequent boss fights
-  - Mini-boss feels distinct from regular enemies and main boss
-
-**v0.21.4 - Boss Arena Design and Environmental Integration (Week 42, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Design VeyraBoss arena with multi-level platforming elements
-- Implement environmental hazards and interactive elements in arena
-- Add arena-specific mechanics that enhance boss encounters
-- Create dynamic arena changes during different boss phases
-- Update camera system for optimal boss encounter viewing
-- **Assets Required:**
-  - `environment_veyra_boss_arena.png` - Veyra boss arena layout
-  - `environment_boss_arena_hazards.png` - Arena hazard elements
-  - `environment_arena_phase_changes.png` - Arena transformation visuals
-- **Acceptance Criteria:**
-  - Boss arena enhances rather than complicates boss encounters
-  - Environmental elements provide tactical options for players
-  - Arena design supports dynamic camera and player movement
-
-**v0.21.5 - Boss Encounter Polish and Integration (Week 42, Days 7)**
-
-##### Technical Tasks:
-
-- Polish boss combat animations and visual effects
-- Balance boss difficulty for appropriate challenge level
-- Add boss encounter music and audio design
-- Create boss victory sequences and narrative payoff
-- Conduct comprehensive boss encounter testing and refinement
-- **Assets Required:**
-  - `ui_boss_victory_celebration.png` - Boss defeat celebration UI
-  - `vfx_boss_defeat.png` - Boss defeat visual effects
-- **Acceptance Criteria:**
-  - Boss encounters feel polished and memorable
-  - Difficulty provides satisfying challenge without frustration
-  - Boss victories feel earned and narratively significant
-
 ---
 
 ### **Sprint 22 (Weeks 43-44): Void's Edge - "Path to Oblivion"**
@@ -4156,96 +2134,6 @@ Version: v0.22.0
 - Climactic environmental storytelling.
 - Challenging enemy gauntlets.
 
-#### **Microversion Plan:**
-
-**v0.22.1 - Final Void's Edge Level Segments (Week 43, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Design ultimate platforming challenges requiring mastery of all mechanics
-- Implement final level progression with escalating difficulty
-- Create multiple path options accommodating different playstyles
-- Add final checkpoint placement for challenging endgame content
-- Update level streaming for complex final area requirements
-- **Assets Required:**
-  - `environment_voids_edge_final.png` - Final area level layouts
-  - `environment_ultimate_challenges.png` - Master-level platforming elements
-  - `environment_final_path_markers.png` - Path guidance for complex areas
-- **Acceptance Criteria:**
-  - Final challenges test mastery without feeling unfair
-  - Multiple approaches available for players with different strengths
-  - Level progression builds appropriate tension toward final confrontation
-
-**v0.22.2 - Climactic Environmental Storytelling (Week 43, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Implement environmental narrative revealing final story elements
-- Add visual storytelling showing impact of player's journey
-- Create atmospheric progression building toward Hollow King encounter
-- Update environmental details reflecting narrative climax
-- Add interactive environmental elements revealing lore
-- **Assets Required:**
-  - `environment_climactic_storytelling.png` - Story-revealing environmental details
-  - `environment_hollow_king_influence.png` - Final antagonist environmental impact
-  - `vfx_narrative_atmosphere.png` - Atmospheric effects supporting story
-- **Acceptance Criteria:**
-  - Environmental storytelling enhances narrative impact
-  - Visual progression supports story without requiring exposition
-  - Environmental details reward exploration and observation
-
-**v0.22.3 - Challenging Enemy Gauntlets (Week 44, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Design enemy encounter sequences testing all combat abilities
-- Implement wave-based combat challenges with varied enemy types
-- Add strategic enemy placement requiring tactical thinking
-- Create enemy combination encounters demanding adaptability
-- Update enemy spawning for climactic challenge sequences
-- **Assets Required:**
-  - `enemy_gauntlet_formation.png` - Strategic enemy placement layouts
-  - `vfx_enemy_wave_spawn.png` - Enemy wave spawning effects
-  - `ui_gauntlet_progress.png` - Gauntlet progress indicators
-- **Acceptance Criteria:**
-  - Enemy gauntlets provide ultimate combat challenge
-  - Encounters require use of all learned combat techniques
-  - Challenge level appropriate for endgame content
-
-**v0.22.4 - Final Area Integration and Pacing (Week 44, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Integrate all final area elements into cohesive experience
-- Balance pacing between challenge and narrative progression
-- Add rest points and preparation areas before major challenges
-- Create smooth transition sequences leading to final boss
-- Update save system for endgame checkpoint management
-- **Assets Required:**
-  - `environment_final_rest_areas.png` - Preparation and rest point layouts
-  - `environment_boss_approach.png` - Final boss approach areas
-- **Acceptance Criteria:**
-  - Final area provides appropriate buildup to climax
-  - Pacing allows for tension and release throughout final challenges
-  - Smooth progression toward final boss encounter
-
-**v0.22.5 - Void's Edge Completion and Polish (Week 44, Days 7)**
-
-##### Technical Tasks:
-
-- Polish all final area visuals and atmospheric effects
-- Add final audio design and environmental sound
-- Create final area completion celebration and narrative transition
-- Conduct full final area playthrough testing
-- Prepare integration points for final boss encounter
-- **Assets Required:**
-  - `vfx_final_area_completion.png` - Final area completion effects
-  - `environment_boss_transition.png` - Transition to final boss area
-- **Acceptance Criteria:**
-  - Final area feels polished and complete
-  - Appropriate buildup and transition to final boss
-  - All final area systems work cohesively together
-
 ---
 
 ### **Sprint 23 (Weeks 45-46): Final Boss - "Confronting the Hollow King"**
@@ -4257,96 +2145,6 @@ Version: v0.23.0
 - Fully functional Hollow King boss fight (multi-stage).
 - Unique mechanics for the final boss.
 - Final boss arena.
-
-#### **Microversion Plan:**
-
-**v0.23.1 - Hollow King Boss Foundation (Week 45, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create HollowKingBoss class with ultimate boss mechanics
-- Implement multi-stage boss system with distinct phases
-- Add reality manipulation abilities unique to final boss
-- Create boss vulnerability system requiring mastery of all player abilities
-- Update boss system for ultimate encounter complexity
-- **Assets Required:**
-  - `character_hollow_king_boss.png` - Hollow King boss form animations
-  - `character_hollow_king_phases.png` - Multi-phase transformation visuals
-  - `vfx_hollow_king_reality_manipulation.png` - Reality manipulation effects
-- **Acceptance Criteria:**
-  - Final boss provides ultimate test of all game systems
-  - Multi-stage encounter maintains engagement throughout
-  - Boss mechanics feel unique and climactic
-
-**v0.23.2 - Final Boss Unique Mechanics (Week 45, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Implement reality-warping arena transformation abilities
-- Add time manipulation counters requiring strategic thinking
-- Create environmental manipulation attacks affecting arena
-- Implement summoning abilities bringing previous enemy types
-- Add boss invulnerability phases requiring specific strategies
-- **Assets Required:**
-  - `vfx_arena_reality_warp.png` - Arena transformation effects
-  - `vfx_boss_time_counter.png` - Boss time manipulation countermeasures
-  - `environment_boss_arena_changes.png` - Dynamic arena transformation
-- **Acceptance Criteria:**
-  - Unique mechanics distinguish final boss from all previous encounters
-  - Boss abilities require creative use of all player skills
-  - Mechanics feel challenging but learnable with practice
-
-**v0.23.3 - Final Boss Arena Implementation (Week 46, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Design ultimate boss arena with dynamic transformation capabilities
-- Implement multi-level arena supporting all movement mechanics
-- Add environmental elements that enhance boss encounter
-- Create arena hazards that complement boss abilities
-- Update camera system for epic final boss presentation
-- **Assets Required:**
-  - `environment_hollow_king_arena.png` - Final boss arena layout
-  - `environment_arena_ultimate_hazards.png` - Final boss arena hazards
-  - `environment_arena_multi_level.png` - Multi-tier arena design
-- **Acceptance Criteria:**
-  - Arena design supports all final boss mechanics
-  - Environmental elements enhance rather than complicate encounter
-  - Arena feels appropriately epic and climactic
-
-**v0.23.4 - Boss Phase Integration and Progression (Week 46, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Integrate all boss phases into cohesive encounter progression
-- Implement phase transition sequences with narrative elements
-- Add boss dialogue and story beats during encounter
-- Create dynamic difficulty scaling based on player performance
-- Update save system for boss encounter checkpoint management
-- **Assets Required:**
-  - `ui_boss_phase_indicator.png` - Boss phase progression UI
-  - `cutscene_boss_phase_transition.png` - Phase transition cinematics
-- **Acceptance Criteria:**
-  - All boss phases flow naturally into cohesive encounter
-  - Phase transitions enhance narrative and mechanical progression
-  - Boss encounter feels like satisfying culmination of entire game
-
-**v0.23.5 - Final Boss Polish and Completion (Week 46, Days 7)**
-
-##### Technical Tasks:
-
-- Polish all final boss visual effects and animations
-- Balance final boss difficulty for appropriate ultimate challenge
-- Add epic final boss music and audio design
-- Create boss defeat sequence and transition to ending
-- Conduct comprehensive final boss encounter testing
-- **Assets Required:**
-  - `vfx_final_boss_epic.png` - Epic final boss visual effects
-  - `ui_final_boss_victory.png` - Final boss victory celebration
-- **Acceptance Criteria:**
-  - Final boss feels polished and memorable
-  - Difficulty provides ultimate satisfying challenge
-  - Boss defeat creates appropriate sense of achievement and conclusion
 
 ---
 
@@ -4361,99 +2159,9 @@ Version: v0.24.0
 - Credits sequence.
 - Logic for different endings if applicable.
 
-#### **Microversion Plan:**
-
-**v0.24.1 - Ending Cutscene System (Week 47, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create EndingCutsceneSystem for final narrative sequences
-- Implement branching ending logic based on player choices
-- Add ending cutscene presentation with enhanced visuals
-- Create ending dialogue system for final character moments
-- Update save system to track ending completion status
-- **Assets Required:**
-  - `cutscene_ending_victory.png` - Victory ending cutscene visuals
-  - `cutscene_ending_choice_branch.png` - Choice-based ending variations
-  - `ui_ending_presentation.png` - Ending presentation interface
-- **Acceptance Criteria:**
-  - Ending cutscenes provide satisfying narrative conclusion
-  - Player choices throughout game impact ending presentation
-  - Ending sequences feel earned and emotionally resonant
-
-**v0.24.2 - Final Narrative Exposition and Character Resolution (Week 47, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Implement final dialogue sequences resolving character arcs
-- Add narrative exposition explaining aftermath of player actions
-- Create character resolution scenes showing future outcomes
-- Update dialogue system for extended ending sequences
-- Add final world state presentation based on player journey
-- **Assets Required:**
-  - `character_final_resolution.png` - Character resolution scene visuals
-  - `environment_world_aftermath.png` - Post-adventure world state
-  - `ui_narrative_conclusion.png` - Final narrative presentation elements
-- **Acceptance Criteria:**
-  - All major character arcs receive satisfying resolution
-  - Final exposition answers key narrative questions
-  - World state reflects impact of player's journey and choices
-
-**v0.24.3 - Credits System Implementation (Week 48, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create CreditsSystem with scrolling text and visuals
-- Implement credits sequence with game highlights and statistics
-- Add player achievement summary during credits
-- Create credits skip functionality for subsequent playthroughs
-- Update input system for credits navigation
-- **Assets Required:**
-  - `ui_credits_background.png` - Credits sequence background
-  - `ui_credits_text_styling.png` - Credits text presentation styling
-  - `ui_player_statistics.png` - Player journey statistics presentation
-- **Acceptance Criteria:**
-  - Credits provide appropriate recognition for development team
-  - Player statistics create sense of accomplishment
-  - Credits sequence feels polished and professional
-
-**v0.24.4 - Multiple Ending Logic and Variations (Week 48, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Implement ending variation system based on player choices
-- Add ending unlock conditions based on completion criteria
-- Create ending replay system for viewing different outcomes
-- Update ending presentation to reflect choice consequences
-- Add ending unlock tracking and achievement integration
-- **Assets Required:**
-  - `ui_ending_variation_indicator.png` - Ending variation UI elements
-  - `ui_ending_replay_menu.png` - Ending replay selection interface
-- **Acceptance Criteria:**
-  - Multiple endings provide meaningful replay value
-  - Choice consequences clearly reflected in ending variations
-  - Ending unlock system encourages exploration of different playstyles
-
-**v0.24.5 - Narrative Conclusion Polish and Integration (Week 48, Days 7)**
-
-##### Technical Tasks:
-
-- Polish all ending sequences and narrative presentation
-- Add final music and audio design for ending sequences
-- Create smooth transitions between ending elements
-- Update ending sequence timing and pacing
-- Conduct full narrative conclusion testing and refinement
-- **Assets Required:**
-  - `vfx_ending_polish.png` - Polished ending visual effects
-  - `ui_ending_transition.png` - Smooth ending transition elements
-- **Acceptance Criteria:**
-  - All ending sequences feel polished and complete
-  - Narrative conclusion provides satisfying game completion experience
-  - Ending systems work seamlessly with all game completion scenarios
-
 ---
 
-## Epic 5: Polish & Release
+### **Polishing & Release Sprints**
 
 ---
 
@@ -4468,78 +2176,6 @@ Version: v0.25.0 (Alpha)
 - Extensive bug list.
 - Initial performance profiling.
 
-#### **Microversion Plan:**
-
-**v0.25.1 - Content Lock and Feature Completion (Week 49, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Freeze all new feature development and content additions
-- Complete any remaining placeholder implementations
-- Implement final integration testing for all game systems
-- Create comprehensive feature checklist and verification
-- Update version control for content lock milestone
-- **Acceptance Criteria:**
-  - All planned features implemented to first-pass quality
-  - No new features or content to be added after this point
-  - Complete game playable without missing core functionality
-
-**v0.25.2 - Full Game Playthrough Testing (Week 49, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Conduct multiple complete playthroughs from start to finish
-- Document all discovered bugs, flow issues, and polish needs
-- Test all player progression paths and choice variations
-- Verify save/load functionality throughout entire game
-- Create prioritized bug and polish task lists
-- **Acceptance Criteria:**
-  - Complete game playable without game-breaking issues
-  - All major gameplay paths functional and tested
-  - Comprehensive bug database established for polish phase
-
-**v0.25.3 - Performance Profiling and Optimization (Week 50, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Conduct comprehensive performance profiling across all platforms
-- Identify performance bottlenecks and optimization opportunities
-- Implement critical performance fixes for major issues
-- Create performance optimization task list for subsequent sprints
-- Test performance across different hardware configurations
-- **Acceptance Criteria:**
-  - Game performance meets minimum playable standards
-  - Performance issues documented and prioritized
-  - Critical performance blockers resolved
-
-**v0.25.4 - Alpha Build Preparation (Week 50, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create stable Alpha build for internal and external testing
-- Implement build verification and quality assurance processes
-- Add Alpha-specific telemetry and feedback collection systems
-- Create Alpha testing documentation and feedback channels
-- Prepare Alpha distribution for wider testing audience
-- **Acceptance Criteria:**
-  - Stable Alpha build ready for extended testing
-  - Feedback collection systems operational
-  - Alpha testing infrastructure prepared
-
-**v0.25.5 - Alpha Milestone Documentation (Week 50, Days 7)**
-
-##### Technical Tasks:
-
-- Document all Alpha milestone achievements and remaining work
-- Create detailed polish roadmap for subsequent sprints
-- Update project timeline based on Alpha testing discoveries
-- Prepare stakeholder reports on Alpha milestone completion
-- Finalize Alpha testing plans and feedback integration processes
-- **Acceptance Criteria:**
-  - Alpha milestone fully documented and verified
-  - Clear roadmap established for Beta milestone
-  - Stakeholder alignment on Alpha achievements and next steps
-
 ---
 
 ### **Sprint 26 (Weeks 51-52): Art & Audio Polish Pass 1**
@@ -4553,78 +2189,6 @@ Version: v0.26.0
 - Final SFX pass for key actions.
 - Music tracks integrated into all levels/scenes.
 
-#### **Microversion Plan:**
-
-**v0.26.1 - Art Asset Finalization (Week 51, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Replace all placeholder art assets with final polished versions
-- Implement consistent art style across all game biomes
-- Add detailed character animations and environmental sprites
-- Create final UI art assets with polished visual design
-- Update asset pipeline for final art integration
-- **Acceptance Criteria:**
-  - All placeholder art replaced with final quality assets
-  - Consistent visual style maintained throughout game
-  - Art quality meets final release standards
-
-**v0.26.2 - Visual Effects Enhancement (Week 51, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Polish all ability visual effects for enhanced impact
-- Add particle effects for environmental atmosphere
-- Implement enhanced lighting effects across all biomes
-- Create polished damage and impact visual feedback
-- Update VFX system performance for complex effects
-- **Acceptance Criteria:**
-  - Visual effects enhance gameplay without impacting performance
-  - Consistent VFX quality across all game systems
-  - Enhanced visual feedback improves player experience
-
-**v0.26.3 - Audio Implementation and Sound Effects (Week 52, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Implement comprehensive sound effects for all game actions
-- Add environmental audio for atmospheric immersion
-- Create dynamic audio mixing for different game situations
-- Implement audio feedback for UI interactions and menu systems
-- Test audio quality and balance across different output devices
-- **Acceptance Criteria:**
-  - Complete sound coverage for all game actions and environments
-  - Audio enhances immersion without overwhelming gameplay
-  - Consistent audio quality across all platforms
-
-**v0.26.4 - Music Integration and Adaptive Audio (Week 52, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Integrate final music tracks for all levels and scenes
-- Implement adaptive music system responding to gameplay events
-- Add smooth music transitions between different game areas
-- Create dynamic music mixing for combat and exploration
-- Test music integration and emotional impact
-- **Acceptance Criteria:**
-  - Music enhances emotional impact of gameplay and story
-  - Smooth audio transitions maintain immersion
-  - Dynamic music system responds appropriately to gameplay
-
-**v0.26.5 - Audio-Visual Polish Integration (Week 52, Days 7)**
-
-##### Technical Tasks:
-
-- Synchronize visual effects with audio for enhanced impact
-- Polish timing of audio-visual feedback for player actions
-- Create cohesive audio-visual experience across all game systems
-- Test complete audio-visual integration and polish
-- Finalize audio-visual settings and configuration options
-- **Acceptance Criteria:**
-  - Audio and visual elements work together seamlessly
-  - Enhanced impact and immersion through integrated polish
-  - Complete audio-visual experience meets final quality standards
-
 ---
 
 ### **Sprint 27 (Weeks 53-54): UI/UX Overhaul & Accessibility**
@@ -4636,78 +2200,6 @@ Version: v0.27.0
 - Polished UI art and animations.
 - Intuitive menu navigation and HUD.
 - Key accessibility features (e.g., remappable controls, text scaling, color-blind modes).
-
-#### **Microversion Plan:**
-
-**v0.27.1 - UI Art and Animation Polish (Week 53, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create final polished UI art for all interface elements
-- Implement smooth UI animations and transitions
-- Add visual feedback for all user interactions
-- Create consistent UI styling across all game screens
-- Polish HUD elements for optimal gameplay integration
-- **Acceptance Criteria:**
-  - All UI elements meet final visual quality standards
-  - Smooth animations enhance user experience
-  - Consistent UI design language throughout game
-
-**v0.27.2 - Menu Navigation and UX Flow Optimization (Week 53, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Optimize menu navigation based on playtesting feedback
-- Implement intuitive information hierarchy and organization
-- Add quick access features for frequently used functions
-- Create clear onboarding flow for new players
-- Test menu systems for accessibility and ease of use
-- **Acceptance Criteria:**
-  - Menu navigation feels intuitive and efficient
-  - Information easily accessible and well-organized
-  - Onboarding effectively introduces game systems to new players
-
-**v0.27.3 - Accessibility Features Implementation (Week 54, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Implement remappable control system for all input devices
-- Add text scaling options for improved readability
-- Create color-blind friendly visual options and indicators
-- Implement audio cues for visual elements
-- Add difficulty adjustment options for various player needs
-- **Acceptance Criteria:**
-  - Game accessible to players with diverse needs and abilities
-  - Control customization supports various input preferences
-  - Visual and audio accessibility options effectively implemented
-
-**v0.27.4 - Advanced Accessibility and QoL Features (Week 54, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Add subtitle system for all audio content
-- Implement high contrast visual mode options
-- Create reduced motion settings for motion-sensitive players
-- Add customizable UI scaling and layout options
-- Test accessibility features with diverse user groups
-- **Acceptance Criteria:**
-  - Comprehensive accessibility coverage for major accessibility needs
-  - Quality of life features improve experience for all players
-  - Accessibility testing validates feature effectiveness
-
-**v0.27.5 - UI/UX Integration and Final Polish (Week 54, Days 7)**
-
-##### Technical Tasks:
-
-- Integrate all UI improvements into cohesive user experience
-- Polish final UI details and micro-interactions
-- Test complete UI/UX flow for consistency and quality
-- Create UI/UX documentation for future reference
-- Finalize UI settings and configuration systems
-- **Acceptance Criteria:**
-  - Complete UI/UX experience feels polished and professional
-  - All accessibility features integrated smoothly
-  - UI documentation supports future maintenance and updates
 
 ---
 
@@ -4722,78 +2214,6 @@ Version: v0.28.0 (Beta)
 - Performance improvements on target platforms.
 - Gather feedback from external testers (if applicable).
 
-#### **Microversion Plan:**
-
-**v0.28.1 - Critical Bug Resolution (Week 55, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Fix all game-breaking and critical severity bugs
-- Resolve major progression blockers and save/load issues
-- Address critical performance problems affecting playability
-- Test fixes thoroughly to prevent regression issues
-- Update automated testing to catch similar issues
-- **Acceptance Criteria:**
-  - No game-breaking bugs remain in Beta build
-  - All critical progression paths functional
-  - Critical performance issues resolved
-
-**v0.28.2 - High Priority Bug Fixing (Week 55, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Fix high-priority bugs affecting core gameplay experience
-- Resolve UI/UX issues and visual glitches
-- Address audio problems and missing sound effects
-- Fix input responsiveness and control issues
-- Test high-priority fixes for stability and integration
-- **Acceptance Criteria:**
-  - Major gameplay issues resolved
-  - UI/UX experience significantly improved
-  - Core game systems function reliably
-
-**v0.28.3 - Performance Optimization Pass (Week 56, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Implement performance optimizations identified in profiling
-- Optimize asset loading and memory management
-- Improve framerate stability across all target platforms
-- Reduce loading times and optimize streaming systems
-- Test performance improvements across hardware configurations
-- **Acceptance Criteria:**
-  - Consistent performance meets target framerate on all platforms
-  - Loading times reduced to acceptable levels
-  - Memory usage optimized for target hardware
-
-**v0.28.4 - Beta Build Preparation and Testing (Week 56, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create stable Beta build with all fixes and optimizations
-- Conduct comprehensive Beta build verification testing
-- Implement Beta-specific feedback collection systems
-- Prepare Beta distribution and testing infrastructure
-- Create Beta testing documentation and guidelines
-- **Acceptance Criteria:**
-  - Stable Beta build ready for external testing
-  - Beta testing infrastructure operational
-  - Feedback collection systems properly implemented
-
-**v0.28.5 - Beta Feedback Integration Planning (Week 56, Days 7)**
-
-##### Technical Tasks:
-
-- Establish Beta feedback collection and analysis processes
-- Create prioritization framework for Beta feedback
-- Plan integration timeline for Beta testing results
-- Set up monitoring systems for Beta build performance
-- Prepare rapid response processes for critical Beta issues
-- **Acceptance Criteria:**
-  - Beta feedback processes established and operational
-  - Clear framework for integrating Beta testing results
-  - Rapid response capabilities for critical issues
-
 ---
 
 ### **Sprint 29 (Weeks 57-58): Final Polish & Release Candidate**
@@ -4807,78 +2227,6 @@ Version: v0.29.0 (RC)
 - Localization support (if planned).
 - Release Candidate build.
 
-#### **Microversion Plan:**
-
-**v0.29.1 - Beta Feedback Integration (Week 57, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Analyze and prioritize all Beta testing feedback
-- Implement critical fixes identified in Beta testing
-- Address major balance issues and difficulty concerns
-- Fix any newly discovered bugs from Beta testing
-- Test Beta feedback fixes for integration and stability
-- **Acceptance Criteria:**
-  - Critical Beta feedback addressed and implemented
-  - Major Beta-identified issues resolved
-  - Beta fixes properly tested and integrated
-
-**v0.29.2 - Final Game Balance Pass (Week 57, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Fine-tune all gameplay balance based on complete testing data
-- Adjust difficulty progression and challenge curves
-- Balance progression systems and skill upgrades
-- Polish combat balance and enemy encounter difficulty
-- Test final balance changes for overall game flow
-- **Acceptance Criteria:**
-  - Game balance provides consistent and appropriate challenge
-  - Progression systems feel rewarding and well-paced
-  - Combat encounters balanced for engaging gameplay
-
-**v0.29.3 - Final Polish Pass (Week 58, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Complete final polish pass on all art, audio, and animation
-- Fix remaining minor bugs and visual inconsistencies
-- Polish UI details and micro-interactions
-- Add final environmental details and atmospheric elements
-- Test complete polish integration for consistency
-- **Acceptance Criteria:**
-  - All game elements meet final release quality standards
-  - Visual and audio consistency throughout entire game
-  - Minor issues and polish items completed
-
-**v0.29.4 - Release Candidate Preparation (Week 58, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Create Release Candidate build with all final changes
-- Conduct comprehensive Release Candidate verification testing
-- Prepare Release Candidate for final approval and distribution
-- Create release documentation and deployment procedures
-- Test Release Candidate on all target platforms
-- **Acceptance Criteria:**
-  - Stable Release Candidate ready for final approval
-  - Release Candidate meets all quality and content requirements
-  - Release procedures and documentation complete
-
-**v0.29.5 - Localization and Final Preparation (Week 58, Days 7)**
-
-##### Technical Tasks:
-
-- Implement localization support and test multi-language functionality
-- Finalize all release materials and marketing assets
-- Complete final legal and certification requirements
-- Prepare day-one patch planning and post-launch support
-- Conduct final Release Candidate approval process
-- **Acceptance Criteria:**
-  - Localization (if applicable) properly implemented and tested
-  - All release requirements and certifications complete
-  - Release Candidate approved for gold master preparation
-
 ---
 
 ### **Sprint 30 (Weeks 59-60): Launch & Initial Post-Launch Support**
@@ -4891,75 +2239,3 @@ Version: v1.0.0 (Release)
 - Marketing and launch materials ready.
 - Post-launch support plan active.
 - Day 0/Day 1 patch preparation (if necessary).
-
-#### **Microversion Plan:**
-
-**v1.0.0 - Gold Master Creation (Week 59, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Create final Gold Master build from approved Release Candidate
-- Conduct final Gold Master verification and certification
-- Complete all platform submission requirements and processes
-- Finalize all legal and licensing documentation
-- Prepare Gold Master for manufacturing and distribution
-- **Acceptance Criteria:**
-  - Gold Master build meets all release standards and requirements
-  - Platform submissions completed and approved
-  - All legal and licensing requirements satisfied
-
-**v1.0.1 - Launch Preparation (Week 59, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Finalize all marketing materials and launch communications
-- Prepare launch day procedures and monitoring systems
-- Set up post-launch analytics and feedback collection
-- Train support team for launch day customer service
-- Prepare rapid response procedures for launch day issues
-- **Acceptance Criteria:**
-  - Launch preparation complete and all systems operational
-  - Marketing materials and communications ready
-  - Support systems prepared for launch day
-
-**v1.0.2 - Launch Day Monitoring (Week 60, Days 1-3.5)**
-
-##### Technical Tasks:
-
-- Monitor launch day metrics and player feedback
-- Provide rapid response support for any critical launch issues
-- Track player progression and identify any unexpected problems
-- Collect and analyze initial player feedback and reviews
-- Coordinate with marketing team for launch day communications
-- **Acceptance Criteria:**
-  - Successful game launch with minimal critical issues
-  - Launch day monitoring systems functional and providing data
-  - Rapid response capabilities active for critical issues
-
-**v1.0.3 - Initial Post-Launch Support (Week 60, Days 3.5-7)**
-
-##### Technical Tasks:
-
-- Address any critical post-launch issues with rapid patches
-- Analyze comprehensive player data and feedback
-- Plan and develop Day 1 patch if necessary
-- Implement community feedback integration processes
-- Establish long-term post-launch support and update planning
-- **Acceptance Criteria:**
-  - Post-launch support systems operational and effective
-  - Critical post-launch issues identified and addressed
-  - Long-term support and update framework established
-
-**v1.0.4 - Post-Launch Analysis and Planning (Week 60, Days 7)**
-
-##### Technical Tasks:
-
-- Conduct comprehensive post-launch analysis and retrospective
-- Document lessons learned and process improvements
-- Plan future updates and content based on player feedback
-- Establish ongoing development and support priorities
-- Create post-launch roadmap and community engagement strategy
-- **Acceptance Criteria:**
-  - Complete post-launch analysis and documentation
-  - Future development priorities established
-  - Community engagement and support strategies active

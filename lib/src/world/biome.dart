@@ -159,7 +159,7 @@ class Biome {
       particleEffects: <String>[
         'aether_particles',
         'crystal_sparkles',
-        'floating_light_orbs'
+        'floating_light_orbs',
       ],
       environmentalHazards: <String>[],
     )..paletteColors.addAll(<Color>[

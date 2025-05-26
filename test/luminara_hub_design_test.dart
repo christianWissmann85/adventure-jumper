@@ -219,8 +219,10 @@ void main() {
           .loadLevel('luminara_hub'); // Verify Mira's spawn point
       final miraSpawn = level.spawnPoints!['mira'];
       expect(miraSpawn, isNotNull);
-      expect(miraSpawn!.entityType,
-          equals('mira')); // Using the spawn point name as entityType
+      expect(
+        miraSpawn!.entityType,
+        equals('mira'),
+      ); // Using the spawn point name as entityType
       expect(miraSpawn.properties['npcType'], equals('mira'));
 
       // Verify Mira's interaction zone
@@ -272,8 +274,10 @@ void main() {
           .loadLevel('luminara_hub'); // Verify player spawn point
       final playerSpawn = level.spawnPoints!['player_start'];
       expect(playerSpawn, isNotNull);
-      expect(playerSpawn!.entityType,
-          equals('player_start')); // Using the spawn point name as entityType
+      expect(
+        playerSpawn!.entityType,
+        equals('player_start'),
+      ); // Using the spawn point name as entityType
 
       // Player should start on or near the central plaza
       final centralPlaza = level.geometry!.platforms.firstWhere(

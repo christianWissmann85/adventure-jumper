@@ -25,8 +25,9 @@ class PhysicsComponent extends Component {
     if (isStatic != null) _isStatic = isStatic;
     if (isSensor != null) _isSensor = isSensor;
     if (affectedByGravity != null) _affectedByGravity = affectedByGravity;
-    if (bounciness != null)
+    if (bounciness != null) {
       _restitution = bounciness; // Use _restitution for bounciness
+    }
     if (useEdgeDetection != null) _useEdgeDetection = useEdgeDetection;
   }
 

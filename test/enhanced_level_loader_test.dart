@@ -271,8 +271,10 @@ void main() {
           level.entitySpawnDefinitions.containsKey('enemy_patrol'),
           isTrue,
         );
-        expect(level.entitySpawnDefinitions.containsKey('power_up'),
-            isTrue); // Verify environmental data
+        expect(
+          level.entitySpawnDefinitions.containsKey('power_up'),
+          isTrue,
+        ); // Verify environmental data
         expect(level.environmentalData, isNotNull);
         expect(level.environmentalData!.lighting.ambientIntensity, equals(0.4));
         expect(level.environmentalData!.weather.type, equals('light_rain'));
@@ -316,8 +318,10 @@ void main() {
         expect(level.levelBounds, isNull);
         expect(level.cameraBounds, isNull);
         expect(level.geometry, isNull);
-        expect(level.spawnPoints,
-            isNull); // Environmental data should have defaults
+        expect(
+          level.spawnPoints,
+          isNull,
+        ); // Environmental data should have defaults
         expect(level.environmentalData, isNotNull);
         expect(level.environmentalData!.lighting.ambientIntensity, equals(0.3));
         expect(level.environmentalData!.weather.type, equals('clear'));
