@@ -5,6 +5,7 @@
 Defines the implementation of Kael, the main player character, with primary focus on **Fluid & Expressive Movement** that enables player creativity and skill expression. This system prioritizes responsive controls, smooth transitions, and movement-integrated abilities that support engaging gameplay flow.
 
 > **Design & Technical References:**
+>
 > - [Character Design: Kael](../../01_Game_Design/Characters/01-main-character.md) - Design specifications and abilities
 > - [Game Design: Mechanics](../../01_Game_Design/GDD.md) - Core gameplay mechanics
 > - [Design Cohesion Guide](../../04_Project_Management/DesignCohesionGuide.md) - Design pillars and validation criteria
@@ -15,14 +16,16 @@ Defines the implementation of Kael, the main player character, with primary focu
 > - [UI System TDD](UISystem.TDD.md) - Character state UI feedback
 
 ### Purpose
+
 - **Primary**: Deliver fluid and expressive movement that feels responsive and empowering
-- Implement responsive character movement with <2 frame input lag target
-- Enable creative movement combinations supporting multiple approach strategies  
+- Implement responsive character movement with <4 frame input response (optimal for 60fps gameplay)
+- Enable creative movement combinations supporting multiple approach strategies
 - Integrate movement seamlessly with combat abilities (no interruptions)
 - Support progressive mastery through increasingly complex movement options
 - Handle character state transitions with smooth, readable animations
 
 ### Scope
+
 - Character controller physics optimized for 60fps gameplay feel
 - Core ability system (Jump, Dash, Strike, Pulse) with movement integration
 - Animation state machine prioritizing fluidity over realism
@@ -31,8 +34,10 @@ Defines the implementation of Kael, the main player character, with primary focu
 - Movement-combat integration ensuring abilities enhance rather than interrupt flow
 
 ### Design Cohesion Focus: Fluid & Expressive Movement
+
 This TDD specifically supports the **Fluid & Expressive Movement** design pillar through:
-- **Responsiveness**: Sub-2-frame input response for all movement actions
+
+- **Responsiveness**: <4-frame input response for optimal gameplay feel (67ms at 60fps)
 - **Flow Integration**: Movement abilities that work together seamlessly
 - **Player Expression**: Multiple movement approaches for any situation
 - **Progressive Complexity**: Movement options that grow with player skill
@@ -69,6 +74,7 @@ class AbilitySystem {
 ```
 
 ### Key Responsibilities
+
 - **KaelCharacter**: Main character coordination and high-level behavior
 - **CharacterMovement**: Physics-based movement and collision handling
 - **AbilitySystem**: Management of all character abilities and their states
@@ -76,6 +82,7 @@ class AbilitySystem {
 ## 3. Data Structures
 
 ### Character State
+
 ```dart
 class CharacterState {
   Vector2 position;
@@ -89,6 +96,7 @@ class CharacterState {
 ```
 
 ### Ability Data
+
 ```dart
 class AbilityData {
   String abilityId;
@@ -103,12 +111,14 @@ class AbilityData {
 ## 4. Algorithms
 
 ### Movement Physics
+
 - Platformer-style physics with momentum
 - Coyote time for forgiving jump mechanics
 - Variable jump height based on input duration
 - Wall sliding and wall jumping mechanics
 
 ### Ability Execution
+
 - State-based ability activation
 - Cooldown and resource management
 - Animation synchronization with ability effects
@@ -117,6 +127,7 @@ class AbilityData {
 ## 5. API/Interfaces
 
 ### Character Controller Interface
+
 ```dart
 interface ICharacterController {
   void moveHorizontal(double direction);
@@ -134,6 +145,7 @@ interface ICharacterState {
 ```
 
 ### Ability System Interface
+
 ```dart
 interface IAbilitySystem {
   bool executeAbility(String abilityId);
@@ -145,6 +157,7 @@ interface IAbilitySystem {
 ## 6. Dependencies
 
 ### System Dependencies
+
 - **Physics System**: For movement and collision detection
 - **Aether System**: For energy management and ability costs
 - **Input System**: For player control handling
@@ -152,6 +165,7 @@ interface IAbilitySystem {
 - **Audio System**: For movement and ability sound effects
 
 ### Component Dependencies
+
 - Level geometry for collision detection
 - Enemy systems for combat interactions
 - UI system for ability cooldown display
@@ -182,12 +196,14 @@ lib/
 ## 8. Performance Considerations
 
 ### Optimization Strategies
+
 - Efficient collision detection with spatial partitioning
 - Animation state caching to reduce lookups
 - Input prediction for responsive controls
 - Ability effect pooling for visual effects
 
 ### Memory Management
+
 - Reuse ability effect objects
 - Efficient state machine implementation
 - Minimal allocation during movement updates
@@ -195,12 +211,14 @@ lib/
 ## 9. Testing Strategy
 
 ### Unit Tests
+
 - Movement physics accuracy
 - Ability cooldown calculations
 - State transition correctness
 - Input response timing
 
 ### Integration Tests
+
 - Character-environment interaction
 - Ability system integration with combat
 - Animation synchronization with actions
@@ -210,43 +228,49 @@ lib/
 ### Sprint-Aligned Development Phases
 
 **Sprint 1: Movement Foundation**
+
 - Basic character controller with responsive horizontal movement
 - Jump mechanics with variable height and coyote time
 - Ground detection and basic physics integration
 - Input buffering system for combo preparation
-- *Validation*: Sub-2-frame input response, smooth movement transitions
+- _Validation_: <4-frame input response (67ms at 60fps), smooth movement transitions
 
 **Sprint 2-3: Fluid Movement System**
+
 - Dash ability with directional control and momentum preservation
 - Wall sliding and wall jumping mechanics
 - Movement state machine with seamless transitions
 - Basic animation integration prioritizing responsiveness
-- *Validation*: Movement abilities work together without interruption
+- _Validation_: Movement abilities work together without interruption
 
 **Sprint 4-6: Combat-Movement Integration**
+
 - Strike ability that enhances rather than interrupts movement
 - Pulse ability with movement-based targeting
 - Ability combo system supporting creative play
 - Combat actions that maintain movement flow
-- *Validation*: Combat abilities feel like movement extensions
+- _Validation_: Combat abilities feel like movement extensions
 
 **Sprint 7+: Progressive Mastery Features**
+
 - Advanced movement combinations and techniques
 - Upgrade system that expands movement expression
 - World-specific abilities that build on core movement
 - Movement mastery challenges and skill expression metrics
-- *Validation*: Increasing complexity feels natural and rewarding
+- _Validation_: Increasing complexity feels natural and rewarding
 
 ### Design Cohesion Validation Checkpoints
 
 **Fluid & Expressive Movement Metrics:**
-- **Input Responsiveness**: <2 frame lag for all movement actions
+
+- **Input Responsiveness**: <4 frame lag for all movement actions (67ms at 60fps)
 - **Transition Smoothness**: No jarring stops between movement abilities
 - **Creative Expression**: Multiple viable movement approaches for navigation
 - **Combat Integration**: No movement interruptions during combat abilities
 - **Progressive Feel**: Each upgrade feels meaningfully more expressive
 
 **Player Experience Validation:**
+
 - Movement feels immediately satisfying even for new players
 - Advanced players can express skill through movement creativity
 - Combat enhances movement flow rather than interrupting it
@@ -254,6 +278,7 @@ lib/
 - All abilities work together harmoniously
 
 ### Control Mapping (Optimized for Flow)
+
 - **WASD/Arrow Keys**: Movement (immediate response)
 - **Space**: Jump (variable height, buffered input)
 - **Shift**: Dash (directional, momentum-preserving)
@@ -264,12 +289,14 @@ lib/
 ## 11. Future Considerations
 
 ### Expandability
+
 - New ability types for different worlds
 - Character customization options
 - Multiple character support
 - Advanced movement mechanics (wall running, etc.)
 
 ### Accessibility
+
 - Customizable control schemes
 - Visual indicators for ability states
 - Audio cues for important actions

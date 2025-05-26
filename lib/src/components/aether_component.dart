@@ -1,5 +1,7 @@
 import 'package:flame/components.dart';
 
+import '../events/player_events.dart';
+
 /// Component that handles Aether energy and abilities
 /// Manages Aether reserves, ability usage, cooldowns, and effects
 class AetherComponent extends Component {
@@ -22,6 +24,9 @@ class AetherComponent extends Component {
   double _currentAether = 100;
   double _aetherRegenRate = 5; // Aether points per second
   bool _isActive = true;
+
+  // Event system integration for T2.8.4
+  final PlayerEventBus _eventBus = PlayerEventBus.instance;
 
   // Ability states
   List<String> _unlockedAbilities = <String>[];
@@ -56,6 +61,11 @@ class AetherComponent extends Component {
     'aether_blast': 0.5,
     'aether_shield': 4.0,
   };
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    // Component is properly loaded through normal Flame lifecycle
+  }
 
   @override
   void onMount() {
@@ -85,9 +95,20 @@ class AetherComponent extends Component {
 
     // Regenerate Aether over time
     if (_currentAether < _maxAether) {
+      final double oldAether = _currentAether;
       _currentAether += _aetherRegenRate * dt;
       if (_currentAether > _maxAether) {
         _currentAether = _maxAether;
+      }
+
+      // Fire event for Aether regeneration (only if there was actual change)
+      if (_currentAether != oldAether) {
+        _fireAetherChangedEvent(
+          oldAether,
+          _currentAether,
+          _currentAether - oldAether,
+          'regeneration',
+        );
       }
     }
 
@@ -133,21 +154,37 @@ class AetherComponent extends Component {
       return false;
     }
 
+    // Get the correct ability cost from either user-defined or default costs
+    final double cost =
+        _abilityCosts[abilityName] ?? _defaultAbilityCosts[abilityName] ?? 0;
+
     // Check if we have enough Aether
-    final double cost = _abilityCosts[abilityName] ?? 0;
     if (_currentAether < cost) {
       return false;
     }
 
     // Consume Aether
+    final double oldAether = _currentAether;
     _currentAether -= cost;
 
-    // Activate ability
+    // Fire event for Aether consumption with the exact cost
+    _fireAetherChangedEvent(
+      oldAether,
+      _currentAether,
+      -cost,
+      'ability_$abilityName',
+    );
+
+    // Activate ability and set duration timer
     _abilityActive[abilityName] = true;
-    _abilityDurationTimers[abilityName] = _abilityDurations[abilityName] ?? 0;
+    _abilityDurationTimers[abilityName] = _abilityDurations[abilityName] ??
+        _defaultAbilityDurations[abilityName] ??
+        0;
 
     // Start cooldown
-    _abilityCooldownTimers[abilityName] = _abilityCooldowns[abilityName] ?? 0;
+    _abilityCooldownTimers[abilityName] = _abilityCooldowns[abilityName] ??
+        _defaultAbilityCooldowns[abilityName] ??
+        0;
 
     // Trigger ability start effect
     _onAbilityStart(abilityName);
@@ -191,10 +228,39 @@ class AetherComponent extends Component {
   void addAether(double amount) {
     if (amount <= 0) return;
 
+    final double oldAether = _currentAether;
     _currentAether += amount;
     if (_currentAether > _maxAether) {
       _currentAether = _maxAether;
     }
+
+    // Fire event for Aether change with actual change amount
+    final double actualChange = _currentAether - oldAether;
+    _fireAetherChangedEvent(
+      oldAether,
+      _currentAether,
+      actualChange,
+      'add_aether',
+    );
+  }
+
+  /// Fire Aether changed event
+  void _fireAetherChangedEvent(
+    double oldAether,
+    double newAether,
+    double changeAmount,
+    String reason,
+  ) {
+    final double timestamp = DateTime.now().millisecondsSinceEpoch.toDouble();
+    final event = PlayerAetherChangedEvent(
+      timestamp: timestamp,
+      oldAmount: oldAether.round(),
+      newAmount: newAether.round(),
+      maxAmount: _maxAether.round(),
+      changeAmount: changeAmount.round(),
+      changeReason: reason,
+    );
+    _eventBus.fireEvent(event);
   }
 
   /// Consume Aether energy
@@ -202,7 +268,16 @@ class AetherComponent extends Component {
     if (amount <= 0) return true;
 
     if (_currentAether >= amount) {
+      final double oldAether = _currentAether;
       _currentAether -= amount;
+
+      // Fire event for Aether change
+      _fireAetherChangedEvent(
+        oldAether,
+        _currentAether,
+        -amount,
+        'consume_aether',
+      );
       return true;
     }
 
@@ -211,7 +286,10 @@ class AetherComponent extends Component {
 
   /// Set maximum Aether capacity
   void setMaxAether(double max, {bool scaleCurrentAether = false}) {
-    final double percentage = _currentAether / _maxAether;
+    if (max < 0) max = 0; // Handle negative max Aether values
+
+    final double oldAether = _currentAether;
+    final double percentage = _maxAether > 0 ? _currentAether / _maxAether : 0;
     _maxAether = max;
 
     if (scaleCurrentAether) {
@@ -221,6 +299,14 @@ class AetherComponent extends Component {
         _currentAether = _maxAether;
       }
     }
+
+    // Fire event for Aether change
+    _fireAetherChangedEvent(
+      oldAether,
+      _currentAether,
+      _currentAether - oldAether,
+      'set_max_aether',
+    );
   }
 
   /// Check if an ability is unlocked
@@ -259,7 +345,11 @@ class AetherComponent extends Component {
   // Getters
   double get maxAether => _maxAether;
   double get currentAether => _currentAether;
+  double get aetherRegenRate => _aetherRegenRate;
   double get aetherPercentage => _currentAether / _maxAether * 100;
-  List<String> get unlockedAbilities => List<String>.unmodifiable(_unlockedAbilities);
-  Map<String, bool> get abilityStates => Map<String, bool>.unmodifiable(_abilityActive);
+  bool get isActive => _isActive;
+  List<String> get unlockedAbilities =>
+      List<String>.unmodifiable(_unlockedAbilities);
+  Map<String, bool> get abilityStates =>
+      Map<String, bool>.unmodifiable(_abilityActive);
 }

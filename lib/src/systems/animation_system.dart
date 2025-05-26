@@ -4,6 +4,31 @@ import 'base_system.dart';
 
 /// System that manages entity animation states
 /// Handles animation transitions, playback, and synchronization
+///
+/// ARCHITECTURE:
+/// -------------
+/// AnimationSystem coordinates animation playback for game entities.
+/// It integrates with other systems in the following ways:
+/// - Processes entities with AnimationComponent
+/// - Responds to state changes from physics and input systems
+/// - Tracks animation states to manage transitions between animations
+/// - Provides global animation speed control
+///
+/// PERFORMANCE CONSIDERATIONS:
+/// ---------------------------
+/// - Animation updates are optimized based on visibility and distance
+/// - State tracking avoids redundant animation transitions
+/// - Uses efficient sprite sheet management for memory optimization
+///
+/// USAGE EXAMPLES:
+/// --------------
+/// ```dart
+/// // Set global animation speed (e.g., for slow-motion effects)
+/// animationSystem.setGlobalAnimationSpeed(0.5);
+///
+/// // Add entity to animation system
+/// animationSystem.addEntity(character);
+/// ```
 class AnimationSystem extends BaseSystem {
   AnimationSystem() : super();
 

@@ -13,6 +13,8 @@ class PhysicsComponent extends Component {
     bool? isStatic,
     bool? isSensor,
     bool? affectedByGravity,
+    double? bounciness, // Added bounciness
+    bool? useEdgeDetection, // Added useEdgeDetection
   }) {
     if (velocity != null) _velocity = velocity;
     if (acceleration != null) _acceleration = acceleration;
@@ -23,6 +25,9 @@ class PhysicsComponent extends Component {
     if (isStatic != null) _isStatic = isStatic;
     if (isSensor != null) _isSensor = isSensor;
     if (affectedByGravity != null) _affectedByGravity = affectedByGravity;
+    if (bounciness != null)
+      _restitution = bounciness; // Use _restitution for bounciness
+    if (useEdgeDetection != null) _useEdgeDetection = useEdgeDetection;
   }
 
   // Physics properties
@@ -30,7 +35,7 @@ class PhysicsComponent extends Component {
   Vector2 _acceleration = Vector2.zero();
   double _mass = 1;
   double _friction = 0.1;
-  double _restitution = 0.2; // Bounciness
+  double _restitution = 0.2; // Internal field for bounciness
   double _gravityScale = 1;
   bool _isStatic = false; // Static objects don't move
   bool _isSensor = false; // Sensor objects don't collide physically
@@ -58,6 +63,8 @@ class PhysicsComponent extends Component {
       32.0; // Distance threshold for edge proximity
   Vector2? _leftEdgePosition;
   Vector2? _rightEdgePosition;
+  bool _useEdgeDetection =
+      false; // Whether this component should have edges detected by PhysicsSystem
 
   // Max velocity capping
   final double _maxVelocityX = 400;
@@ -149,7 +156,10 @@ class PhysicsComponent extends Component {
   Vector2 get acceleration => _acceleration;
   double get mass => _mass;
   double get friction => _friction;
-  double get restitution => _restitution;
+  double get restitution => _restitution; // Kept for direct access if needed
+  double get bounciness => _restitution; // Getter for bounciness
+  set bounciness(double value) =>
+      _restitution = value.clamp(0.0, 1.0); // Setter for bounciness, clamped
   double get gravityScale => _gravityScale;
   double get maxVelocityX => _maxVelocityX;
   double get maxVelocityY => _maxVelocityY;
@@ -180,6 +190,9 @@ class PhysicsComponent extends Component {
   double get edgeDetectionThreshold => _edgeDetectionThreshold;
   Vector2? get leftEdgePosition => _leftEdgePosition?.clone();
   Vector2? get rightEdgePosition => _rightEdgePosition?.clone();
+  bool get useEdgeDetection => _useEdgeDetection; // Getter for useEdgeDetection
+  set useEdgeDetection(bool value) =>
+      _useEdgeDetection = value; // Setter for useEdgeDetection
 
   /// Set gravity scale multiplier
   void setGravityScale(double scale) {

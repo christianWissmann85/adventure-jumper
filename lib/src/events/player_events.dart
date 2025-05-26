@@ -13,6 +13,12 @@ enum PlayerEventType {
   heal,
   collectItem,
   reachCheckpoint,
+  statChanged,
+  levelUp,
+  aetherChanged,
+  healthChanged,
+  energyChanged,
+  experienceGained,
 }
 
 /// Base class for player events
@@ -142,6 +148,166 @@ class PlayerLeftEdgeEvent extends PlayerEvent {
         'previousEdgePosition': previousEdgePosition,
         'edgeSide': edgeSide,
         'playerPosition': playerPosition,
+      };
+}
+
+/// Event fired when player stats change
+class PlayerStatChangedEvent extends PlayerEvent {
+  const PlayerStatChangedEvent({
+    required super.timestamp,
+    required this.statType,
+    required this.oldValue,
+    required this.newValue,
+    required this.maxValue,
+    this.changeReason,
+  }) : super(type: PlayerEventType.statChanged);
+
+  final String statType; // 'health', 'energy', 'aether', 'experience'
+  final double oldValue;
+  final double newValue;
+  final double maxValue;
+  final String?
+      changeReason; // 'damage', 'heal', 'collect', 'ability_use', etc.
+
+  @override
+  Map<String, dynamic>? get data => {
+        'statType': statType,
+        'oldValue': oldValue,
+        'newValue': newValue,
+        'maxValue': maxValue,
+        'changeReason': changeReason,
+      };
+}
+
+/// Event fired when player levels up
+class PlayerLevelUpEvent extends PlayerEvent {
+  const PlayerLevelUpEvent({
+    required super.timestamp,
+    required this.oldLevel,
+    required this.newLevel,
+    required this.healthIncrease,
+    required this.energyIncrease,
+  }) : super(type: PlayerEventType.levelUp);
+
+  final int oldLevel;
+  final int newLevel;
+  final double healthIncrease;
+  final double energyIncrease;
+
+  @override
+  Map<String, dynamic>? get data => {
+        'oldLevel': oldLevel,
+        'newLevel': newLevel,
+        'healthIncrease': healthIncrease,
+        'energyIncrease': energyIncrease,
+      };
+}
+
+/// Event fired when Aether value changes
+class PlayerAetherChangedEvent extends PlayerEvent {
+  const PlayerAetherChangedEvent({
+    required super.timestamp,
+    required this.oldAmount,
+    required this.newAmount,
+    required this.maxAmount,
+    required this.changeAmount,
+    this.changeReason,
+  }) : super(type: PlayerEventType.aetherChanged);
+
+  final int oldAmount;
+  final int newAmount;
+  final int maxAmount;
+  final int changeAmount;
+  final String? changeReason;
+
+  @override
+  Map<String, dynamic>? get data => {
+        'oldAmount': oldAmount,
+        'newAmount': newAmount,
+        'maxAmount': maxAmount,
+        'changeAmount': changeAmount,
+        'changeReason': changeReason,
+      };
+}
+
+/// Event fired when health changes
+class PlayerHealthChangedEvent extends PlayerEvent {
+  const PlayerHealthChangedEvent({
+    required super.timestamp,
+    required this.oldHealth,
+    required this.newHealth,
+    required this.maxHealth,
+    required this.changeAmount,
+    this.changeReason,
+  }) : super(type: PlayerEventType.healthChanged);
+
+  final double oldHealth;
+  final double newHealth;
+  final double maxHealth;
+  final double changeAmount;
+  final String? changeReason;
+
+  @override
+  Map<String, dynamic>? get data => {
+        'oldHealth': oldHealth,
+        'newHealth': newHealth,
+        'maxHealth': maxHealth,
+        'changeAmount': changeAmount,
+        'changeReason': changeReason,
+      };
+}
+
+/// Event fired when energy changes
+class PlayerEnergyChangedEvent extends PlayerEvent {
+  const PlayerEnergyChangedEvent({
+    required super.timestamp,
+    required this.oldEnergy,
+    required this.newEnergy,
+    required this.maxEnergy,
+    required this.changeAmount,
+    this.changeReason,
+  }) : super(type: PlayerEventType.energyChanged);
+
+  final double oldEnergy;
+  final double newEnergy;
+  final double maxEnergy;
+  final double changeAmount;
+  final String? changeReason;
+
+  @override
+  Map<String, dynamic>? get data => {
+        'oldEnergy': oldEnergy,
+        'newEnergy': newEnergy,
+        'maxEnergy': maxEnergy,
+        'changeAmount': changeAmount,
+        'changeReason': changeReason,
+      };
+}
+
+/// Event fired when experience is gained
+class PlayerExperienceGainedEvent extends PlayerEvent {
+  const PlayerExperienceGainedEvent({
+    required super.timestamp,
+    required this.oldExperience,
+    required this.newExperience,
+    required this.experienceGained,
+    required this.experienceToNextLevel,
+    this.source,
+  }) : super(type: PlayerEventType.experienceGained);
+
+  final int oldExperience;
+  final int newExperience;
+  final int experienceGained;
+  final int experienceToNextLevel;
+  final String? source; // 'combat', 'exploration', 'quest', etc.
+
+  @override
+  Map<String, dynamic>? get data => {
+        'oldExperience': oldExperience,
+        'newExperience': newExperience,
+        'experienceGained': experienceGained,
+        'experienceToNextLevel': experienceToNextLevel,
+        'source': source,
       };
 }
 

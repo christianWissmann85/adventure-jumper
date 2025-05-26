@@ -56,14 +56,13 @@ class Player extends Entity {
     health = HealthComponent();
     aether = AetherComponent();
     add(health);
-    add(aether);
-
-    // Initialize subsystems
+    add(aether); // Initialize subsystems
     controller = PlayerController(this);
     animator = PlayerAnimator(this);
     stats = PlayerStats();
     add(controller);
     add(animator);
+    add(stats);
 
     // Implementation needed: Load player sprites
     // Implementation needed: Set initial position

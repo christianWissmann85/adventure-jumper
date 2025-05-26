@@ -47,7 +47,8 @@ class Biome {
     return Biome(
       type: BiomeType.cave,
       name: 'Echoing Depths',
-      description: 'Dark caverns with crystal formations and underground lakes.',
+      description:
+          'Dark caverns with crystal formations and underground lakes.',
       primaryColor: const Color(0xFF3A3A4D), // Dark blue-grey
       secondaryColor: const Color(0xFF5E5E7A), // Medium blue-grey
       ambientSoundtrack: 'ambient/cave.mp3',
@@ -66,7 +67,8 @@ class Biome {
     return Biome(
       type: BiomeType.mountain,
       name: 'Crystal Peaks',
-      description: 'Snow-capped mountains with treacherous cliffs and howling winds.',
+      description:
+          'Snow-capped mountains with treacherous cliffs and howling winds.',
       primaryColor: const Color(0xFF6F8AA0), // Slate blue
       secondaryColor: const Color(0xFFD5DEE6), // Light grey-blue
       gravity: 10.2, // Slightly higher gravity
@@ -87,7 +89,8 @@ class Biome {
     return Biome(
       type: BiomeType.aetherRealm,
       name: 'Flowing Aether',
-      description: 'Ethereal spaces where reality bends and Aether flows freely.',
+      description:
+          'Ethereal spaces where reality bends and Aether flows freely.',
       primaryColor: const Color(0xFF4D3A78), // Deep purple
       secondaryColor: const Color(0xFF8A6FC4), // Medium purple
       gravity: 7.5, // Lower gravity
@@ -141,6 +144,34 @@ class Biome {
       ]);
   }
 
+  /// Create a Luminara biome instance
+  factory Biome.luminara() {
+    return Biome(
+      type: BiomeType.luminara,
+      name: 'Crystal Spires of Luminara',
+      description:
+          'Crystalline hub city with floating platforms and Aether-infused architecture.',
+      primaryColor: const Color(0xFF87CEEB), // Sky blue
+      secondaryColor: const Color(0xFFE6F3FF), // Very light blue
+      gravity: 8.5, // Slightly lower gravity due to Aether influence
+      hasAetherEnhancement: true,
+      ambientSoundtrack: 'ambient/luminara.mp3',
+      particleEffects: <String>[
+        'aether_particles',
+        'crystal_sparkles',
+        'floating_light_orbs'
+      ],
+      environmentalHazards: <String>[],
+    )..paletteColors.addAll(<Color>[
+        const Color(0xFF87CEEB), // Sky blue
+        const Color(0xFFE6F3FF), // Very light blue
+        const Color(0xFFADD8E6), // Light blue
+        const Color(0xFFB0E0E6), // Powder blue
+        const Color(0xFFF0F8FF), // Alice blue
+        const Color(0xFFE0FFFF), // Light cyan
+      ]);
+  }
+
   /// Create biome instance from BiomeType
   factory Biome.fromType(BiomeType type) {
     switch (type) {
@@ -156,6 +187,8 @@ class Biome {
         return Biome.ruins();
       case BiomeType.settlement:
         return Biome.settlement();
+      case BiomeType.luminara:
+        return Biome.luminara();
     }
   }
 

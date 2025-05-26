@@ -1,0 +1,207 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "Enhanced Test Level",
+    "author": "Adventure Jumper Team",
+    "description": "Test level for enhanced JSON format parsing",
+    "nextLevel": null,
+    "parTime": 120,
+    "theme": "forest"
+  },
+  "properties": {
+    "id": "enhanced_test",
+    "name": "Enhanced Test Level",
+    "width": 2000,
+    "height": 1200,
+    "gravity": 9.8,
+    "backgroundPath": "images/backgrounds/forest_background.png",
+    "musicPath": "audio/music/forest_theme.ogg",
+    "ambientSoundPath": "audio/sfx/forest_ambient.ogg",
+    "biomeType": "forest"
+  },
+  "bounds": {
+    "left": 0,
+    "right": 2000,
+    "top": 0,
+    "bottom": 1200
+  },
+  "cameraBounds": {
+    "left": -100,
+    "right": 2100,
+    "top": -50,
+    "bottom": 1250
+  },
+  "geometry": {
+    "platforms": [
+      {
+        "id": "main_ground",
+        "x": 0,
+        "y": 1100,
+        "width": 2000,
+        "height": 100,
+        "material": "grass",
+        "friction": 0.8
+      },
+      {
+        "id": "floating_platform_1",
+        "x": 400,
+        "y": 900,
+        "width": 200,
+        "height": 32,
+        "material": "wood",
+        "friction": 0.6,
+        "movementPath": [
+          {"x": 400, "y": 900, "duration": 2.0},
+          {"x": 600, "y": 900, "duration": 2.0},
+          {"x": 400, "y": 900, "duration": 2.0}
+        ]
+      }
+    ],
+    "boundaries": [
+      {
+        "id": "left_wall",
+        "type": "wall",
+        "vertices": [
+          {"x": 0, "y": 0},
+          {"x": 0, "y": 1200},
+          {"x": 32, "y": 1200},
+          {"x": 32, "y": 0}
+        ]
+      },
+      {
+        "id": "kill_zone",
+        "type": "killZone",
+        "vertices": [
+          {"x": 0, "y": 1200},
+          {"x": 2000, "y": 1200},
+          {"x": 2000, "y": 1250},
+          {"x": 0, "y": 1250}
+        ]
+      }
+    ],
+    "triggerZones": [
+      {
+        "id": "checkpoint_trigger",
+        "type": "checkpoint",
+        "x": 1000,
+        "y": 1000,
+        "width": 100,
+        "height": 100,
+        "properties": {
+          "checkpointId": "mid_level"
+        }
+      }
+    ]
+  },
+  "spawnPoints": {
+    "player_start": {
+      "type": "player",
+      "x": 100,
+      "y": 1000,
+      "properties": {
+        "facing": "right"
+      }
+    },
+    "level_exit": {
+      "type": "portal",
+      "x": 1800,
+      "y": 1000,
+      "properties": {
+        "destination": "level_2",
+        "portalType": "exit"
+      }
+    }
+  },
+  "entitySpawnDefinitions": [
+    {
+      "id": "coin_1",
+      "entityType": "collectible",
+      "entitySubtype": "coin",
+      "x": 300,
+      "y": 1050,
+      "properties": {
+        "value": 10,
+        "sparkle": true
+      }
+    },
+    {
+      "id": "enemy_patrol",
+      "entityType": "enemy",
+      "entitySubtype": "goblin",
+      "x": 800,
+      "y": 1050,
+      "properties": {
+        "patrolDistance": 200,
+        "speed": 50,
+        "health": 2
+      }
+    },
+    {
+      "id": "power_up",
+      "entityType": "powerup",
+      "entitySubtype": "jump_boost",
+      "x": 1200,
+      "y": 1050,
+      "properties": {
+        "duration": 10.0,
+        "multiplier": 1.5
+      }
+    }
+  ],
+  "entitySpawnGroups": [
+    {
+      "id": "coin_cluster",
+      "entities": ["coin_1"],
+      "spawnConditions": {
+        "trigger": "always"
+      }
+    }
+  ],
+  "environment": {
+    "lighting": {
+      "ambientColor": 4285427332,
+      "ambientIntensity": 0.4,
+      "lightSources": [
+        {
+          "position": {"x": 1000, "y": 800},
+          "color": 4294962176,
+          "intensity": 0.8,
+          "radius": 300
+        }
+      ]
+    },
+    "weather": {
+      "type": "light_rain",
+      "intensity": 0.3,
+      "properties": {
+        "dropSize": "small",
+        "windDirection": "left"
+      }
+    },
+    "ambientEffects": [
+      {
+        "type": "fireflies",
+        "properties": {
+          "count": 20,
+          "area": {"x": 0, "y": 0, "width": 2000, "height": 800}
+        }
+      }
+    ],
+    "backgroundLayers": [
+      {
+        "imagePath": "images/backgrounds/forest_far.png",
+        "scrollFactor": 0.2,
+        "zIndex": -2
+      },
+      {
+        "imagePath": "images/backgrounds/forest_mid.png",
+        "scrollFactor": 0.5,
+        "zIndex": -1
+      }
+    ]
+  },
+  "playerSpawn": {
+    "x": 100,
+    "y": 1000
+  }
+}

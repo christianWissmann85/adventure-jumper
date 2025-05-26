@@ -1,0 +1,718 @@
+{
+  "metadata": {
+    "version": "2.1",
+    "name": "Luminara Hub - Crystal Spire",
+    "author": "Adventure Jumper Team",
+    "description": "Central hub area of Luminara featuring the Crystal Spire, multiple districts, and Mira's location",
+    "nextLevel": null,
+    "parTime": null,
+    "theme": "luminara",
+    "difficulty": "tutorial",
+    "tags": ["hub", "tutorial", "safe_zone", "npc_interactions"]
+  },
+  "properties": {
+    "id": "luminara_hub",
+    "name": "Luminara Hub - Crystal Spire",
+    "width": 3200,
+    "height": 2400,
+    "gravity": 9.8,
+    "backgroundPath": "images/backgrounds/luminara_spire.png",
+    "musicPath": "audio/music/luminara_peaceful.ogg",
+    "ambientSoundPath": "audio/sfx/luminara_ambient.ogg",
+    "biomeType": "luminara"
+  },
+  "bounds": {
+    "left": 0,
+    "right": 3200,
+    "top": 0,
+    "bottom": 2400
+  },
+  "cameraBounds": {
+    "left": -200,
+    "right": 3400,
+    "top": -100,
+    "bottom": 2500
+  },
+  "geometry": {
+    "platforms": [
+      {
+        "id": "central_plaza_base",
+        "x": 1400,
+        "y": 2200,
+        "width": 400,
+        "height": 64,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_main",
+        "description": "Main plaza platform with crystal fountain"
+      },
+      {
+        "id": "keepers_archive_platform",
+        "x": 800,
+        "y": 1800,
+        "width": 300,
+        "height": 48,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_library",
+        "description": "Platform leading to Keeper's Archive - Mira's location"
+      },
+      {
+        "id": "archive_upper_level",
+        "x": 750,
+        "y": 1600,
+        "width": 400,
+        "height": 48,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_library"
+      },
+      {
+        "id": "market_district_main",
+        "x": 2100,
+        "y": 1900,
+        "width": 350,
+        "height": 48,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_market",
+        "description": "Main market area platform"
+      },
+      {
+        "id": "market_upper_shop",
+        "x": 2200,
+        "y": 1700,
+        "width": 200,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_market"
+      },
+      {
+        "id": "aether_well_platform",
+        "x": 1500,
+        "y": 1400,
+        "width": 200,
+        "height": 64,
+        "material": "pure_crystal",
+        "friction": 1.0,
+        "visualStyle": "luminara_well",
+        "description": "Central Aether Well platform - save point"
+      },
+      {
+        "id": "spire_ascent_1",
+        "x": 1400,
+        "y": 1200,
+        "width": 150,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_spire"
+      },
+      {
+        "id": "spire_ascent_2",
+        "x": 1650,
+        "y": 1000,
+        "width": 150,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_spire"
+      },
+      {
+        "id": "spire_ascent_3",
+        "x": 1350,
+        "y": 800,
+        "width": 150,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_spire"
+      },
+      {
+        "id": "spire_summit",
+        "x": 1450,
+        "y": 600,
+        "width": 300,
+        "height": 64,
+        "material": "pure_crystal",
+        "friction": 1.0,
+        "visualStyle": "luminara_summit",
+        "description": "Crystal Spire summit - Elder Nyssa's location"
+      },
+      {
+        "id": "observation_deck_east",
+        "x": 2600,
+        "y": 1500,
+        "width": 200,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_observation"
+      },
+      {
+        "id": "observation_deck_west",
+        "x": 400,
+        "y": 1500,
+        "width": 200,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_observation"
+      },
+      {
+        "id": "bridge_east_to_center",
+        "x": 1800,
+        "y": 2000,
+        "width": 300,
+        "height": 24,
+        "material": "crystal_bridge",
+        "friction": 0.8,
+        "visualStyle": "luminara_bridge"
+      },
+      {
+        "id": "bridge_west_to_center",
+        "x": 1100,
+        "y": 2000,
+        "width": 300,
+        "height": 24,
+        "material": "crystal_bridge",
+        "friction": 0.8,
+        "visualStyle": "luminara_bridge"
+      },
+      {
+        "id": "tutorial_practice_area",
+        "x": 600,
+        "y": 2100,
+        "width": 250,
+        "height": 32,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_training"
+      },
+      {
+        "id": "secret_alcove_1",
+        "x": 200,
+        "y": 1200,
+        "width": 100,
+        "height": 24,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_hidden"
+      },
+      {
+        "id": "secret_alcove_2",
+        "x": 2900,
+        "y": 1300,
+        "width": 120,
+        "height": 24,
+        "material": "crystal_stone",
+        "friction": 0.9,
+        "visualStyle": "luminara_hidden"
+      }
+    ],
+    "boundaries": [
+      {
+        "id": "left_boundary",
+        "type": "wall",
+        "vertices": [
+          {"x": 0, "y": 0},
+          {"x": 0, "y": 2400},
+          {"x": 32, "y": 2400},
+          {"x": 32, "y": 0}
+        ],
+        "material": "invisible_wall"
+      },
+      {
+        "id": "right_boundary",
+        "type": "wall",
+        "vertices": [
+          {"x": 3168, "y": 0},
+          {"x": 3168, "y": 2400},
+          {"x": 3200, "y": 2400},
+          {"x": 3200, "y": 0}
+        ],
+        "material": "invisible_wall"
+      },
+      {
+        "id": "void_barrier",
+        "type": "killZone",
+        "vertices": [
+          {"x": 0, "y": 2400},
+          {"x": 3200, "y": 2400},
+          {"x": 3200, "y": 2500},
+          {"x": 0, "y": 2500}
+        ],
+        "effect": "respawn_at_last_checkpoint"
+      }
+    ],
+    "triggerZones": [
+      {
+        "id": "central_plaza_arrival",
+        "type": "story_trigger",
+        "x": 1400,
+        "y": 2000,
+        "width": 400,
+        "height": 200,
+        "properties": {
+          "triggerEvent": "first_arrival_luminara",
+          "oneTime": true,
+          "description": "Triggers introduction sequence to Luminara"
+        }
+      },
+      {
+        "id": "mira_interaction_zone",
+        "type": "npc_interaction",
+        "x": 850,
+        "y": 1700,
+        "width": 200,
+        "height": 100,
+        "properties": {
+          "npcId": "mira",
+          "interactionType": "dialogue",
+          "description": "Mira's interaction area in the Keeper's Archive"
+        }
+      },
+      {
+        "id": "aether_well_zone",
+        "type": "checkpoint",
+        "x": 1450,
+        "y": 1200,
+        "width": 300,
+        "height": 200,
+        "properties": {
+          "checkpointId": "luminara_aether_well",
+          "savePoint": true,
+          "fastTravelPoint": true,
+          "description": "Central Aether Well - main save point"
+        }
+      },
+      {
+        "id": "market_entry",
+        "type": "area_transition",
+        "x": 2100,
+        "y": 1800,
+        "width": 350,
+        "height": 100,
+        "properties": {
+          "areaName": "Market District",
+          "description": "Entry to Market District area"
+        }
+      },
+      {
+        "id": "archive_entry",
+        "type": "area_transition",
+        "x": 800,
+        "y": 1700,
+        "width": 300,
+        "height": 100,
+        "properties": {
+          "areaName": "Keeper's Archive",
+          "description": "Entry to Keeper's Archive"
+        }
+      },
+      {
+        "id": "spire_summit_access",
+        "type": "progression_gate",
+        "x": 1450,
+        "y": 500,
+        "width": 300,
+        "height": 100,
+        "properties": {
+          "requiredAbility": "aether_dash",
+          "description": "Access to Spire Summit requires Aether Dash ability"
+        }
+      },
+      {
+        "id": "secret_area_1",
+        "type": "hidden_area",
+        "x": 150,
+        "y": 1100,
+        "width": 200,
+        "height": 100,
+        "properties": {
+          "discoveryReward": "aether_shard_small",
+          "description": "Hidden alcove with Aether Shard collectible"
+        }
+      },
+      {
+        "id": "secret_area_2",
+        "type": "hidden_area",
+        "x": 2850,
+        "y": 1200,
+        "width": 220,
+        "height": 100,
+        "properties": {
+          "discoveryReward": "echo_crystal_luminara_1",
+          "description": "Hidden area with Echo Crystal lore collectible"
+        }
+      }
+    ]
+  },
+  "spawnPoints": {
+    "player_start": {
+      "type": "player",
+      "x": 1600,
+      "y": 2100,
+      "properties": {
+        "facing": "left",
+        "description": "Player starts in central plaza"
+      }
+    },
+    "mira": {
+      "type": "npc",
+      "x": 950,
+      "y": 1750,
+      "properties": {
+        "npcType": "mira",
+        "facing": "right",
+        "initialState": "idle",
+        "dialogueSet": "luminara_introduction",
+        "description": "Mira in the Keeper's Archive"
+      }
+    },
+    "rook": {
+      "type": "npc",
+      "x": 2250,
+      "y": 1850,
+      "properties": {
+        "npcType": "rook",
+        "facing": "left",
+        "initialState": "working",
+        "dialogueSet": "market_introduction",
+        "description": "Rook in the Market District"
+      }
+    },
+    "elder_nyssa": {
+      "type": "npc",
+      "x": 1600,
+      "y": 550,
+      "properties": {
+        "npcType": "elder_nyssa",
+        "facing": "down",
+        "initialState": "meditating",
+        "dialogueSet": "spire_summit_wisdom",
+        "accessRequirement": "complete_tutorial",
+        "description": "Elder Nyssa at Spire Summit"
+      }
+    },
+    "checkpoint_aether_well": {
+      "type": "checkpoint",
+      "x": 1600,
+      "y": 1350,
+      "properties": {
+        "checkpointType": "aether_well",
+        "saveData": true,
+        "fastTravel": true,
+        "description": "Main Aether Well checkpoint"
+      }
+    }
+  },
+  "entities": {
+    "collectibles": [
+      {
+        "id": "aether_shard_plaza_1",
+        "type": "aether_shard",
+        "x": 1350,
+        "y": 2150,
+        "properties": {
+          "value": 5,
+          "size": "small"
+        }
+      },
+      {
+        "id": "aether_shard_plaza_2",
+        "type": "aether_shard",
+        "x": 1850,
+        "y": 2150,
+        "properties": {
+          "value": 5,
+          "size": "small"
+        }
+      },
+      {
+        "id": "lost_page_archive",
+        "type": "lost_page",
+        "x": 900,
+        "y": 1550,
+        "properties": {
+          "pageId": "luminara_history_1",
+          "loreCategory": "world_history"
+        }
+      },
+      {
+        "id": "echo_crystal_market",
+        "type": "echo_crystal",
+        "x": 2300,
+        "y": 1650,
+        "properties": {
+          "crystalId": "merchant_memory_1",
+          "audioClip": "rook_backstory_fragment"
+        }
+      },
+      {
+        "id": "aether_shard_secret_1",
+        "type": "aether_shard",
+        "x": 250,
+        "y": 1150,
+        "properties": {
+          "value": 10,
+          "size": "medium",
+          "hidden": true
+        }
+      },
+      {
+        "id": "echo_crystal_secret_2",
+        "type": "echo_crystal",
+        "x": 2950,
+        "y": 1250,
+        "properties": {
+          "crystalId": "ancient_luminara_echo",
+          "audioClip": "old_luminara_memory",
+          "hidden": true
+        }
+      }
+    ],
+    "interactables": [
+      {
+        "id": "crystal_fountain",
+        "type": "decoration_interactive",
+        "x": 1600,
+        "y": 2180,
+        "properties": {
+          "interactionType": "examine",
+          "description": "The central crystal fountain pulses with gentle Aether energy",
+          "tooltip": "Press [E] to examine"
+        }
+      },
+      {
+        "id": "training_dummy_1",
+        "type": "training_dummy",
+        "x": 650,
+        "y": 2070,
+        "properties": {
+          "dummyType": "basic_combat",
+          "tutorial": "basic_attacks"
+        }
+      },
+      {
+        "id": "training_dummy_2",
+        "type": "training_dummy",
+        "x": 750,
+        "y": 2070,
+        "properties": {
+          "dummyType": "movement",
+          "tutorial": "jump_and_dash"
+        }
+      },
+      {
+        "id": "archive_terminal",
+        "type": "information_terminal",
+        "x": 1000,
+        "y": 1570,
+        "properties": {
+          "terminalType": "lore_database",
+          "content": "luminara_world_info"
+        }
+      },
+      {
+        "id": "market_bulletin",
+        "type": "information_board",
+        "x": 2150,
+        "y": 1870,
+        "properties": {
+          "boardType": "quest_board",
+          "quests": ["fetch_aether_crystals", "explore_observation_decks"]
+        }
+      }
+    ]
+  },
+  "environmentalData": {
+    "lighting": {
+      "ambientColor": "#E6F3FF",
+      "ambientIntensity": 0.7,
+      "lightSources": [
+        {
+          "type": "crystal_glow",
+          "x": 1600,
+          "y": 2200,
+          "color": "#ADD8E6",
+          "intensity": 1.0,
+          "radius": 300
+        },
+        {
+          "type": "aether_well_glow",
+          "x": 1600,
+          "y": 1400,
+          "color": "#87CEEB",
+          "intensity": 1.2,
+          "radius": 250
+        },
+        {
+          "type": "spire_summit_glow",
+          "x": 1600,
+          "y": 600,
+          "color": "#B0E0E6",
+          "intensity": 0.9,
+          "radius": 200
+        }
+      ],
+      "dynamicLighting": true,
+      "timeOfDay": "eternal_twilight"
+    },
+    "weather": {
+      "type": "clear",
+      "intensity": 0.0,
+      "effects": ["gentle_aether_particles", "soft_crystal_sparkles"]
+    },
+    "backgroundLayers": [
+      {
+        "layer": 0,
+        "path": "images/backgrounds/luminara_distant_mountains.png",
+        "parallaxX": 0.1,
+        "parallaxY": 0.0,
+        "alpha": 0.6
+      },
+      {
+        "layer": 1,
+        "path": "images/backgrounds/luminara_floating_islands.png",
+        "parallaxX": 0.3,
+        "parallaxY": 0.1,
+        "alpha": 0.8
+      },
+      {
+        "layer": 2,
+        "path": "images/backgrounds/luminara_crystal_formations.png",
+        "parallaxX": 0.6,
+        "parallaxY": 0.2,
+        "alpha": 1.0
+      },
+      {
+        "layer": 3,
+        "path": "images/foregrounds/luminara_aether_particles.png",
+        "parallaxX": 1.2,
+        "parallaxY": 0.3,
+        "alpha": 0.4
+      }
+    ],
+    "ambientEffects": [
+      {
+        "type": "aether_particles",
+        "density": 0.3,
+        "movement": "gentle_drift",
+        "color": "#ADD8E6"
+      },
+      {
+        "type": "crystal_sparkles",
+        "density": 0.2,
+        "movement": "random_twinkle",
+        "color": "#F0F8FF"
+      },
+      {
+        "type": "floating_light_orbs",
+        "density": 0.1,
+        "movement": "slow_orbit",
+        "color": "#E0FFFF"
+      }
+    ]
+  },
+  "navigation": {
+    "primaryPaths": [
+      {
+        "name": "Plaza to Archive",
+        "waypoints": [
+          {"x": 1600, "y": 2200},
+          {"x": 1250, "y": 2000},
+          {"x": 950, "y": 1800}
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "name": "Plaza to Market",
+        "waypoints": [
+          {"x": 1600, "y": 2200},
+          {"x": 1950, "y": 2000},
+          {"x": 2250, "y": 1900}
+        ],
+        "difficulty": "easy"
+      },
+      {
+        "name": "Plaza to Aether Well",
+        "waypoints": [
+          {"x": 1600, "y": 2200},
+          {"x": 1600, "y": 1400}
+        ],
+        "difficulty": "medium",
+        "requiredAbility": "basic_jump"
+      },
+      {
+        "name": "Aether Well to Spire Summit",
+        "waypoints": [
+          {"x": 1600, "y": 1400},
+          {"x": 1475, "y": 1200},
+          {"x": 1725, "y": 1000},
+          {"x": 1425, "y": 800},
+          {"x": 1600, "y": 600}
+        ],
+        "difficulty": "hard",
+        "requiredAbility": "aether_dash"
+      }
+    ],
+    "secrets": [
+      {
+        "name": "Western Secret Alcove",
+        "entryPoint": {"x": 400, "y": 1500},
+        "secretLocation": {"x": 250, "y": 1200},
+        "difficulty": "medium",
+        "hint": "Look for the hidden path behind the observation deck"
+      },
+      {
+        "name": "Eastern Hidden Chamber",
+        "entryPoint": {"x": 2600, "y": 1500},
+        "secretLocation": {"x": 2950, "y": 1300},
+        "difficulty": "hard",
+        "hint": "Wall jump sequence required from the eastern observation deck"
+      }
+    ]
+  },
+  "accessibility": {
+    "alternativePaths": [
+      {
+        "purpose": "Archive access without wall jumping",
+        "path": [
+          {"x": 1600, "y": 2200},
+          {"x": 1200, "y": 2000},
+          {"x": 950, "y": 1800}
+        ]
+      },
+      {
+        "purpose": "Market access for movement-impaired players",
+        "path": [
+          {"x": 1600, "y": 2200},
+          {"x": 2000, "y": 2000},
+          {"x": 2250, "y": 1900}
+        ]
+      }
+    ],
+    "visualAids": [
+      {
+        "type": "navigation_crystals",
+        "description": "Glowing crystals mark main pathways"
+      },
+      {
+        "type": "platform_highlights",
+        "description": "Interactive platforms have subtle glow effects"
+      }
+    ],
+    "assistiveFeatures": [
+      {
+        "type": "audio_cues",
+        "description": "Directional audio cues for navigation"
+      },
+      {
+        "type": "haptic_feedback",
+        "description": "Controller vibration for interaction points"
+      }
+    ]
+  }
+}

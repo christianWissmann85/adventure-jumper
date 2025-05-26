@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "id": "legacy_test",
+    "name": "Legacy Test Level",
+    "width": 800,
+    "height": 600,
+    "gravity": 9.8,
+    "backgroundPath": "bg.png",
+    "biomeType": "forest"
+  },
+  "platforms": [
+    {
+      "id": "ground",
+      "x": 0,
+      "y": 550,
+      "width": 800,
+      "height": 50
+    }
+  ],
+  "enemies": [
+    {
+      "id": "goblin_1",
+      "type": "goblin",
+      "x": 400,
+      "y": 500
+    }
+  ]
+}

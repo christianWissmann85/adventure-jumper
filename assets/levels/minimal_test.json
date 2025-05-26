@@ -1,0 +1,11 @@
+{
+  "properties": {
+    "id": "minimal_test",
+    "name": "Minimal Test Level",
+    "width": 800,
+    "height": 600,
+    "gravity": 9.8,
+    "backgroundPath": "bg.png",
+    "biomeType": "forest"
+  }
+}

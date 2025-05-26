@@ -10,7 +10,6 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('End-to-End Gameplay Tests', () {
     final gameTester = FlameTester(AdventureJumperGame.new);
-
     gameTester.testGameWidget(
       'player should move and jump correctly',
       verify: (game, tester) async {
@@ -27,9 +26,7 @@ void main() {
         player.physics!.setVelocity(Vector2.zero());
 
         // Set player as on ground for jump testing
-        player.physics!.setOnGround(true);
-
-        // Simulate right key press
+        player.physics!.setOnGround(true); // Simulate right key press
         game.onKeyEvent(
           KeyDownEvent(
             physicalKey: PhysicalKeyboardKey.keyD,
@@ -40,9 +37,15 @@ void main() {
           {LogicalKeyboardKey.keyD}, // Keys currently pressed
         );
 
-        // Update game a few frames
+        // Process the input through the game systems and update game frames
         for (int i = 0; i < 20; i++) {
-          game.update(0.016);
+          // Let the game process the input and update systems
+          game.inputSystem.update(0.016);
+          player.controller.update(0.016);
+          game.movement.update(0.016);
+          game.physicsSystem.update(0.016);
+
+          await tester.pump(const Duration(milliseconds: 16));
         }
 
         // Player should have moved right - we just want to see any positive movement
@@ -65,14 +68,20 @@ void main() {
             LogicalKeyboardKey.space,
           }, // Keys currently pressed
         ); // Save position before jump
-        final preJumpPosition = Vector2.copy(player.position);
-
-        // Set player as on ground again before jump (physics system clears this)
+        final preJumpPosition = Vector2.copy(
+          player.position,
+        ); // Set player as on ground again before jump (physics system clears this)
         player.physics!.setOnGround(true);
 
-        // Update game a few frames to start jump
+        // Process the jump input through the game systems and update game frames
         for (int i = 0; i < 2; i++) {
-          game.update(0.016);
+          // Let the game process the jump input and update systems
+          game.inputSystem.update(0.016);
+          player.controller.update(0.016);
+          game.movement.update(0.016);
+          game.physicsSystem.update(0.016);
+
+          await tester.pump(const Duration(milliseconds: 16));
         }
 
         // Player should have moved upward (Y should be more negative)
@@ -144,9 +153,12 @@ void main() {
         bool hasLanded = false;
         int maxFrames = 200; // Increased safety limit
         int currentFrame = 0;
-
         while (!hasLanded && currentFrame < maxFrames) {
-          game.update(0.016);
+          // Process physics and movement systems
+          game.physicsSystem.update(0.016);
+          game.movement.update(0.016);
+
+          await tester.pump(const Duration(milliseconds: 16));
           currentFrame++;
 
           // Check if player has landed on platform

@@ -6,27 +6,40 @@ library;
 
 import 'dart:ui';
 
-/// Physics and movement constants
+/// Physics and movement constants - T2.13.1: Optimized for maximum responsiveness and fluid movement
 class PhysicsConstants {
-  // World physics
-  static const double gravity = 980; // pixels/second²
-  static const double terminalVelocity = 800; // pixels/second
-  static const double airResistance = 0.02;
-  static const double groundFriction = 0.85;
+  // World physics - T2.13.1: Enhanced for sub-2-frame responsive feel
+  static const double gravity =
+      1400; // pixels/second² (increased for snappier, more responsive movement)
+  static const double terminalVelocity =
+      950; // pixels/second (slightly higher for better feel)
+  static const double airResistance =
+      0.012; // Further reduced for enhanced air control
+  static const double groundFriction =
+      0.65; // Reduced for maximum responsive ground movement
 
-  // Player movement
-  static const double playerWalkSpeed = 200; // pixels/second
-  static const double playerRunSpeed = 350; // pixels/second
-  static const double playerJumpVelocity = -450; // pixels/second (negative = up)
-  static const double playerDoubleJumpVelocity = -380;
-  static const double playerWallJumpVelocity = -400;
-  static const double playerWallSlideSpeed = 100;
+  // Player movement - T2.13.2: Enhanced for ultra-responsive acceleration and speeds
+  static const double playerWalkSpeed =
+      280; // pixels/second (enhanced base speed for better flow)
+  static const double playerRunSpeed =
+      450; // pixels/second (increased top speed for fluid movement)
+  static const double playerJumpVelocity =
+      -540; // pixels/second (enhanced for better arc and responsiveness)
+  static const double playerDoubleJumpVelocity =
+      -440; // Enhanced double jump feel
+  static const double playerWallJumpVelocity =
+      -470; // Improved wall jump responsiveness
+  static const double playerWallSlideSpeed = 75; // Optimized for better control
 
-  // Movement constraints
-  static const double maxHorizontalSpeed = 500;
-  static const double maxVerticalSpeed = 1000;
-  static const double coyoteTime = 0.15; // seconds
-  static const double jumpBufferTime = 0.1; // seconds
+  // Movement constraints - T2.13.2: Enhanced for maximum expressive movement
+  static const double maxHorizontalSpeed =
+      600; // Higher speed ceiling for expression
+  static const double maxVerticalSpeed =
+      1200; // Enhanced vertical limits for better jumps
+  static const double coyoteTime =
+      0.20; // seconds (more forgiving for fluid play)
+  static const double jumpBufferTime =
+      0.15; // seconds (more generous for combo flow)
 
   // Collision detection
   static const double collisionTolerance = 0.1;

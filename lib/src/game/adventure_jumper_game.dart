@@ -10,18 +10,21 @@ import 'package:logging/logging.dart';
 import '../systems/input_system.dart';
 import '../systems/movement_system.dart';
 import '../systems/physics_system.dart';
+import '../ui/game_hud.dart';
 import 'game_camera.dart';
 import 'game_config.dart';
 import 'game_world.dart';
 
 /// Main game class for Adventure Jumper
 /// Handles overall game state, system coordination, and scene management
-class AdventureJumperGame extends FlameGame with TapDetector, HasKeyboardHandlerComponents {
+class AdventureJumperGame extends FlameGame
+    with TapDetector, HasKeyboardHandlerComponents {
   late GameWorld gameWorld;
   late GameCamera gameCamera;
   late InputSystem inputSystem;
   late MovementSystem movementSystem;
   late PhysicsSystem physicsSystem;
+  late GameHUD gameHUD; // Add GameHUD reference
 
   // Random number generator for the game
   final math.Random random = math.Random();
@@ -57,11 +60,27 @@ class AdventureJumperGame extends FlameGame with TapDetector, HasKeyboardHandler
     _logger.fine('Game camera initialized'); // Initialize game world
     gameWorld = GameWorld();
     add(gameWorld);
-    _logger.fine('Game world initialized'); // Register player with input system once world is loaded
+    _logger.fine('Game world initialized');
+
+    // Wait for world to load
     await gameWorld.loaded;
+
+    // Initialize the game HUD
+    final screenSize = Vector2(size.x, size.y);
+    gameHUD = GameHUD(
+      screenSize: screenSize,
+      player: gameWorld.player,
+      showFps: true,
+    );
+    add(gameHUD);
+    _logger.fine('Game HUD initialized');
+
+    // Register player with input system once world is loaded
     if (gameWorld.player != null) {
       inputSystem.setFocusedEntity(gameWorld.player!);
-      _logger.fine('Player registered with input system'); // Register player with movement system
+      _logger.fine(
+        'Player registered with input system',
+      ); // Register player with movement system
       movementSystem.addEntity(gameWorld.player!);
       _logger.fine('Player registered with movement system');
 
@@ -112,7 +131,10 @@ class AdventureJumperGame extends FlameGame with TapDetector, HasKeyboardHandler
   }
 
   @override
-  KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
     // Call parent method first
     super.onKeyEvent(event, keysPressed);
 

@@ -27,6 +27,14 @@ class PlayerController extends Component with KeyboardHandler {
   bool _moveLeft = false;
   bool _moveRight = false;
   bool _jump = false;
+  double _lastDeltaTime =
+      0.016; // Track delta time for deceleration calculations
+
+  // T2.13.4: Movement smoothing variables
+  double _targetVelocityX = 0.0; // Target horizontal velocity for smoothing
+  double _inputSmoothTimer = 0.0; // Timer for input smoothing
+  bool _hasInputThisFrame = false; // Track if we have input this frame
+
   // T2.3.2: Enhanced jump state machine
   JumpState _jumpState = JumpState.grounded;
   bool _jumpInputHeld = false;
@@ -52,19 +60,29 @@ class PlayerController extends Component with KeyboardHandler {
   void update(double dt) {
     super.update(dt);
 
-    // T2.3.2: Update jump state machine
-    _updateJumpStateMachine(dt);
+    // Track delta time for deceleration calculations
+    _lastDeltaTime = dt;
 
-    // T2.3.4: Update timers
+    // T2.3.2: Update jump state machine
+    _updateJumpStateMachine(dt); // T2.3.4: Update timers
     _updateTimers(dt);
+
+    // T2.13.4: Update movement smoothing
+    _updateMovementSmoothing(dt);
+
     // T2.6.3: Update edge detection state
     _updateEdgeDetection();
+
+    // Reset input tracking for this frame
+    _hasInputThisFrame = false;
 
     // Process movement inputs
     if (_moveLeft) {
       _movePlayerLeft(dt);
+      _hasInputThisFrame = true;
     } else if (_moveRight) {
       _movePlayerRight(dt);
+      _hasInputThisFrame = true;
     } else {
       // Stop horizontal movement when no keys are pressed
       _stopHorizontalMovement();
@@ -104,30 +122,74 @@ class PlayerController extends Component with KeyboardHandler {
     }
   }
 
-  /// Handle movement to the left
+  /// Handle movement to the left - T2.13.2: Enhanced with acceleration & T2.13.3: Air control
   void _movePlayerLeft(double dt) {
-    // Apply leftward movement via physics component
-    if (player.physics != null) {
-      // Set horizontal velocity for left movement
-      const double moveSpeed = 200.0; // pixels per second
-      player.physics!.velocity.x = -moveSpeed;
-    } // For now, also provide visual debug feedback
+    if (player.physics == null) return;
+
+    // Determine if we're in air and get appropriate parameters
+    final bool isInAir = !player.physics!.isOnGround;
+    double acceleration = isInAir
+        ? GameConfig.airAcceleration * GameConfig.airControlMultiplier
+        : GameConfig.playerAcceleration;
+    double maxSpeed =
+        isInAir ? GameConfig.maxAirSpeed : GameConfig.maxWalkSpeed;
+
+    // T2.13.3: Enhanced control - boost acceleration for direction changes
+    if (player.physics!.velocity.x > 0) {
+      // Changing direction - apply turnaround boost (both air and ground)
+      acceleration = isInAir
+          ? GameConfig.airTurnAroundSpeed
+          : GameConfig.playerAcceleration *
+              1.5; // 1.5x boost for ground turnaround
+    }
+
+    // Apply leftward acceleration
+    player.physics!.velocity.x -= acceleration * dt;
+
+    // Clamp to maximum speed
+    if (player.physics!.velocity.x < -maxSpeed) {
+      player.physics!.velocity.x = -maxSpeed;
+    }
+
+    // Debug feedback
     developer.log(
-      'Player moving left (velocity: ${player.physics?.velocity.x ?? 0})',
+      'Player accelerating left${isInAir ? ' (air)' : ''} (velocity: ${player.physics!.velocity.x.toStringAsFixed(1)})',
       name: 'PlayerController._movePlayerLeft',
     );
   }
 
-  /// Handle movement to the right
+  /// Handle movement to the right - T2.13.2: Enhanced with acceleration & T2.13.3: Air control
   void _movePlayerRight(double dt) {
-    // Apply rightward movement via physics component
-    if (player.physics != null) {
-      // Set horizontal velocity for right movement
-      const double moveSpeed = 200.0; // pixels per second
-      player.physics!.velocity.x = moveSpeed;
-    } // For now, also provide visual debug feedback
+    if (player.physics == null) return;
+
+    // Determine if we're in air and get appropriate parameters
+    final bool isInAir = !player.physics!.isOnGround;
+    double acceleration = isInAir
+        ? GameConfig.airAcceleration * GameConfig.airControlMultiplier
+        : GameConfig.playerAcceleration;
+    double maxSpeed =
+        isInAir ? GameConfig.maxAirSpeed : GameConfig.maxWalkSpeed;
+
+    // T2.13.3: Enhanced control - boost acceleration for direction changes
+    if (player.physics!.velocity.x < 0) {
+      // Changing direction - apply turnaround boost (both air and ground)
+      acceleration = isInAir
+          ? GameConfig.airTurnAroundSpeed
+          : GameConfig.playerAcceleration *
+              1.5; // 1.5x boost for ground turnaround
+    }
+
+    // Apply rightward acceleration
+    player.physics!.velocity.x += acceleration * dt;
+
+    // Clamp to maximum speed
+    if (player.physics!.velocity.x > maxSpeed) {
+      player.physics!.velocity.x = maxSpeed;
+    }
+
+    // Debug feedback
     developer.log(
-      'Player moving right (velocity: ${player.physics?.velocity.x ?? 0})',
+      'Player accelerating right${isInAir ? ' (air)' : ''} (velocity: ${player.physics!.velocity.x.toStringAsFixed(1)})',
       name: 'PlayerController._movePlayerRight',
     );
   }
@@ -135,7 +197,6 @@ class PlayerController extends Component with KeyboardHandler {
   /// T2.3.2: Update jump state machine
   void _updateJumpStateMachine(double dt) {
     if (player.physics == null) return;
-
     final bool isCurrentlyOnGround = player.physics!.isOnGround;
     final double currentVelocityY = player.physics!.velocity.y;
 
@@ -150,6 +211,11 @@ class PlayerController extends Component with KeyboardHandler {
           _coyoteTimer = GameConfig.jumpCoyoteTime;
           // T2.5.3: Fire left ground event
           _fireLeftGroundEvent('fall');
+        } else if (!isCurrentlyOnGround && currentVelocityY == 0) {
+          // Player was manually placed in air (testing scenario)
+          // Transition to falling but don't give coyote time
+          _jumpState = JumpState.falling;
+          _coyoteTimer = 0.0; // No coyote time for manual placement
         }
         break;
 
@@ -167,20 +233,30 @@ class PlayerController extends Component with KeyboardHandler {
           _jumpState = JumpState.falling;
         }
         break;
-
       case JumpState.falling:
         if (isCurrentlyOnGround) {
           _jumpState = JumpState.landing;
           _landingTimer = 0.1; // Brief landing state
           // T2.5.3: Fire landing event with enhanced data
           _fireLandingEvent();
+
+          // Check for buffered jumps immediately when landing
+          if (_jumpBufferTimer > 0 && _canPerformJump()) {
+            _performJump();
+            _jumpBufferTimer = 0.0; // Consume the buffer
+          }
         }
         break;
-
       case JumpState.landing:
         _landingTimer -= dt;
         if (_landingTimer <= 0) {
           _jumpState = JumpState.grounded;
+
+          // Check for buffered jumps when landing is complete
+          if (_jumpBufferTimer > 0 && _canPerformJump()) {
+            _performJump();
+            _jumpBufferTimer = 0.0; // Consume the buffer
+          }
         }
         break;
     }
@@ -211,6 +287,35 @@ class PlayerController extends Component with KeyboardHandler {
     }
   }
 
+  /// T2.13.4: Update movement smoothing for fluid motion
+  void _updateMovementSmoothing(double dt) {
+    if (player.physics == null) return;
+
+    // Update input smoothing timer
+    if (_hasInputThisFrame) {
+      _inputSmoothTimer = GameConfig.inputSmoothingTime;
+    } else if (_inputSmoothTimer > 0) {
+      _inputSmoothTimer -= dt;
+    }
+
+    // Apply velocity smoothing using interpolation
+    final double currentVel = player.physics!.velocity.x;
+    final double smoothingFactor = GameConfig.velocitySmoothingFactor;
+
+    // Smooth velocity transitions when no input is present
+    if (!_hasInputThisFrame && _inputSmoothTimer <= 0) {
+      // Apply smoothing to reduce jitter when stopping
+      if (currentVel.abs() > GameConfig.minMovementThreshold) {
+        final double smoothedVel =
+            currentVel * (1.0 - smoothingFactor * dt * 60); // 60fps normalized
+        player.physics!.velocity.x = smoothedVel;
+      } else {
+        // Below threshold, snap to zero
+        player.physics!.velocity.x = 0.0;
+      }
+    }
+  }
+
   /// T2.3.1 & T2.3.4: Handle jump input with variable height
   void _handleJumpInput() {
     // Add to jump buffer
@@ -222,14 +327,22 @@ class PlayerController extends Component with KeyboardHandler {
     }
   }
 
-  /// T2.3.1: Apply jump force to player PhysicsComponent
+  /// T2.3.1: Apply jump force to player PhysicsComponent - T2.13.3: Enhanced with air speed retention
   void _performJump() {
     if (player.physics == null) return;
 
     final bool isCoyoteJump = !player.physics!.isOnGround && _coyoteTimer > 0;
 
+    // T2.13.3: Retain horizontal momentum when jumping
+    final double currentHorizontalSpeed = player.physics!.velocity.x;
+    final double retainedSpeed =
+        currentHorizontalSpeed * GameConfig.airSpeedRetention;
+
     // Apply initial jump force using GameConfig values
     player.physics!.velocity.y = GameConfig.jumpForce;
+
+    // T2.13.3: Apply retained horizontal speed for fluid movement
+    player.physics!.velocity.x = retainedSpeed;
 
     // Update state
     _jumpState = JumpState.jumping;
@@ -240,7 +353,7 @@ class PlayerController extends Component with KeyboardHandler {
     // T2.5.3: Fire jump event
     _fireJumpEvent(isCoyoteJump); // Debug feedback
     developer.log(
-      'Player jumping (velocity: ${player.physics!.velocity.y})',
+      'Player jumping (velocity: ${player.physics!.velocity.y}, horizontal retained: ${retainedSpeed.toStringAsFixed(1)})',
       name: 'PlayerController._performJump',
     );
   }
@@ -342,10 +455,33 @@ class PlayerController extends Component with KeyboardHandler {
     return _canPerformJump();
   }
 
-  /// Stop horizontal movement
+  /// Stop horizontal movement - T2.13.2: Enhanced with deceleration
   void _stopHorizontalMovement() {
-    // Stop horizontal movement by setting velocity to 0
-    if (player.physics != null) {
+    if (player.physics == null) return;
+
+    // Apply deceleration based on air/ground state
+    final double deceleration = player.physics!.isOnGround
+        ? GameConfig.playerDeceleration
+        : GameConfig.airDeceleration;
+
+    // Apply deceleration in opposite direction of current velocity
+    if (player.physics!.velocity.x > 0) {
+      // Moving right, decelerate left
+      player.physics!.velocity.x -= deceleration * _lastDeltaTime;
+      if (player.physics!.velocity.x < 0) {
+        player.physics!.velocity.x = 0; // Stop at zero
+      }
+    } else if (player.physics!.velocity.x < 0) {
+      // Moving left, decelerate right
+      player.physics!.velocity.x += deceleration * _lastDeltaTime;
+      if (player.physics!.velocity.x > 0) {
+        player.physics!.velocity.x = 0; // Stop at zero
+      }
+    }
+
+    // Clamp very small values to zero to prevent floating point drift
+    // Increased threshold to handle test precision requirements
+    if (player.physics!.velocity.x.abs() < 0.01) {
       player.physics!.velocity.x = 0.0;
     }
   }
@@ -370,15 +506,26 @@ class PlayerController extends Component with KeyboardHandler {
     _landingTimer = 0.0;
     _jumpCooldownTimer = 0.0;
     _coyoteTimer = 0.0;
+
+    // T2.13.4: Reset smoothing variables
+    _targetVelocityX = 0.0;
+    _inputSmoothTimer = 0.0;
+    _hasInputThisFrame = false;
+
     // Legacy variables
     _isJumping = false;
     _canJump = true;
+
+    // Clear any physics velocity to ensure clean state
+    if (player.physics != null) {
+      player.physics!.velocity.setZero();
+    }
   }
 
   /// Get current movement state for debugging and external systems
   bool get isMovingLeft => _moveLeft;
   bool get isMovingRight => _moveRight;
-  bool get isJumping => _isJumping;
+  bool get isJumping => _jumpInputHeld || _isJumping;
   bool get canJump => _canJump;
   double get jumpCooldownRemaining => _jumpCooldownTimer;
   double get coyoteTimeRemaining => _coyoteTimer;

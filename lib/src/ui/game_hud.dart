@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
+import '../events/player_events.dart';
 import '../player/player.dart';
 
 /// In-game overlay interface
@@ -18,6 +19,7 @@ class GameHUD extends PositionComponent {
   // References
   final Vector2 screenSize;
   Player? _player;
+  late final PlayerEventBus _eventBus = PlayerEventBus.instance;
 
   // Layout settings
   final double padding;
@@ -31,7 +33,6 @@ class GameHUD extends PositionComponent {
 
   // UI state
   bool _isVisible = true;
-
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -44,6 +45,9 @@ class GameHUD extends PositionComponent {
     if (showFps) {
       _createFpsCounter();
     }
+
+    // Subscribe to player events
+    _eventBus.addListener(_handlePlayerEvent);
   }
 
   @override
@@ -134,6 +138,24 @@ class GameHUD extends PositionComponent {
   void resize(Vector2 newScreenSize) {
     // Implementation will be added in future sprints
   }
+
+  /// Handle player events
+  void _handlePlayerEvent(PlayerEvent event) {
+    // Only process events when HUD is visible
+    if (!_isVisible) return;
+
+    // Check for aether change events specifically
+    if (event is PlayerAetherChangedEvent) {
+      _aetherBar.setAether(event.newAmount.toDouble());
+    }
+  }
+
+  @override
+  void onRemove() {
+    // Unsubscribe from events when removed
+    _eventBus.removeListener(_handlePlayerEvent);
+    super.onRemove();
+  }
 }
 
 /// Health bar component for the HUD
@@ -149,7 +171,8 @@ class HealthBar extends PositionComponent {
   double currentHealth;
 
   // Visual settings
-  final Color backgroundColor = const Color(0x88000000); // Semi-transparent black
+  final Color backgroundColor =
+      const Color(0x88000000); // Semi-transparent black
   final Color healthColor = const Color(0xFFE73248); // Red
   final Color healthBorderColor = const Color(0xFFFFFFFF); // White
   final double borderWidth = 2;
@@ -204,16 +227,58 @@ class AetherBar extends PositionComponent {
     required Vector2 size,
     required this.maxAether,
     required this.currentAether,
-  }) : super(position: position, size: size);
+    this.showValueText = true,
+  })  : _displayedAether = currentAether,
+        super(position: position, size: size);
 
   final double maxAether;
   double currentAether;
+  final bool showValueText;
 
   // Visual settings
-  final Color backgroundColor = const Color(0x88000000); // Semi-transparent black
+  final Color backgroundColor =
+      const Color(0x88000000); // Semi-transparent black
   final Color aetherColor = const Color(0xFF42C6E7); // Blue
   final Color aetherBorderColor = const Color(0xFFFFFFFF); // White
+  final Color textColor = const Color(0xFFFFFFFF); // White for text
   final double borderWidth = 2;
+
+  // Text configuration
+  late final TextPaint _textPaint = TextPaint(
+    style: const TextStyle(
+      color: Colors.white,
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+    ),
+  );
+
+  // Animation properties for smooth transitions
+  double _displayedAether;
+  final double _animationSpeed = 5.0; // Speed of the animation
+
+  @override
+  void onLoad() {
+    super.onLoad();
+    _displayedAether = currentAether; // Initialize displayed value
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    // Animate the displayed value towards the actual value
+    if (_displayedAether != currentAether) {
+      final double diff = currentAether - _displayedAether;
+      final double step = diff * dt * _animationSpeed;
+
+      // If the step is small enough, just set it directly
+      if (diff.abs() < 0.1) {
+        _displayedAether = currentAether;
+      } else {
+        _displayedAether += step;
+      }
+    }
+  }
 
   @override
   void render(Canvas canvas) {
@@ -230,7 +295,7 @@ class AetherBar extends PositionComponent {
     );
 
     // Draw aether fill
-    final double aetherWidth = (currentAether / maxAether) * size.x;
+    final double aetherWidth = (_displayedAether / maxAether) * size.x;
     final Paint aetherPaint = Paint()
       ..color = aetherColor
       ..style = PaintingStyle.fill;
@@ -250,6 +315,30 @@ class AetherBar extends PositionComponent {
       Rect.fromLTWH(0, 0, size.x, size.y),
       borderPaint,
     );
+
+    // Draw aether value text if enabled
+    if (showValueText) {
+      // Rounded integer value for display
+      final String aetherText =
+          '${_displayedAether.round()}/${maxAether.round()}';
+
+      // Draw the text next to the bar
+      _textPaint.render(
+        canvas,
+        aetherText,
+        Vector2(
+          size.x + 10,
+          size.y / 2 - 6,
+        ), // Position text to right of bar, vertically centered
+      );
+
+      // Draw "AETHER" label above the text
+      _textPaint.render(
+        canvas,
+        'AETHER',
+        Vector2(size.x + 10, size.y / 2 - 20), // Position above the count text
+      );
+    }
   }
 
   /// Set current aether value
@@ -271,7 +360,8 @@ class FpsCounter extends PositionComponent {
   final double _updateInterval = 0.5; // Update twice per second
 
   // Visual settings
-  final Color backgroundColor = const Color(0x88000000); // Semi-transparent black
+  final Color backgroundColor =
+      const Color(0x88000000); // Semi-transparent black
   final Color textColor = const Color(0xFFFFFFFF); // White
   final double borderWidth = 1;
 

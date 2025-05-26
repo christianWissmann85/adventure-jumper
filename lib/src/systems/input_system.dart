@@ -17,6 +17,40 @@ export 'package:flutter/gestures.dart'
 
 /// System that manages input processing and routing to entities
 /// Handles keyboard, touch, and gamepad input and distributes to entities with input components
+///
+/// ARCHITECTURE:
+/// -------------
+/// InputSystem is the bridge between user interactions and game entities.
+/// It integrates with other systems in the following ways:
+/// - Processes raw input events from multiple device types (keyboard, touch, gamepad)
+/// - Routes input to entities with InputComponent
+/// - Maintains input state for consistent behavior across frames
+/// - Provides virtual controller support for touch-based platforms
+///
+/// PERFORMANCE CONSIDERATIONS:
+/// ---------------------------
+/// - Input events are processed once and distributed efficiently
+/// - Focused entity approach prevents unnecessary input processing
+/// - Input buffering provides responsive controls across varying frame rates
+///
+/// CONFIGURATION OPTIONS:
+/// ---------------------
+/// - Enable/disable different input methods (keyboard, touch, gamepad)
+/// - Virtual controller positioning and sensitivity
+/// - Input mapping for different control schemes
+///
+/// USAGE EXAMPLES:
+/// --------------
+/// ```dart
+/// // Set player as focused entity for direct input
+/// inputSystem.setFocusedEntity(player);
+///
+/// // Enable virtual controller for mobile
+/// inputSystem.setVirtualControllerActive(true);
+///
+/// // Check if a key is currently pressed
+/// bool isJumping = inputSystem.isKeyPressed(LogicalKeyboardKey.space);
+/// ```
 class InputSystem extends BaseFlameSystem {
   InputSystem();
 

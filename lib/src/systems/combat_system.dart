@@ -9,6 +9,42 @@ import 'base_system.dart';
 
 /// System that manages combat interactions between entities
 /// Handles damage calculation, hit detection, and combat effects
+///
+/// ARCHITECTURE:
+/// -------------
+/// CombatSystem manages all combat-related interactions between game entities.
+/// It integrates with other systems in the following ways:
+/// - Processes entities with HealthComponent
+/// - Receives collision events from PhysicsSystem for hit detection
+/// - Interfaces with AnimationSystem for combat visual effects
+/// - Communicates with AudioSystem for combat sounds
+///
+/// PERFORMANCE CONSIDERATIONS:
+/// ---------------------------
+/// - Combat calculations are event-based rather than per-frame for efficiency
+/// - Uses targeted entity processing to avoid scanning all entities
+/// - Combat log size is constrained to prevent memory growth
+///
+/// CONFIGURATION OPTIONS:
+/// ---------------------
+/// - Global damage multiplier for difficulty scaling
+/// - Combat logging toggle for debugging and analytics
+/// - Damage type configurations for different gameplay mechanics
+///
+/// USAGE EXAMPLES:
+/// --------------
+/// ```dart
+/// // Process damage between entities
+/// combatSystem.processDamage(
+///   attacker, 
+///   target, 
+///   10.0, 
+///   damageType: 'fire',
+/// );
+///
+/// // Check if an entity is alive
+/// bool isAlive = combatSystem.isEntityAlive(entity);
+/// ```
 class CombatSystem extends BaseSystem {
   CombatSystem();
 

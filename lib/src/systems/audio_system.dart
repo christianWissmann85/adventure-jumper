@@ -4,15 +4,40 @@ import 'package:flame_audio/flame_audio.dart';
 import '../components/audio_component.dart';
 import '../entities/entity.dart';
 import '../utils/logger.dart';
-import 'system.dart';
+import 'base_system.dart';
 
 /// System that manages sound triggering and audio management
 /// Handles music, sound effects, spatial audio, and volume control
-class AudioSystem extends System {
+///
+/// ARCHITECTURE:
+/// -------------
+/// AudioSystem manages all audio playback and processing in the game.
+/// It integrates with other systems in the following ways:
+/// - Processes entities with AudioComponent
+/// - Handles spatial audio relative to listener position (typically camera/player)
+/// - Provides volume controls for different audio categories
+/// - Manages audio resource loading and memory usage
+///
+/// PERFORMANCE CONSIDERATIONS:
+/// ---------------------------
+/// - Audio playback is optimized by distance-based culling for spatial sounds
+/// - Uses preloading to avoid runtime loading hitches
+/// - Monitors sound channel counts to prevent audio overload
+///
+/// USAGE EXAMPLES:
+/// --------------
+/// ```dart
+/// // Play a sound effect
+/// audioSystem.playSfx('jump_sound.mp3');
+///
+/// // Play music with crossfade
+/// audioSystem.playMusic('level_theme.mp3', crossFade: true);
+///
+/// // Play spatial sound at entity position
+/// audioSystem.playSpatialSfx('footstep.mp3', entity.position);
+/// ```
+class AudioSystem extends BaseSystem {
   AudioSystem() : super();
-
-  // Entities processed by this system
-  final List<Entity> _entities = <Entity>[];
 
   // Configuration
   bool _isMusicEnabled = true;
@@ -48,34 +73,27 @@ class AudioSystem extends System {
 
   @override
   void dispose() {}
+  @override
+  bool canProcessEntity(Entity entity) {
+    // Process entities with audio components
+    return entity.children.whereType<AudioComponent>().isNotEmpty;
+  }
 
   @override
-  void addEntity(Entity entity) {
-    if (!_entities.contains(entity)) {
-      _entities.add(entity);
+  void processEntity(Entity entity, double dt) {
+    // Update spatial audio for this entity
+    final Iterable<AudioComponent> audioComponents =
+        entity.children.whereType<AudioComponent>();
+    for (final AudioComponent audio in audioComponents) {
+      // Update listener position for spatial audio
+      audio.updateListenerPosition(_listenerPosition);
     }
   }
 
   @override
-  void removeEntity(Entity entity) {
-    _entities.remove(entity);
-  }
-
-  @override
-  void update(double dt) {
-    if (!isActive) return;
-
-    // Update spatial audio for entities
-    for (final Entity entity in _entities) {
-      if (!entity.isActive) continue;
-
-      final Iterable<AudioComponent> audioComponents =
-          entity.children.whereType<AudioComponent>();
-      for (final AudioComponent audio in audioComponents) {
-        // Update listener position for spatial audio
-        audio.updateListenerPosition(_listenerPosition);
-      }
-    }
+  void processSystem(double dt) {
+    // System-wide audio processing can be added here if needed
+    // For now, most audio operations are event-driven
   }
 
   /// Play a sound effect
@@ -301,16 +319,18 @@ class AudioSystem extends System {
     // Other audio types would be updated here
   }
 
-  /// Register an entity with this system
+  /// Backward compatibility method for legacy code
+  /// @deprecated Use addEntity instead
+  @override
   void registerEntity(Entity entity) {
-    if (!_entities.contains(entity)) {
-      _entities.add(entity);
-    }
+    addEntity(entity);
   }
 
-  /// Unregister an entity from this system
+  /// Backward compatibility method for legacy code
+  /// @deprecated Use removeEntity instead
+  @override
   void unregisterEntity(Entity entity) {
-    _entities.remove(entity);
+    removeEntity(entity);
   }
 
   /// Update listener position for spatial audio
@@ -318,10 +338,13 @@ class AudioSystem extends System {
     _listenerPosition = position.clone();
   }
 
-  /// Set system active state
+  /// Override setActive to handle audio state
+  @override
   void setActive(bool active) {
-    isActive = active;
+    // Call the parent implementation
+    super.setActive(active);
 
+    // Add custom audio handling
     if (!isActive) {
       pauseAll();
     } else {
@@ -329,12 +352,9 @@ class AudioSystem extends System {
     }
   }
 
-  /// Clear all entities
-  void clearEntities() {
-    _entities.clear();
-  }
+  // No need to override clearEntities as BaseSystem already provides it
 
-  // Getters  int get entityCount => _entities.length;
+  // No need for entityCount getter as BaseSystem already provides it
   double get masterVolume => _masterVolume;
   double get musicVolume => _musicVolume;
   double get sfxVolume => _sfxVolume;
