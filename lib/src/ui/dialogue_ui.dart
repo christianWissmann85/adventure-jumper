@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../entities/npc.dart';
 import '../game/adventure_jumper_game.dart';
+import '../systems/dialogue_system.dart';
 
 /// Structure for a single dialogue entry
 class DialogueEntry {
@@ -19,6 +20,11 @@ class DialogueEntry {
     this.useTypewriter = true,
     this.pauseAfterPunctuation = true,
     this.canSkip = true,
+    this.conditions,
+    this.onShowCallbacks,
+    this.onCompleteCallbacks,
+    this.stateChanges,
+    this.metadata,
   });
 
   final String speakerName;
@@ -31,6 +37,13 @@ class DialogueEntry {
   final bool useTypewriter; // Whether to use typewriter effect
   final bool pauseAfterPunctuation; // Pause after periods, commas, etc.
   final bool canSkip; // Whether player can skip this dialogue
+
+  // Enhanced features for T3.8
+  final Map<String, dynamic>? conditions; // Conditions for showing this entry
+  final List<String>? onShowCallbacks; // Callbacks to execute when shown
+  final List<String>? onCompleteCallbacks; // Callbacks when completed
+  final Map<String, dynamic>? stateChanges; // State changes to apply
+  final Map<String, dynamic>? metadata; // Additional metadata
 }
 
 /// Dialogue navigation node for conversation trees
@@ -41,6 +54,12 @@ class DialogueNode {
     this.nextNodeId,
     this.choiceNodeIds,
     this.conditions,
+    this.priority = 0,
+    this.tags,
+    this.visitCount = 0,
+    this.maxVisits,
+    this.cooldownSeconds,
+    this.lastVisited,
   });
 
   final String id;
@@ -48,6 +67,38 @@ class DialogueNode {
   final String? nextNodeId; // Default next node
   final Map<String, String>? choiceNodeIds; // Choice text -> node ID mapping
   final Map<String, dynamic>? conditions; // Conditions for showing this node
+
+  // Enhanced features for T3.8
+  final int priority; // Priority for node selection when multiple nodes match
+  final List<String>? tags; // Tags for categorizing nodes
+  int visitCount; // Number of times this node has been visited
+  final int? maxVisits; // Maximum number of times this node can be visited
+  final int? cooldownSeconds; // Cooldown before node can be visited again
+  DateTime? lastVisited; // Last time this node was visited
+
+  /// Check if this node can be visited based on cooldown and visit limits
+  bool canVisit() {
+    // Check visit limit
+    if (maxVisits != null && visitCount >= maxVisits!) {
+      return false;
+    }
+
+    // Check cooldown
+    if (cooldownSeconds != null && lastVisited != null) {
+      final timeSinceLastVisit = DateTime.now().difference(lastVisited!);
+      if (timeSinceLastVisit.inSeconds < cooldownSeconds!) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /// Mark this node as visited
+  void markVisited() {
+    visitCount++;
+    lastVisited = DateTime.now();
+  }
 }
 
 /// NPC conversation interface
@@ -95,6 +146,7 @@ class DialogueUI extends PositionComponent with TapCallbacks {
   // Enhanced dialogue navigation
   final Map<String, DialogueNode> _dialogueNodes = <String, DialogueNode>{};
   String? _currentNodeId;
+  DialogueSystem? _dialogueSystem; // Integration with dialogue system
 
   // Enhanced typewriter state
   double _typewriterTimer = 0.0;
@@ -177,7 +229,8 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     // Check if dialogue sequence is empty
     if (_dialogueSequence.isEmpty) {
       print(
-          'Warning: Attempted to start dialogue with empty sequence for NPC: ${npc.runtimeType}');
+        'Warning: Attempted to start dialogue with empty sequence for NPC: ${npc.runtimeType}',
+      );
       return;
     }
 
@@ -203,7 +256,8 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     // Check if nodes map is empty or start node doesn't exist
     if (_dialogueNodes.isEmpty) {
       print(
-          'Warning: Attempted to start dialogue with empty nodes map for NPC: ${npc.runtimeType}');
+        'Warning: Attempted to start dialogue with empty nodes map for NPC: ${npc.runtimeType}',
+      );
       return;
     }
 
@@ -217,8 +271,30 @@ class DialogueUI extends PositionComponent with TapCallbacks {
       _showDialogueFromNode(startNode);
     } else {
       print(
-          'Warning: Start node "$startNodeId" not found for NPC: ${npc.runtimeType}');
+        'Warning: Start node "$startNodeId" not found for NPC: ${npc.runtimeType}',
+      );
     }
+  }
+
+  /// Set the dialogue system for advanced conversation features
+  void setDialogueSystem(DialogueSystem dialogueSystem) {
+    _dialogueSystem = dialogueSystem;
+  }
+
+  /// Start dialogue with integrated dialogue system support
+  void startDialogueFromNodeWithSystem(
+    NPC npc,
+    Map<String, DialogueNode> nodes,
+    String startNodeId,
+    DialogueSystem dialogueSystem,
+  ) {
+    _dialogueSystem = dialogueSystem;
+
+    // Start dialogue in the UI
+    startDialogueFromNode(npc, nodes, startNodeId);
+
+    // Note: The dialogue system integration will be handled through the
+    // choice selection and navigation methods that use _dialogueSystem
   }
 
   /// Navigate to a specific dialogue node
@@ -609,13 +685,19 @@ class DialogueUI extends PositionComponent with TapCallbacks {
 
     final String selectedChoice = _currentChoices[choiceIndex];
 
-    // Handle node-based dialogue choices
+    // Handle node-based dialogue choices with DialogueSystem integration
     if (_currentNodeId != null && _dialogueNodes.isNotEmpty) {
       final DialogueNode? currentNode = _dialogueNodes[_currentNodeId];
       if (currentNode?.choiceNodeIds != null) {
         final String? nextNodeId = currentNode!.choiceNodeIds![selectedChoice];
         if (nextNodeId != null) {
-          navigateToNode(nextNodeId);
+          // Use DialogueSystem if available for enhanced state management
+          if (_dialogueSystem != null) {
+            _dialogueSystem!.selectChoice(choiceIndex);
+            _dialogueSystem!.navigateToNode(nextNodeId);
+          } else {
+            navigateToNode(nextNodeId);
+          }
           return;
         }
       }
