@@ -405,6 +405,7 @@ When updating existing code that uses `print()`:
 
 ```dart
 // Before (using print)
+ // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
 print('Player moving left (velocity: ${velocity.x})');
 
 // After (temporary debugging)

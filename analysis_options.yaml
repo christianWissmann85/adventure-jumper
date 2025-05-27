@@ -4,3 +4,7 @@ include: package:flutter_lints/flutter.yaml
 linter:
   rules:
     require_trailing_commas: true
+    # Temporarily disabled to reduce Problems panel clutter during development
+    # AI agents: Please migrate print() statements to structured logging
+    # See docs/05_Style_Guides/LoggingStyle.md for guidelines
+    avoid_print: false

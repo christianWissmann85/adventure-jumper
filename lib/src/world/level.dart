@@ -304,9 +304,9 @@ class Level extends Component {
             .add('Spawn point ${spawnPoint.id} outside level bounds');
       }
     }
-
     if (validationErrors.isNotEmpty) {
       for (final String error in validationErrors) {
+        // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
         print('Level validation error: $error');
       }
       return false;
@@ -332,6 +332,7 @@ class Level extends Component {
       platforms.add(platform);
       add(platform);
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print(
         'Warning: Platform at ${platform.position} is outside level bounds',
       );
@@ -344,6 +345,7 @@ class Level extends Component {
       enemies.add(enemy);
       add(enemy);
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: Enemy at ${enemy.position} is outside level bounds');
     }
   }
@@ -354,6 +356,7 @@ class Level extends Component {
       collectibles.add(collectible);
       add(collectible);
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print(
         'Warning: Collectible at ${collectible.position} is outside level bounds',
       );
@@ -366,6 +369,7 @@ class Level extends Component {
       hazards.add(hazard);
       add(hazard);
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: Hazard at ${hazard.position} is outside level bounds');
     }
   }
@@ -376,6 +380,7 @@ class Level extends Component {
       npcs.add(npc);
       add(npc);
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: NPC at ${npc.position} is outside level bounds');
     }
   }
@@ -383,6 +388,7 @@ class Level extends Component {
   /// Set the player for this level with spawn point validation
   void setPlayer(Player newPlayer, Vector2 spawnPoint) {
     if (!_isPositionInBounds(spawnPoint)) {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: Player spawn point $spawnPoint is outside level bounds');
       // Use fallback spawn point or adjust to bounds
       spawnPoint = _getValidatedSpawnPoint(spawnPoint);
@@ -412,6 +418,7 @@ class Level extends Component {
       checkpoints.add(position);
       // Checkpoint component will be added in future sprints
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: Checkpoint at $position is outside level bounds');
     }
   }
@@ -422,6 +429,7 @@ class Level extends Component {
       portals.add(portal);
       add(portal);
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: Portal at ${portal.position} is outside level bounds');
     }
   }
@@ -486,6 +494,7 @@ class Level extends Component {
     if (_isPositionInBounds(Vector2(definition.x, definition.y))) {
       _entitySpawnDefinitions[definition.id] = definition;
     } else {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print(
         'Warning: Entity spawn ${definition.id} at (${definition.x}, ${definition.y}) is outside level bounds',
       );
@@ -502,6 +511,7 @@ class Level extends Component {
     final EntitySpawnDefinition? definition =
         _entitySpawnDefinitions[definitionId];
     if (definition == null) {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: No spawn definition found for ID: $definitionId');
       return;
     }
@@ -515,6 +525,7 @@ class Level extends Component {
         _spawnGroups.where((g) => g.id == groupId).firstOrNull;
 
     if (group == null) {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Warning: No spawn group found for ID: $groupId');
       return;
     }
@@ -563,9 +574,11 @@ class Level extends Component {
           await _spawnCheckpoint(definition);
           break;
         default:
+          // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
           print('Warning: Unknown entity type: ${definition.entityType}');
       }
     } catch (e) {
+      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
       print('Error spawning entity ${definition.id}: $e');
     }
   }
@@ -590,6 +603,7 @@ class Level extends Component {
       if (path != null && path.length >= 2) {
         // Movement path will be set when Platform class is enhanced with movement support
         // For now, we acknowledge the path data exists
+        // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
         print(
           'Platform ${definition.id} has movement path with ${path.length} waypoints',
         );

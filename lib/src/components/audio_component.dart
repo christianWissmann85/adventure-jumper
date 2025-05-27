@@ -100,7 +100,8 @@ class AudioComponent extends Component {
     bool? force = false,
   }) {
     if (!_isActive) return;
-    if (_soundMappings[soundType] == null || _soundMappings[soundType]!.isEmpty) {
+    if (_soundMappings[soundType] == null ||
+        _soundMappings[soundType]!.isEmpty) {
       return;
     }
 
@@ -157,7 +158,8 @@ class AudioComponent extends Component {
     if (sounds.length == 1) return sounds[0];
 
     // Try to find a sound not recently played
-    final List<String> availableSounds = sounds.where((String s) => !_recentSounds.contains(s)).toList();
+    final List<String> availableSounds =
+        sounds.where((String s) => !_recentSounds.contains(s)).toList();
 
     String selectedSound;
     if (availableSounds.isEmpty) {
@@ -186,6 +188,7 @@ class AudioComponent extends Component {
     // audioSystem.play(soundFile, volume);
 
     // Debug output
+    // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
     // print('Playing sound: $soundFile at volume $volume');
   }
 

@@ -167,6 +167,7 @@ class NPC extends Entity {
   void startDialogue() {
     // T3.4.3: Enhanced dialogue trigger system
     // This will integrate with DialogueSystem in future implementations
+    // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
     print('$_name: Starting dialogue with ID: $_dialogueId');
   }
 
@@ -174,6 +175,7 @@ class NPC extends Entity {
   void offerQuest() {
     // T3.4.3: Enhanced quest trigger system
     // This will integrate with QuestSystem in future implementations
+    // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
     print('$_name: Offering quest with ID: $_questId');
   }
 
