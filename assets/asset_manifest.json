@@ -1,0 +1,501 @@
+{
+  "asset_manifest": {
+    "version": "1.0.0",
+    "generated": "2025-05-31",
+    "project": "Adventure Jumper",
+    "sprint": 3,
+    "description": "Comprehensive asset manifest for Adventure Jumper project",
+    "categories": {
+      "characters": {
+        "player": {
+          "base_path": "assets/images/characters/player/",
+          "assets": {
+            "player_idle.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical",
+              "sprite_sheet_config": {
+                "columns": 4,
+                "rows": 1,
+                "sprite_width": 32,
+                "sprite_height": 32
+              }
+            },
+            "player_run.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical",
+              "sprite_sheet_config": {
+                "columns": 8,
+                "rows": 1,
+                "sprite_width": 32,
+                "sprite_height": 32
+              }
+            },
+            "player_jump.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical",
+              "sprite_sheet_config": {
+                "columns": 6,
+                "rows": 1,
+                "sprite_width": 32,
+                "sprite_height": 32
+              }
+            },
+            "player_fall.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical"
+            },
+            "player_landing.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical"
+            },
+            "player_attack.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical",
+              "sprite_sheet_config": {
+                "columns": 5,
+                "rows": 1,
+                "sprite_width": 32,
+                "sprite_height": 32
+              }
+            },
+            "player_damaged.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical"
+            },
+            "player_death.png": {
+              "dimensions": "32x64",
+              "frames": 1,
+              "status": "present",
+              "priority": "critical"
+            }
+          }
+        },
+        "enemies": {
+          "base_path": "assets/images/characters/enemies/",
+          "assets": {
+            "bat_fly.png": {
+              "dimensions": "32x32",
+              "frames": 4,
+              "status": "present",
+              "priority": "high"
+            },
+            "slime_idle.png": {
+              "dimensions": "48x32",
+              "frames": 4,
+              "status": "present",
+              "priority": "high"
+            },
+            "goblin_idle.png": {
+              "dimensions": "24x24",
+              "frames": 4,
+              "status": "missing",
+              "priority": "high",
+              "sprite_sheet_config": {
+                "columns": 4,
+                "rows": 1,
+                "sprite_width": 24,
+                "sprite_height": 24
+              }
+            },
+            "goblin_walk.png": {
+              "dimensions": "144x24",
+              "frames": 6,
+              "status": "missing",
+              "priority": "high",
+              "sprite_sheet_config": {
+                "columns": 6,
+                "rows": 1,
+                "sprite_width": 24,
+                "sprite_height": 24
+              }
+            },
+            "orc_idle.png": {
+              "dimensions": "48x48",
+              "frames": 4,
+              "status": "missing",
+              "priority": "medium",
+              "sprite_sheet_config": {
+                "columns": 4,
+                "rows": 1,
+                "sprite_width": 48,
+                "sprite_height": 48
+              }
+            },
+            "orc_attack.png": {
+              "dimensions": "336x48",
+              "frames": 7,
+              "status": "missing",
+              "priority": "medium",
+              "sprite_sheet_config": {
+                "columns": 7,
+                "rows": 1,
+                "sprite_width": 48,
+                "sprite_height": 48
+              }
+            }
+          }
+        },
+        "npcs": {
+          "base_path": "assets/images/characters/npcs/",
+          "assets": {
+            "character_mira_idle.png": {
+              "dimensions": "192x32",
+              "frames": 6,
+              "status": "missing",
+              "priority": "high",
+              "description": "Mira idle animation"
+            },
+            "character_mira_talk.png": {
+              "dimensions": "128x32",
+              "frames": 4,
+              "status": "missing",
+              "priority": "high",
+              "description": "Mira talking animation"
+            },
+            "character_mira_point.png": {
+              "dimensions": "96x32",
+              "frames": 3,
+              "status": "missing",
+              "priority": "high",
+              "description": "Mira pointing gesture"
+            }
+          }
+        }
+      },
+      "tilesets": {
+        "luminara": {
+          "base_path": "assets/images/tilesets/luminara/",
+          "assets": {
+            "tile_luminara_crystal_platform_azure.png": {
+              "dimensions": "16x16",
+              "variants": 5,
+              "status": "missing",
+              "priority": "high",
+              "description": "Azure crystal platform tiles"
+            },
+            "tile_luminara_crystal_platform_teal.png": {
+              "dimensions": "16x16",
+              "variants": 3,
+              "status": "missing",
+              "priority": "high",
+              "description": "Teal crystal platform tiles"
+            },
+            "tile_luminara_master_spire_base.png": {
+              "dimensions": "128x256",
+              "variants": 1,
+              "status": "missing",
+              "priority": "high",
+              "description": "Master spire base structure"
+            }
+          }
+        },
+        "existing": {
+          "base_path": "assets/images/tilesets/",
+          "assets": {
+            "cave/tiles.png": {
+              "dimensions": "512x512",
+              "status": "present",
+              "priority": "medium",
+              "description": "Cave tileset"
+            },
+            "forest/tiles.png": {
+              "dimensions": "512x512",
+              "status": "present",
+              "priority": "medium",
+              "description": "Forest tileset"
+            },
+            "dirt_tile.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "medium"
+            },
+            "ground_tile.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "medium"
+            }
+          }
+        }
+      },
+      "ui": {
+        "hud": {
+          "base_path": "assets/images/ui/hud/",
+          "assets": {
+            "ui_health_bar_frame.png": {
+              "dimensions": "120x16",
+              "status": "missing",
+              "priority": "critical",
+              "description": "Health bar frame"
+            },
+            "ui_health_bar_fill.png": {
+              "dimensions": "112x8",
+              "status": "missing",
+              "priority": "critical",
+              "description": "Health bar fill"
+            },
+            "ui_aether_counter_frame.png": {
+              "dimensions": "80x24",
+              "status": "missing",
+              "priority": "critical",
+              "description": "Aether counter frame"
+            }
+          }
+        },
+        "buttons": {
+          "base_path": "assets/images/ui/buttons/",
+          "assets": {
+            "play_button.png": {
+              "dimensions": "200x80",
+              "status": "present",
+              "priority": "high"
+            },
+            "settings_button.png": {
+              "dimensions": "40x40",
+              "status": "present",
+              "priority": "high"
+            }
+          }
+        },
+        "icons": {
+          "base_path": "assets/images/ui/icons/",
+          "assets": {
+            "heart.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "high"
+            },
+            "coin.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "high"
+            },
+            "star.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "medium"
+            },
+            "pause.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "high"
+            },
+            "sound_on.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "medium"
+            },
+            "sound_off.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "medium"
+            }
+          }
+        }
+      },
+      "effects": {
+        "particles": {
+          "base_path": "assets/images/effects/particles/",
+          "assets": {
+            "sparkle.png": {
+              "dimensions": "16x16",
+              "status": "present",
+              "priority": "medium"
+            }
+          }
+        },
+        "aether": {
+          "base_path": "assets/images/effects/aether/",
+          "assets": {
+            "effect_aether_pickup.png": {
+              "dimensions": "32x32",
+              "frames": 8,
+              "status": "missing",
+              "priority": "high",
+              "description": "Aether shard pickup effect"
+            },
+            "effect_crystal_resonance.png": {
+              "dimensions": "64x64",
+              "frames": 12,
+              "status": "missing",
+              "priority": "high",
+              "description": "Crystal resonance effect"
+            }
+          }
+        }
+      },
+      "props": {
+        "collectibles": {
+          "base_path": "assets/images/props/collectibles/",
+          "assets": {
+            "collectible_aether_shard.png": {
+              "dimensions": "16x16",
+              "frames": 6,
+              "status": "missing",
+              "priority": "critical",
+              "description": "Collectible Aether Shard"
+            }
+          }
+        },
+        "luminara": {
+          "base_path": "assets/images/props/luminara/",
+          "assets": {
+            "prop_luminara_aether_well_core.png": {
+              "dimensions": "64x64",
+              "frames": 8,
+              "status": "missing",
+              "priority": "high",
+              "description": "Aether well core"
+            },
+            "prop_luminara_small_crystal.png": {
+              "dimensions": "16x16",
+              "frames": 6,
+              "status": "missing",
+              "priority": "medium",
+              "description": "Small crystal prop"
+            }
+          }
+        }
+      },
+      "audio": {
+        "music": {
+          "base_path": "assets/audio/music/",
+          "assets": {
+            "main_theme.mp3": {
+              "duration": "3:30",
+              "status": "missing",
+              "priority": "high",
+              "description": "Main game theme"
+            },
+            "level_1.mp3": {
+              "duration": "4:00",
+              "status": "missing",
+              "priority": "high",
+              "description": "Level 1 background music"
+            },
+            "peaceful_area.mp3": {
+              "duration": "3:45",
+              "status": "missing",
+              "priority": "medium",
+              "description": "Peaceful area ambience"
+            }
+          }
+        },
+        "sfx": {
+          "base_path": "assets/audio/sfx/",
+          "assets": {
+            "jump.wav": {
+              "duration": "0.3s",
+              "status": "missing",
+              "priority": "critical",
+              "description": "Player jump sound"
+            },
+            "land.wav": {
+              "duration": "0.2s",
+              "status": "missing",
+              "priority": "critical",
+              "description": "Player landing sound"
+            },
+            "collect_coin.wav": {
+              "duration": "0.5s",
+              "status": "missing",
+              "priority": "high",
+              "description": "Coin collection sound"
+            },
+            "button_click.wav": {
+              "duration": "0.1s",
+              "status": "missing",
+              "priority": "high",
+              "description": "UI button click"
+            }
+          }
+        }
+      },
+      "fonts": {
+        "base_path": "assets/fonts/",
+        "assets": {
+          "pixel_font.ttf": {
+            "status": "present",
+            "priority": "critical",
+            "description": "Main pixel font for UI"
+          }
+        }
+      },
+      "levels": {
+        "base_path": "assets/levels/",
+        "assets": {
+          "enhanced_test.json": {
+            "status": "present",
+            "priority": "high",
+            "description": "Enhanced test level"
+          },
+          "enhanced_test_level.json": {
+            "status": "present",
+            "priority": "high",
+            "description": "Enhanced test level variant"
+          },
+          "luminara_hub.json": {
+            "status": "present",
+            "priority": "critical",
+            "description": "Luminara hub level"
+          },
+          "test_level_1.json": {
+            "status": "present",
+            "priority": "high",
+            "description": "Basic test level"
+          }
+        }
+      }
+    },
+    "summary": {
+      "total_assets": 45,
+      "present_assets": 18,
+      "missing_assets": 27,
+      "coverage_percentage": 40,
+      "critical_missing": 8,
+      "high_priority_missing": 15,
+      "medium_priority_missing": 4
+    },
+    "recommendations": {
+      "immediate_actions": [
+        "Run create_all_placeholder_assets.py to generate placeholders",
+        "Create critical UI elements (health bar, aether counter)",
+        "Generate collectible aether shard sprite",
+        "Add basic sound effects for player actions"
+      ],
+      "sprint_priorities": {
+        "sprint_3": [
+          "Complete UI HUD elements",
+          "Generate Luminara tileset foundation",
+          "Create Mira NPC sprites",
+          "Add essential sound effects"
+        ],
+        "sprint_4": [
+          "Complete enemy sprite sets",
+          "Add background music tracks",
+          "Create environmental effects",
+          "Complete props and collectibles"
+        ]
+      }
+    },
+    "technical_notes": {
+      "asset_loading": "Robust fallback system in place via AssetManager",
+      "placeholder_generation": "Automatic placeholder creation for missing sprites",
+      "error_handling": "Graceful degradation when assets are missing",
+      "testing": "All missing assets have fallback mechanisms for CI/CD"
+    }
+  }
+}

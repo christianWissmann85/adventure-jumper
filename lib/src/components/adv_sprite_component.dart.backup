@@ -1,0 +1,585 @@
+import 'package:flame/components.dart';
+import 'package:flutter/material.dart'
+    show Color, Canvas, Paint, Rect, FilterQuality;
+
+import '../debug/debug_config.dart';
+import 'sprite_rectangle_component.dart';
+
+/// Component that handles sprite rendering for entities
+/// Uses SpriteRectangleComponent to bypass SpriteComponent mounting issues
+class AdvSpriteComponent extends Component {
+  AdvSpriteComponent({
+    String? spritePath,
+    Sprite? sprite,
+    Vector2? spriteSize,
+    Vector2? spriteOffset,
+    bool? flipHorizontally,
+    bool? flipVertically,
+    double? opacity,
+    int? priority,
+  }) {
+    if (sprite != null) _sprite = sprite;
+    if (spriteSize != null) _spriteSize = spriteSize;
+    if (spriteOffset != null) _spriteOffset = spriteOffset;
+    if (flipHorizontally != null) _flipHorizontally = flipHorizontally;
+    if (flipVertically != null) _flipVertically = flipVertically;
+    if (opacity != null) _opacity = opacity;
+    if (priority != null) _renderPriority = priority;
+  }
+
+  // Sprite properties
+  Sprite? _sprite;
+  SpriteAnimation? _currentAnimation;
+  Vector2 _spriteSize = Vector2.zero();
+  Vector2 _spriteOffset = Vector2.zero();
+  bool _flipHorizontally = false;
+  bool _flipVertically = false;
+  double _opacity = 1;
+  int _renderPriority = 0;
+
+  // Visual effects
+  bool _isFlashing = false;
+  double _flashTimer = 0;
+  bool _flashVisible = true;
+
+  // Working sprite component reference (uses RectangleComponent base)
+  SpriteRectangleComponent? _spriteRectangleComponent;
+  SpriteAnimationComponent? _animationComponent; // Keep for animations
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    DebugConfig.spritePrint('[AdvSpriteComponent] onLoad() called');
+
+    if (parent is PositionComponent) {
+      final PositionComponent parentComp = parent as PositionComponent;
+
+      // Initialize based on sprite or animation
+      if (_sprite != null) {
+        _createSpriteRectangleComponent();
+        parentComp.add(_spriteRectangleComponent!);
+        DebugConfig.spritePrint(
+            '[AdvSpriteComponent] Added SpriteRectangleComponent to parent');
+      } else if (_currentAnimation != null) {
+        _createAnimationComponent();
+        parentComp.add(_animationComponent!);
+        DebugConfig.spritePrint(
+            '[AdvSpriteComponent] Added AnimationComponent to parent');
+      }
+    }
+  }
+
+  // Layer for rendering order
+  int get renderLayer => _renderPriority;
+  // Sprite dimensions
+  Vector2 get size {
+    if (_spriteSize != Vector2.zero()) {
+      return _spriteSize;
+    }
+
+    // Return natural sprite size if no custom size set
+    if (_sprite != null) {
+      return Vector2(_sprite!.srcSize.x, _sprite!.srcSize.y);
+    }
+
+    if (_currentAnimation != null && _currentAnimation!.frames.isNotEmpty) {
+      final firstFrame = _currentAnimation!.frames.first.sprite;
+      return Vector2(firstFrame.srcSize.x, firstFrame.srcSize.y);
+    }
+
+    return Vector2.zero();
+  }
+
+  // Set a sprite
+  void setSprite(Sprite sprite) {
+    _sprite = sprite;
+    _currentAnimation = null;
+
+    if (_useCanvasFallback) {
+      _updateCanvasFallback();
+    } else {
+      _updateSpriteComponent();
+    }
+  }
+
+  // Set a sprite animation
+  void setAnimation(SpriteAnimation animation) {
+    _currentAnimation = animation;
+    _sprite = null;
+
+    if (_useCanvasFallback) {
+      // For animations in canvas fallback, use the first frame
+      if (animation.frames.isNotEmpty) {
+        _sprite = animation.frames.first.sprite;
+        _updateCanvasFallback();
+      }
+    } else {
+      _updateAnimationComponent();
+    }
+  }
+
+  // Set sprite flipping
+  void setFlip(bool horizontal, bool vertical) {
+    _flipHorizontally = horizontal;
+    _flipVertically = vertical;
+
+    if (_spriteComponent != null) {
+      if (horizontal) _spriteComponent!.flipHorizontallyAroundCenter();
+      if (vertical) _spriteComponent!.flipVerticallyAroundCenter();
+    }
+
+    if (_animationComponent != null) {
+      if (horizontal) _animationComponent!.flipHorizontallyAroundCenter();
+      if (vertical) _animationComponent!.flipVerticallyAroundCenter();
+    }
+
+    if (_useCanvasFallback && _canvasSpriteComponent != null) {
+      _canvasSpriteComponent!.setFlip(
+        horizontal: horizontal,
+        vertical: vertical,
+      );
+    }
+  } // Update sprite component based on current settings
+
+  void _updateSpriteComponent() {
+    DebugConfig.spritePrint('[AdvSpriteComponent] Updating sprite component');
+    if (parent is PositionComponent) {
+      // Remove any animation component
+      if (_animationComponent != null && _animationComponent!.isMounted) {
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Removing existing animation component',
+        );
+        _animationComponent!.removeFromParent();
+        _animationComponent = null;
+      }
+
+      // Replace existing sprite component
+      if (_spriteComponent != null && _spriteComponent!.isMounted) {
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Removing existing sprite component',
+        );
+        _spriteComponent!.removeFromParent();
+      }
+      if (_sprite != null) {
+        _createSpriteComponent();
+        (parent as PositionComponent).add(_spriteComponent!);
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Sprite component added to parent',
+        ); // Note: Components don't mount immediately in Flame, they mount in the next frame
+        // Let's check mounting status after a brief delay
+        Future.delayed(Duration.zero, () {
+          DebugConfig.spritePrint(
+            '[AdvSpriteComponent] Component mounted (next frame): ${_spriteComponent?.isMounted ?? false}',
+          );
+
+          // If component still isn't mounted after next frame, switch to canvas fallback
+          if (_spriteComponent != null && !_spriteComponent!.isMounted) {
+            _handleMountingFailure();
+          }
+        });
+      }
+    } else {
+      DebugConfig.spritePrint(
+        '[AdvSpriteComponent] ERROR: Parent is not a PositionComponent! Type: ${parent.runtimeType}',
+      );
+    }
+  }
+
+  // Update animation component based on current settings
+  void _updateAnimationComponent() {
+    if (parent is PositionComponent) {
+      // Remove existing sprite component
+      if (_spriteComponent != null && _spriteComponent!.isMounted) {
+        _spriteComponent!.removeFromParent();
+        _spriteComponent = null;
+      }
+
+      // Create or update animation component
+      if (_animationComponent != null && _animationComponent!.isMounted) {
+        _animationComponent!.removeFromParent();
+      }
+
+      if (_currentAnimation != null) {
+        _createAnimationComponent();
+        (parent as PositionComponent).add(_animationComponent!);
+      }
+    }
+  } // Create a new sprite component with current settings
+
+  void _createSpriteComponent() {
+    // Use sprite's natural size if no custom size is set
+    Vector2 componentSize = _spriteSize;
+    if (_spriteSize == Vector2.zero() && _sprite != null) {
+      componentSize = Vector2(_sprite!.srcSize.x, _sprite!.srcSize.y);
+    }
+
+    DebugConfig.spritePrint('[AdvSpriteComponent] Creating sprite component:');
+    DebugConfig.spritePrint('  - Sprite size: $componentSize');
+    DebugConfig.spritePrint('  - Offset: $_spriteOffset');
+    DebugConfig.spritePrint('  - Opacity: $_opacity');
+    DebugConfig.spritePrint('  - Parent type: ${parent.runtimeType}');
+    if (parent is PositionComponent) {
+      final pos = parent as PositionComponent;
+      DebugConfig.spritePrint('  - Parent position: ${pos.position}');
+      DebugConfig.spritePrint('  - Parent size: ${pos.size}');
+    }
+    _spriteComponent = SpriteComponent(
+      sprite: _sprite,
+      position: _spriteOffset,
+      size: componentSize,
+      anchor: Anchor.topLeft,
+    );
+    if (_flipHorizontally) _spriteComponent!.flipHorizontallyAroundCenter();
+    if (_flipVertically) {
+      _spriteComponent!.flipVerticallyAroundCenter();
+    }
+
+    // Set opacity properly
+    _spriteComponent!.paint.color = Color.fromRGBO(255, 255, 255, _opacity);
+
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Sprite component created with size: ${_spriteComponent!.size}',
+    );
+  }
+
+  // Create a new animation component with current settings
+  void _createAnimationComponent() {
+    // Use animation's natural size if no custom size is set
+    Vector2 componentSize = _spriteSize;
+    if (_spriteSize == Vector2.zero() && _currentAnimation != null) {
+      final firstFrame = _currentAnimation!.frames.first.sprite;
+      componentSize = Vector2(firstFrame.srcSize.x, firstFrame.srcSize.y);
+    }
+    _animationComponent = SpriteAnimationComponent(
+      animation: _currentAnimation,
+      position: _spriteOffset,
+      size: componentSize,
+      anchor: Anchor.topLeft,
+    );
+    if (_flipHorizontally) _animationComponent!.flipHorizontallyAroundCenter();
+    if (_flipVertically) {
+      _animationComponent!.flipVerticallyAroundCenter();
+    }
+
+    // Set opacity properly
+    _animationComponent!.paint.color = Color.fromRGBO(255, 255, 255, _opacity);
+  }
+
+  // Handle time-based effects like flashing
+  void applyTimeBasedEffects(double dt) {
+    if (_isFlashing) {
+      _flashTimer -= dt;
+      if (_flashTimer <= 0) {
+        _isFlashing = false;
+        _flashVisible = true;
+        _updateVisibility();
+      } else {
+        // Flash visibility toggling - simplified logic
+        const double flashInterval = 0.1;
+        if ((_flashTimer % (flashInterval * 2)) < flashInterval) {
+          _flashVisible = true;
+        } else {
+          _flashVisible = false;
+        }
+        _updateVisibility();
+      }
+    }
+  }
+
+  // Start a flashing effect
+  void flash(double duration) {
+    _isFlashing = true;
+    _flashTimer = duration;
+    _flashVisible = true;
+
+    if (_useCanvasFallback && _canvasSpriteComponent != null) {
+      _canvasSpriteComponent!.startFlash(duration);
+    }
+  }
+
+  // Update visibility based on effects
+  void _updateVisibility() {
+    if (_spriteComponent != null) {
+      _spriteComponent!.paint.color = Color.fromRGBO(
+        255,
+        255,
+        255,
+        _flashVisible ? _opacity : 0,
+      );
+    }
+    if (_animationComponent != null) {
+      _animationComponent!.paint.color = Color.fromRGBO(
+        255,
+        255,
+        255,
+        _flashVisible ? _opacity : 0,
+      );
+    }
+  }
+
+  // Set opacity/transparency
+  void setOpacity(double opacity) {
+    _opacity = opacity;
+    if (_spriteComponent != null) {
+      _spriteComponent!.paint.color = Color.fromRGBO(
+        255,
+        255,
+        255,
+        _opacity,
+      );
+    }
+
+    if (_animationComponent != null) {
+      _animationComponent!.paint.color = Color.fromRGBO(
+        255,
+        255,
+        255,
+        _opacity,
+      );
+    }
+
+    if (_useCanvasFallback && _canvasSpriteComponent != null) {
+      _canvasSpriteComponent!.setOpacity(_opacity);
+    }
+  }
+
+  // Debug method to print component hierarchy and status
+  void debugPrintStatus() {
+    DebugConfig.hierarchyPrint('[AdvSpriteComponent] === DEBUG STATUS ===');
+    DebugConfig.hierarchyPrint('  - Has sprite: ${_sprite != null}');
+    DebugConfig.hierarchyPrint(
+      '  - Has animation: ${_currentAnimation != null}',
+    );
+    DebugConfig.hierarchyPrint('  - Sprite size: $_spriteSize');
+    DebugConfig.hierarchyPrint('  - Sprite offset: $_spriteOffset');
+    DebugConfig.hierarchyPrint('  - Opacity: $_opacity');
+    DebugConfig.hierarchyPrint(
+      '  - Flip H/V: $_flipHorizontally/$_flipVertically',
+    );
+    DebugConfig.hierarchyPrint(
+      '  - SpriteComponent exists: ${_spriteComponent != null}',
+    );
+    DebugConfig.hierarchyPrint(
+      '  - AnimationComponent exists: ${_animationComponent != null}',
+    );
+
+    if (_spriteComponent != null) {
+      DebugConfig.hierarchyPrint(
+        '  - SpriteComponent mounted: ${_spriteComponent!.isMounted}',
+      );
+      DebugConfig.hierarchyPrint(
+        '  - SpriteComponent size: ${_spriteComponent!.size}',
+      );
+      DebugConfig.hierarchyPrint(
+        '  - SpriteComponent position: ${_spriteComponent!.position}',
+      );
+      DebugConfig.hierarchyPrint(
+        '  - SpriteComponent color: ${_spriteComponent!.paint.color}',
+      );
+    }
+
+    if (_animationComponent != null) {
+      DebugConfig.hierarchyPrint(
+        '  - AnimationComponent mounted: ${_animationComponent!.isMounted}',
+      );
+      DebugConfig.hierarchyPrint(
+        '  - AnimationComponent size: ${_animationComponent!.size}',
+      );
+      DebugConfig.hierarchyPrint(
+        '  - AnimationComponent position: ${_animationComponent!.position}',
+      );
+      DebugConfig.hierarchyPrint(
+        '  - AnimationComponent color: ${_animationComponent!.paint.color}',
+      );
+    }
+
+    DebugConfig.hierarchyPrint('  - Parent type: ${parent?.runtimeType}');
+    if (parent is PositionComponent) {
+      final pos = parent as PositionComponent;
+      DebugConfig.hierarchyPrint('  - Parent position: ${pos.position}');
+      DebugConfig.hierarchyPrint('  - Parent size: ${pos.size}');
+      DebugConfig.hierarchyPrint(
+        '  - Parent children count: ${pos.children.length}',
+      );
+    }
+    DebugConfig.hierarchyPrint('[AdvSpriteComponent] === END DEBUG ===');
+  }
+
+  /// Handle mounting failure by switching to canvas-based fallback
+  void _handleMountingFailure() {
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] === MOUNTING FAILURE DETECTED ===',
+    );
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Switching to canvas-based fallback',
+    );
+
+    _hasMountingIssues = true;
+    _useCanvasFallback = true;
+
+    // Remove the failed sprite component
+    if (_spriteComponent != null) {
+      try {
+        _spriteComponent!.removeFromParent();
+      } catch (e) {
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Error removing failed sprite component: $e',
+        );
+      }
+      _spriteComponent = null;
+    }
+
+    // Create canvas-based fallback
+    _createCanvasFallback();
+  }
+
+  /// Create canvas-based sprite renderer as fallback
+  void _createCanvasFallback() {
+    if (parent is! PositionComponent || _sprite == null) {
+      DebugConfig.spritePrint(
+        '[AdvSpriteComponent] Cannot create canvas fallback: missing parent or sprite',
+      );
+      return;
+    }
+
+    Vector2 componentSize = _spriteSize;
+    if (_spriteSize == Vector2.zero() && _sprite != null) {
+      componentSize = Vector2(_sprite!.srcSize.x, _sprite!.srcSize.y);
+    }
+
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Creating canvas fallback with size: $componentSize',
+    );
+    _canvasSpriteComponent = CanvasSpriteComponent(
+      position: _spriteOffset,
+      size: componentSize,
+      sprite: _sprite,
+      opacity: _opacity,
+      priority: 10, // Higher priority to render above other components
+    );
+
+    // Apply current settings
+    if (_flipHorizontally || _flipVertically) {
+      _canvasSpriteComponent!.setFlip(
+        horizontal: _flipHorizontally,
+        vertical: _flipVertically,
+      );
+    } // Add to parent
+    (parent as PositionComponent).add(_canvasSpriteComponent!);
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Canvas fallback created and added to parent',
+    );
+
+    // Debug: Check if component was added successfully
+    Future.delayed(Duration.zero, () {
+      DebugConfig.spritePrint(
+        '[AdvSpriteComponent] Canvas component mounted status (next frame): ${_canvasSpriteComponent?.isMounted ?? false}',
+      );
+      DebugConfig.spritePrint(
+        '[AdvSpriteComponent] Canvas component parent: ${_canvasSpriteComponent?.parent?.runtimeType}',
+      );
+    });
+  }
+
+  /// Update canvas fallback with current sprite
+  void _updateCanvasFallback() {
+    if (_canvasSpriteComponent != null && _sprite != null) {
+      _canvasSpriteComponent!.setSprite(_sprite!);
+      _canvasSpriteComponent!.setOpacity(_opacity);
+      _canvasSpriteComponent!.setFlip(
+        horizontal: _flipHorizontally,
+        vertical: _flipVertically,
+      );
+      DebugConfig.spritePrint('[AdvSpriteComponent] Canvas fallback updated');
+    }
+  }
+
+  // Getters for component state
+  bool get hasMountingIssues => _hasMountingIssues;
+  bool get usingCanvasFallback => _useCanvasFallback;
+  bool get hasSprite => _sprite != null;
+  bool get hasAnimation => _currentAnimation != null;
+
+  @override
+  void onMount() {
+    super.onMount();
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] onMount() called - isMounted: $isMounted',
+    );
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    // Handle time-based effects like flashing
+    applyTimeBasedEffects(dt);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    super.render(canvas);
+
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] render() called - fallback: $_useCanvasFallback, hasSprite: ${_sprite != null}',
+    );
+
+    // If using canvas fallback, render the sprite directly
+    if (_useCanvasFallback && _sprite != null) {
+      DebugConfig.spritePrint('[AdvSpriteComponent] Direct canvas rendering');
+
+      final image = _sprite!.image;
+
+      // Calculate opacity (considering flash effect)
+      double currentOpacity = _opacity;
+      if (_isFlashing && !_flashVisible) {
+        currentOpacity = 0.0;
+      }
+
+      if (currentOpacity > 0.0) {
+        // Set up paint with opacity
+        final Paint paint = Paint()
+          ..color = Color.fromRGBO(255, 255, 255, currentOpacity)
+          ..filterQuality = FilterQuality.none;
+
+        // Calculate source and destination rectangles
+        final Rect srcRect = Rect.fromLTWH(
+          _sprite!.srcPosition.x,
+          _sprite!.srcPosition.y,
+          _sprite!.srcSize.x,
+          _sprite!.srcSize.y,
+        );
+
+        final Rect dstRect = Rect.fromLTWH(
+          _spriteOffset.x,
+          _spriteOffset.y,
+          _spriteSize.x > 0 ? _spriteSize.x : _sprite!.srcSize.x,
+          _spriteSize.y > 0 ? _spriteSize.y : _sprite!.srcSize.y,
+        );
+
+        // Apply transforms for flipping
+        canvas.save();
+
+        if (_flipHorizontally || _flipVertically) {
+          final centerX = dstRect.left + dstRect.width / 2;
+          final centerY = dstRect.top + dstRect.height / 2;
+
+          canvas.translate(centerX, centerY);
+          canvas.scale(
+            _flipHorizontally ? -1.0 : 1.0,
+            _flipVertically ? -1.0 : 1.0,
+          );
+          canvas.translate(-centerX, -centerY);
+        }
+
+        // Draw the image
+        canvas.drawImageRect(image, srcRect, dstRect, paint);
+        canvas.restore();
+
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Successfully rendered sprite at dstRect: $dstRect',
+        );
+      }
+    }
+  }
+}

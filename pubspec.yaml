@@ -57,18 +57,41 @@ flutter:
 
   # Assets configuration
   assets:
-    # Images
-    - assets/images/characters/
+    # Player assets
+    - assets/images/characters/player/
+    
+    # Enemy assets
+    - assets/images/characters/enemies/
+    
+    # NPC assets
+    - assets/images/characters/npcs/
+    
+    # Background assets
+    - assets/images/backgrounds/
+    
+    # Tileset assets
     - assets/images/tilesets/
+    
+    # UI assets
     - assets/images/ui/
+    
+    # Effects assets
     - assets/images/effects/
     
-    # Audio
-    - assets/audio/music/
-    - assets/audio/sfx/
+    # Props assets
+    - assets/images/props/
+    
+    # Audio assets
+    - assets/audio/
     
     # Fonts
     - assets/fonts/
+    
+    # Level data
+    - assets/levels/
+    
+    # Asset manifest
+    - assets/asset_manifest.json
 
   # Fonts configuration
   # fonts:

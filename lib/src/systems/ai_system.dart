@@ -174,7 +174,7 @@ class AISystem extends BaseSystem {
       // T3.6.3: Handle interaction state transitions
       if (inInteractionRange != wasInInteractionRange) {
         _handleNPCInteractionStateChange(
-            npc, npcId, inInteractionRange, playerPosition);
+            npc, npcId, inInteractionRange, playerPosition,);
       }
 
       // T3.6.2: Update interaction states
@@ -246,7 +246,7 @@ class AISystem extends BaseSystem {
 
   /// T3.6.4: Update NPC proximity-based behaviors
   void _updateNPCProximityBehavior(
-      NPC npc, Vector2 playerPosition, double distance) {
+      NPC npc, Vector2 playerPosition, double distance,) {
     // T3.6.4: Update interaction availability based on proximity
     npc.updateInteractionAvailability(playerPosition);
 
@@ -286,7 +286,7 @@ class AISystem extends BaseSystem {
       // NPC is aware of player but doesn't target them aggressively
       // This could influence idle behaviors, dialogue availability, etc.
       aiComponent.setTarget(
-          playerPosition, false); // false = not a hostile target
+          playerPosition, false,); // false = not a hostile target
     }
 
     // T3.6.1: Let the NPC's AI component handle its own update logic

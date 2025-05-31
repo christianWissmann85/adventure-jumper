@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' show Colors;
 
 import '../assets/player_placeholder.dart';
 import '../assets/sprite_loader.dart';
+import '../debug/debug_config.dart';
 import 'player.dart';
 import 'player_controller.dart';
 
@@ -42,7 +43,8 @@ class PlayerAnimator extends Component {
       if (_spriteLoader.isInTestEnvironment) {
         // In tests, always use placeholder sprites to avoid asset loading issues
         print(
-            '[PlayerAnimator] Test environment detected, using placeholder sprites');
+          '[PlayerAnimator] Test environment detected, using placeholder sprites',
+        );
         await _createPlaceholderAnimations();
       } else {
         // In normal runtime, try to load actual animations, fall back to placeholders
@@ -53,7 +55,7 @@ class PlayerAnimator extends Component {
           await _loadActualAnimations();
           actualAnimationsLoaded = true;
           print('[PlayerAnimator] Successfully loaded actual sprite assets');
-        } catch (e, stackTrace) {
+        } catch (e) {
           // Log the specific asset loading error but continue with fallback
           print('[PlayerAnimator] Asset loading failed: $e');
           print('[PlayerAnimator] Falling back to placeholder animations');
@@ -72,12 +74,14 @@ class PlayerAnimator extends Component {
         print('[PlayerAnimator] Initial idle animation set on player');
       } else {
         print(
-            '[PlayerAnimator] Warning: Could not set initial animation - missing idle sprite or player sprite component');
+          '[PlayerAnimator] Warning: Could not set initial animation - missing idle sprite or player sprite component',
+        );
       }
     } catch (e, stackTrace) {
       // If everything fails, log the error but don't crash
       print(
-          '[PlayerAnimator] Critical error in _loadPlaceholderAnimations: $e');
+        '[PlayerAnimator] Critical error in _loadPlaceholderAnimations: $e',
+      );
       print('[PlayerAnimator] Stack trace: $stackTrace');
 
       try {
@@ -91,11 +95,13 @@ class PlayerAnimator extends Component {
         if (player.sprite != null) {
           player.sprite!.setSprite(fallbackSprite);
           print(
-              '[PlayerAnimator] Emergency fallback sprite created and applied');
+            '[PlayerAnimator] Emergency fallback sprite created and applied',
+          );
         }
       } catch (fallbackError) {
         print(
-            '[PlayerAnimator] FATAL: Even fallback sprite creation failed: $fallbackError');
+          '[PlayerAnimator] FATAL: Even fallback sprite creation failed: $fallbackError',
+        );
         // At this point, we've done everything we can - the component will continue without sprites
       }
     }
@@ -188,18 +194,21 @@ class PlayerAnimator extends Component {
           print('[PlayerAnimator] Created placeholder for: ${state.name}');
         } catch (placeholderError) {
           print(
-              '[PlayerAnimator] Failed to create placeholder for ${state.name}: $placeholderError');
+            '[PlayerAnimator] Failed to create placeholder for ${state.name}: $placeholderError',
+          );
         }
       }
     }
 
     print(
-        '[PlayerAnimator] Asset loading summary: $successCount succeeded, $failureCount failed');
+      '[PlayerAnimator] Asset loading summary: $successCount succeeded, $failureCount failed',
+    );
 
     // If we failed to load any critical sprites, throw an error to trigger fallback
     if (failureCount > 0) {
       throw Exception(
-          'Failed to load $failureCount out of ${spritePaths.length} sprite assets');
+        'Failed to load $failureCount out of ${spritePaths.length} sprite assets',
+      );
     }
 
     // TODO: Load actual sprite animations when asset files are available
@@ -432,25 +441,54 @@ class PlayerAnimator extends Component {
 
   /// Update the current displayed animation
   void _updateCurrentAnimation() {
-    if (player.sprite == null) return;
+    DebugConfig.animatorPrint(
+      '[PlayerAnimator] _updateCurrentAnimation called for state: $_currentState',
+    );
 
-    // Use animation if available
+    if (player.sprite == null) {
+      DebugConfig.animatorPrint(
+        '[PlayerAnimator] ERROR: player.sprite is null!',
+      );
+      return;
+    } // Use animation if available
     if (_animations.containsKey(_currentState)) {
+      DebugConfig.animatorPrint(
+        '[PlayerAnimator] Setting animation for state: $_currentState',
+      );
       player.sprite!.setAnimation(_animations[_currentState]!);
+      if (DebugConfig.enableComponentHierarchyLogging) {
+        player.sprite!.printDebugStatus();
+      }
       return;
-    }
-
-    // Fall back to static sprite if available
+    } // Fall back to static sprite if available
     if (_sprites.containsKey(_currentState)) {
+      DebugConfig.animatorPrint(
+        '[PlayerAnimator] Setting sprite for state: $_currentState',
+      );
       player.sprite!.setSprite(_sprites[_currentState]!);
+      if (DebugConfig.enableComponentHierarchyLogging) {
+        player.sprite!.printDebugStatus();
+      }
       return;
-    }
-
-    // Ultimate fallback - use idle sprite or first available sprite
+    } // Ultimate fallback - use idle sprite or first available sprite
     if (_sprites.containsKey(AnimationState.idle)) {
+      DebugConfig.animatorPrint('[PlayerAnimator] Fallback to idle sprite');
       player.sprite!.setSprite(_sprites[AnimationState.idle]!);
+      if (DebugConfig.enableComponentHierarchyLogging) {
+        player.sprite!.printDebugStatus();
+      }
     } else if (_sprites.isNotEmpty) {
+      DebugConfig.animatorPrint(
+        '[PlayerAnimator] Fallback to first available sprite',
+      );
       player.sprite!.setSprite(_sprites.values.first);
+      if (DebugConfig.enableComponentHierarchyLogging) {
+        player.sprite!.printDebugStatus();
+      }
+    } else {
+      DebugConfig.animatorPrint(
+        '[PlayerAnimator] ERROR: No sprites available!',
+      );
     }
   }
 

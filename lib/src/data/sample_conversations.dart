@@ -1139,7 +1139,7 @@ class SampleConversations {
           'flag_equals_met_mira': {'flag': 'met_mira', 'value': true},
           'flag_equals_first_meeting': {
             'flag': 'first_meeting_complete',
-            'value': true
+            'value': true,
           },
         },
         choiceNodeIds: {
@@ -1212,7 +1212,7 @@ class SampleConversations {
         conditions: {
           'counter_greater_than': {
             'counter': 'conversation_count',
-            'value': 10
+            'value': 10,
           },
           'flag_equals': {'flag': 'first_quest_completed', 'value': true},
         },

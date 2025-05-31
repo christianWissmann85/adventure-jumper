@@ -144,7 +144,7 @@ void main() {
 
       // Process system
       aiSystem.processSystem(
-          0.1); // AI detection ranges should be affected by difficulty multiplier
+          0.1,); // AI detection ranges should be affected by difficulty multiplier
       // This is tested implicitly through the _processNPCAI method
       // We can't directly access the private field, but can verify the method works
       expect(() => aiSystem.setDifficultyMultiplier(1.5), returnsNormally);

@@ -235,7 +235,7 @@ void main() {
       test('should update prompt pulse timer', () {
         final double initialTimer = testNPC.promptPulseTimer;
         testNPC.updateEntity(
-            0.016); // Use updateEntity which calls updateVisualFeedback
+            0.016,); // Use updateEntity which calls updateVisualFeedback
 
         expect(testNPC.promptPulseTimer, greaterThan(initialTimer));
       });

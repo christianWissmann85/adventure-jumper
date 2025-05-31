@@ -7,6 +7,9 @@ import 'package:flutter/material.dart' show Color, KeyEventResult;
 import 'package:flutter/services.dart' show KeyEvent, LogicalKeyboardKey;
 import 'package:logging/logging.dart';
 
+import '../components/debug_rectangle_component.dart';
+import '../debug/debug_config.dart';
+import '../debug/visual_debug_overlay.dart';
 import '../systems/input_system.dart';
 import '../systems/movement_system.dart';
 import '../systems/physics_system.dart';
@@ -25,6 +28,7 @@ class AdventureJumperGame extends FlameGame
   late MovementSystem movementSystem;
   late PhysicsSystem physicsSystem;
   late GameHUD gameHUD; // Add GameHUD reference
+  late VisualDebugOverlay debugOverlay; // Add debug overlay
 
   // Random number generator for the game
   final math.Random random = math.Random();
@@ -60,10 +64,20 @@ class AdventureJumperGame extends FlameGame
     _logger.fine('Game camera initialized'); // Initialize game world
     gameWorld = GameWorld();
     add(gameWorld);
-    _logger.fine('Game world initialized');
-
-    // Wait for world to load
+    _logger.fine('Game world initialized'); // Wait for world to load
     await gameWorld.loaded;
+
+    // Add a test debug rectangle directly to the game to verify basic rendering
+    final DebugRectangleComponent gameTestRect = DebugRectangleComponent(
+      size: Vector2(80, 80),
+      position: Vector2(200, 200), // Top-left area, should be clearly visible
+      color: const Color(0xFFFF0000), // Bright red
+      debugName: 'GameTestRect',
+      priority: 100, // High priority to render on top
+    );
+    add(gameTestRect);
+    _logger.info(
+        'Added test debug rectangle to game - position: ${gameTestRect.position}, size: ${gameTestRect.size}');
 
     // Initialize the game HUD
     final screenSize = Vector2(size.x, size.y);
@@ -73,7 +87,14 @@ class AdventureJumperGame extends FlameGame
       showFps: true,
     );
     add(gameHUD);
-    _logger.fine('Game HUD initialized');
+    _logger.fine(
+      'Game HUD initialized',
+    ); // Initialize visual debug overlay (conditional)
+    if (DebugConfig.enableVisualDebugOverlay) {
+      debugOverlay = VisualDebugOverlay();
+      add(debugOverlay);
+      _logger.fine('Visual debug overlay initialized');
+    }
 
     // Register player with input system once world is loaded
     if (gameWorld.player != null) {

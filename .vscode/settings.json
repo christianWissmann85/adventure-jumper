@@ -2,17 +2,13 @@
   // Dart & Flutter settings
   "dart.debugExternalPackageLibraries": false,
   "dart.debugSdkLibraries": false,
-  "dart.analysisExcludedFolders": [
-    "**/build"
-  ],
+  "dart.analysisExcludedFolders": ["**/build"],
   "dart.enableSdkFormatter": true,
   "dart.openDevTools": "flutter",
   "dart.previewFlutterUiGuides": true,
   "dart.previewFlutterUiGuidesCustomTracking": true,
   "dart.showDartDeveloperLogs": true,
-  "dart.vmAdditionalArgs": [
-    "--enable-asserts"
-  ],
+  "dart.vmAdditionalArgs": ["--enable-asserts"],
   "dart.warnWhenEditingFilesOutsideWorkspace": false,
   "dart.warnWhenEditingFilesInPubCache": false,
   // Flutter specific settings
@@ -20,16 +16,7 @@
   "flutter.showWebServerDevicePreview": false,
   "flutter.createOffline": true,
   "flutter.createOrganization": "",
-  "flutter.iosLanguages": [
-    "en",
-    "es",
-    "de",
-    "fr",
-    "it",
-    "pt",
-    "ru",
-    "zh"
-  ],
+  "flutter.iosLanguages": ["en", "es", "de", "fr", "it", "pt", "ru", "zh"],
   // Editor settings
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
@@ -37,10 +24,7 @@
     "source.organizeImports": "explicit"
   },
   "editor.defaultFormatter": "Dart-Code.dart-code",
-  "editor.rulers": [
-    80,
-    100
-  ],
+  "editor.rulers": [80, 100],
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.insertSpaces": true,
@@ -77,18 +61,33 @@
   "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
   // Extension settings
   "extensions.ignoreRecommendations": false,
-  "dart.pubAdditionalArgs": [
-    "--no-precompile"
-  ],
-  "dart.pubTestAdditionalArgs": [
-    "--reporter",
-    "expanded"
-  ],
+  "dart.pubAdditionalArgs": ["--no-precompile"],
+  "dart.pubTestAdditionalArgs": ["--reporter", "expanded"],
   "dart.runPubGetOnPubspecChanges": "always",
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#65c89b",
+    "activityBar.background": "#65c89b",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#945bc4",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#65c89b",
+    "statusBar.background": "#42b883",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#359268",
+    "statusBarItem.remoteBackground": "#42b883",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#42b883",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#42b88399",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#42b883"
 }

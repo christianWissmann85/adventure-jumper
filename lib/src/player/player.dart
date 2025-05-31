@@ -1,7 +1,9 @@
 import 'package:flame/components.dart';
+import 'package:flutter/material.dart' show Color;
 
 import '../components/adv_sprite_component.dart';
 import '../components/aether_component.dart';
+import '../components/debug_rectangle_component.dart';
 import '../components/health_component.dart';
 import '../components/input_component.dart';
 import '../components/input_modes.dart';
@@ -36,11 +38,21 @@ class Player extends Entity {
   Future<void> setupEntity() async {
     // Initialize physics component (inherited from Entity)
     physics = PhysicsComponent();
-    add(physics!);
-
-    // Initialize sprite component (inherited from Entity)
-    sprite = AdvSpriteComponent();
-    add(sprite!);
+    add(physics!); // Initialize sprite component (inherited from Entity)
+    sprite = AdvSpriteComponent(
+      spriteSize: size,
+      opacity: 1.0,
+    );
+    add(sprite!); // Create a temporary fallback visual using DebugRectangleComponent
+    // This ensures the player is visible while sprites load and provides extensive debug logging
+    final DebugRectangleComponent playerFallback = DebugRectangleComponent(
+      size: size,
+      position: Vector2.zero(),
+      color: const Color(0xFF3498DB), // Blue color like placeholder
+      debugName: 'PlayerFallback',
+      priority: -1, // Lower priority so it renders behind sprite components
+    );
+    add(playerFallback);
 
     // Initialize input component for player input handling
     input = InputComponent(

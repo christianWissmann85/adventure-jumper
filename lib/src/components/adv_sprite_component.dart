@@ -1,8 +1,11 @@
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart' show Color;
+import 'package:flutter/material.dart';
+
+import '../debug/debug_config.dart';
+import 'sprite_rectangle_component.dart';
 
 /// Component that handles sprite rendering for entities
-/// Manages sprite sheets, animations, and visual effects
+/// Uses SpriteRectangleComponent to bypass SpriteComponent mounting issues
 class AdvSpriteComponent extends Component {
   AdvSpriteComponent({
     String? spritePath,
@@ -14,7 +17,6 @@ class AdvSpriteComponent extends Component {
     double? opacity,
     int? priority,
   }) {
-    if (spritePath != null) {/* No longer storing path */}
     if (sprite != null) _sprite = sprite;
     if (spriteSize != null) _spriteSize = spriteSize;
     if (spriteOffset != null) _spriteOffset = spriteOffset;
@@ -36,28 +38,34 @@ class AdvSpriteComponent extends Component {
 
   // Visual effects
   bool _isFlashing = false;
-  // Flash timer tracks remaining time
   double _flashTimer = 0;
   bool _flashVisible = true;
 
-  // Sprite component references
+  // Working sprite component reference (uses RectangleComponent base)
+  SpriteRectangleComponent? _spriteRectangleComponent;
   SpriteAnimationComponent? _animationComponent;
-  SpriteComponent? _spriteComponent;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+    DebugConfig.spritePrint('[AdvSpriteComponent] onLoad() called');
 
     if (parent is PositionComponent) {
       final PositionComponent parentComp = parent as PositionComponent;
 
       // Initialize based on sprite or animation
       if (_sprite != null) {
-        _createSpriteComponent();
-        parentComp.add(_spriteComponent!);
+        _createSpriteRectangleComponent();
+        parentComp.add(_spriteRectangleComponent!);
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Added SpriteRectangleComponent to parent',
+        );
       } else if (_currentAnimation != null) {
         _createAnimationComponent();
         parentComp.add(_animationComponent!);
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Added AnimationComponent to parent',
+        );
       }
     }
   }
@@ -66,21 +74,35 @@ class AdvSpriteComponent extends Component {
   int get renderLayer => _renderPriority;
 
   // Sprite dimensions
-  Vector2 get size => _spriteSize;
+  Vector2 get size {
+    if (_spriteSize != Vector2.zero()) {
+      return _spriteSize;
+    }
+
+    // Return natural sprite size if no custom size set
+    if (_sprite != null) {
+      return Vector2(_sprite!.srcSize.x, _sprite!.srcSize.y);
+    }
+
+    if (_currentAnimation != null && _currentAnimation!.frames.isNotEmpty) {
+      final firstFrame = _currentAnimation!.frames.first.sprite;
+      return Vector2(firstFrame.srcSize.x, firstFrame.srcSize.y);
+    }
+
+    return Vector2.zero();
+  }
 
   // Set a sprite
   void setSprite(Sprite sprite) {
     _sprite = sprite;
     _currentAnimation = null;
-
-    _updateSpriteComponent();
+    _updateSpriteRectangleComponent();
   }
 
   // Set a sprite animation
   void setAnimation(SpriteAnimation animation) {
     _currentAnimation = animation;
     _sprite = null;
-
     _updateAnimationComponent();
   }
 
@@ -89,9 +111,11 @@ class AdvSpriteComponent extends Component {
     _flipHorizontally = horizontal;
     _flipVertically = vertical;
 
-    if (_spriteComponent != null) {
-      if (horizontal) _spriteComponent!.flipHorizontallyAroundCenter();
-      if (vertical) _spriteComponent!.flipVerticallyAroundCenter();
+    if (_spriteRectangleComponent != null) {
+      _spriteRectangleComponent!.setFlip(
+        horizontal: horizontal,
+        vertical: vertical,
+      );
     }
 
     if (_animationComponent != null) {
@@ -100,161 +124,258 @@ class AdvSpriteComponent extends Component {
     }
   }
 
-  // Update sprite component based on current settings
-  void _updateSpriteComponent() {
+  // Update sprite rectangle component based on current settings
+  void _updateSpriteRectangleComponent() {
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Updating sprite rectangle component',
+    );
     if (parent is PositionComponent) {
       // Remove any animation component
       if (_animationComponent != null && _animationComponent!.isMounted) {
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Removing existing animation component',
+        );
         _animationComponent!.removeFromParent();
         _animationComponent = null;
-      }
-
-      // Replace existing sprite component
-      if (_spriteComponent != null && _spriteComponent!.isMounted) {
-        _spriteComponent!.removeFromParent();
-      }
-
-      if (_sprite != null) {
-        _createSpriteComponent();
-        (parent as PositionComponent).add(_spriteComponent!);
+      } // Update existing sprite rectangle component OR create new one
+      if (_spriteRectangleComponent != null &&
+          _spriteRectangleComponent!.isMounted) {
+        // Update existing component instead of recreating
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Updating existing sprite rectangle component',
+        );
+        _spriteRectangleComponent!.setSprite(_sprite);
+        _spriteRectangleComponent!.setFlip(
+          horizontal: _flipHorizontally,
+          vertical: _flipVertically,
+        );
+        _spriteRectangleComponent!.setOpacityValue(_opacity);
+      } else if (_sprite != null) {
+        // Create new sprite rectangle component only if needed
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Creating new sprite rectangle component',
+        );
+        _createSpriteRectangleComponent();
+        (parent as PositionComponent).add(_spriteRectangleComponent!);
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Added new sprite rectangle component',
+        );
       }
     }
   }
 
   // Update animation component based on current settings
   void _updateAnimationComponent() {
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Updating animation component',
+    );
     if (parent is PositionComponent) {
-      // Remove existing sprite component
-      if (_spriteComponent != null && _spriteComponent!.isMounted) {
-        _spriteComponent!.removeFromParent();
-        _spriteComponent = null;
+      // Remove any sprite rectangle component
+      if (_spriteRectangleComponent != null &&
+          _spriteRectangleComponent!.isMounted) {
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Removing existing sprite rectangle component',
+        );
+        _spriteRectangleComponent!.removeFromParent();
+        _spriteRectangleComponent = null;
       }
 
-      // Create or update animation component
+      // Remove existing animation component
       if (_animationComponent != null && _animationComponent!.isMounted) {
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Removing existing animation component',
+        );
         _animationComponent!.removeFromParent();
+        _animationComponent = null;
       }
 
+      // Create new animation component
       if (_currentAnimation != null) {
         _createAnimationComponent();
         (parent as PositionComponent).add(_animationComponent!);
+        DebugConfig.spritePrint(
+          '[AdvSpriteComponent] Added new animation component',
+        );
       }
     }
   }
 
-  // Create a new sprite component with current settings
-  void _createSpriteComponent() {
-    _spriteComponent = SpriteComponent(
-      sprite: _sprite,
-      position: _spriteOffset,
-      size: _spriteSize,
-      anchor: Anchor.center,
+  // Create a SpriteRectangleComponent (uses working RectangleComponent base)
+  void _createSpriteRectangleComponent() {
+    if (_sprite == null) return;
+
+    _spriteRectangleComponent = SpriteRectangleComponent(
+      sprite: _sprite!,
+      size: size,
+      priority: _renderPriority,
     );
-    if (_flipHorizontally) _spriteComponent!.flipHorizontallyAroundCenter();
-    if (_flipVertically) {
-      _spriteComponent!.flipVerticallyAroundCenter(); // Set opacity
-    }
-    final Color currentColor = _spriteComponent!.paint.color;
-    _spriteComponent!.paint.color = Color.fromRGBO(
-      (currentColor.r * 255.0).round() & 0xff,
-      (currentColor.g * 255.0).round() & 0xff,
-      (currentColor.b * 255.0).round() & 0xff,
-      _opacity,
+
+    // Apply visual effects
+    _spriteRectangleComponent!.setFlip(
+      horizontal: _flipHorizontally,
+      vertical: _flipVertically,
+    );
+    _spriteRectangleComponent!.setOpacity(_opacity);
+
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] SpriteRectangleComponent created with size: ${_spriteRectangleComponent!.size}',
     );
   }
 
-  // Create a new animation component with current settings
+  // Create animation component
   void _createAnimationComponent() {
+    if (_currentAnimation == null) return;
+
     _animationComponent = SpriteAnimationComponent(
-      animation: _currentAnimation,
+      animation: _currentAnimation!,
+      size: size,
       position: _spriteOffset,
-      size: _spriteSize,
-      anchor: Anchor.center,
+      priority: _renderPriority,
     );
+
+    // Apply flipping
     if (_flipHorizontally) _animationComponent!.flipHorizontallyAroundCenter();
-    if (_flipVertically) {
-      _animationComponent!.flipVerticallyAroundCenter(); // Set opacity
-    }
-    final Color currentColor = _animationComponent!.paint.color;
-    _animationComponent!.paint.color = Color.fromRGBO(
-      (currentColor.r * 255.0).round() & 0xff,
-      (currentColor.g * 255.0).round() & 0xff,
-      (currentColor.b * 255.0).round() & 0xff,
-      _opacity,
+    if (_flipVertically) _animationComponent!.flipVerticallyAroundCenter();
+
+    // Apply opacity
+    _animationComponent!.paint.color = Color.fromRGBO(255, 255, 255, _opacity);
+
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Animation component created with size: ${_animationComponent!.size}',
     );
   }
 
-  // Handle time-based effects like flashing
-  void applyTimeBasedEffects(double dt) {
+  // Start a flash effect
+  void startFlash(double duration) {
+    _isFlashing = true;
+    _flashTimer = duration;
+    _flashVisible = true;
+
+    if (_spriteRectangleComponent != null) {
+      _spriteRectangleComponent!.startFlash(duration);
+    }
+
+    if (_animationComponent != null) {
+      _animationComponent!.paint.color = Color.fromRGBO(
+        255,
+        255,
+        255,
+        _flashVisible ? _opacity : _opacity * 0.3,
+      );
+    }
+  }
+
+  // Alias for startFlash for backward compatibility
+  void flash(double duration) => startFlash(duration);
+
+  // Stop the flash effect
+  void stopFlash() {
+    _isFlashing = false;
+    _flashVisible = true;
+
+    if (_spriteRectangleComponent != null) {
+      _spriteRectangleComponent!.stopFlash();
+    }
+
+    if (_animationComponent != null) {
+      _animationComponent!.paint.color = Color.fromRGBO(
+        255,
+        255,
+        255,
+        _opacity,
+      );
+    }
+  }
+
+  // Set opacity
+  void setOpacity(double opacity) {
+    _opacity = opacity;
+
+    if (_spriteRectangleComponent != null) {
+      _spriteRectangleComponent!.setOpacityValue(_opacity);
+    }
+
+    if (_animationComponent != null) {
+      _animationComponent!.paint.color =
+          Color.fromRGBO(255, 255, 255, _opacity);
+    }
+  }
+
+  // Debug status
+  void printDebugStatus() {
+    DebugConfig.spritePrint('[AdvSpriteComponent] Debug Status:');
+    DebugConfig.spritePrint(
+      '  - SpriteRectangleComponent exists: ${_spriteRectangleComponent != null}',
+    );
+    DebugConfig.spritePrint(
+      '  - AnimationComponent exists: ${_animationComponent != null}',
+    );
+    DebugConfig.spritePrint('  - Current sprite: ${_sprite != null}');
+    DebugConfig.spritePrint(
+      '  - Current animation: ${_currentAnimation != null}',
+    );
+    DebugConfig.spritePrint('  - Opacity: $_opacity');
+    DebugConfig.spritePrint(
+      '  - Flip H/V: $_flipHorizontally/$_flipVertically',
+    );
+
+    if (_spriteRectangleComponent != null) {
+      DebugConfig.spritePrint(
+        '  - SpriteRectangleComponent mounted: ${_spriteRectangleComponent!.isMounted}',
+      );
+      DebugConfig.spritePrint(
+        '  - SpriteRectangleComponent size: ${_spriteRectangleComponent!.size}',
+      );
+      DebugConfig.spritePrint(
+        '  - SpriteRectangleComponent position: ${_spriteRectangleComponent!.position}',
+      );
+    }
+
+    if (_animationComponent != null) {
+      DebugConfig.spritePrint(
+        '  - AnimationComponent mounted: ${_animationComponent!.isMounted}',
+      );
+      DebugConfig.spritePrint(
+        '  - AnimationComponent size: ${_animationComponent!.size}',
+      );
+      DebugConfig.spritePrint(
+        '  - AnimationComponent position: ${_animationComponent!.position}',
+      );
+    }
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    // Update flash effect
     if (_isFlashing) {
       _flashTimer -= dt;
       if (_flashTimer <= 0) {
         _isFlashing = false;
-        _flashVisible = true;
-        _updateVisibility();
+        stopFlash();
       } else {
-        // Flash visibility toggling - simplified logic
-        const double flashInterval = 0.1;
-        if ((_flashTimer % (flashInterval * 2)) < flashInterval) {
-          _flashVisible = true;
-        } else {
-          _flashVisible = false;
+        // Toggle visibility for flashing effect
+        _flashVisible = !_flashVisible;
+        if (_animationComponent != null) {
+          _animationComponent!.paint.color = Color.fromRGBO(
+            255,
+            255,
+            255,
+            _flashVisible ? _opacity : _opacity * 0.3,
+          );
         }
-        _updateVisibility();
       }
     }
   }
 
-  // Start a flashing effect
-  void flash(double duration) {
-    _isFlashing = true;
-    _flashTimer = duration;
-    _flashVisible = true;
-  }
-
-  // Update visibility based on effects
-  void _updateVisibility() {
-    if (_spriteComponent != null) {
-      final Color currentColor = _spriteComponent!.paint.color;
-      _spriteComponent!.paint.color = Color.fromRGBO(
-        (currentColor.r * 255.0).round() & 0xff,
-        (currentColor.g * 255.0).round() & 0xff,
-        (currentColor.b * 255.0).round() & 0xff,
-        _flashVisible ? _opacity : 0,
-      );
-    }
-    if (_animationComponent != null) {
-      final Color currentColor = _animationComponent!.paint.color;
-      _animationComponent!.paint.color = Color.fromRGBO(
-        (currentColor.r * 255.0).round() & 0xff,
-        (currentColor.g * 255.0).round() & 0xff,
-        (currentColor.b * 255.0).round() & 0xff,
-        _flashVisible ? _opacity : 0,
-      );
-    }
-  }
-
-  // Set opacity/transparency
-  void setOpacity(double opacity) {
-    _opacity = opacity;
-    if (_spriteComponent != null) {
-      final Color currentColor = _spriteComponent!.paint.color;
-      _spriteComponent!.paint.color = Color.fromRGBO(
-        (currentColor.r * 255.0).round() & 0xff,
-        (currentColor.g * 255.0).round() & 0xff,
-        (currentColor.b * 255.0).round() & 0xff,
-        _opacity,
-      );
-    }
-
-    if (_animationComponent != null) {
-      final Color currentColor = _animationComponent!.paint.color;
-      _animationComponent!.paint.color = Color.fromRGBO(
-        (currentColor.r * 255.0).round() & 0xff,
-        (currentColor.g * 255.0).round() & 0xff,
-        (currentColor.b * 255.0).round() & 0xff,
-        _opacity,
-      );
-    }
+  @override
+  void render(Canvas canvas) {
+    // Note: SpriteRectangleComponent and SpriteAnimationComponent handle their own rendering
+    // This render method is mainly for debugging
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] render() called - hasSprite: ${_sprite != null}, hasAnimation: ${_currentAnimation != null}',
+    );
+    super.render(canvas);
   }
 }

@@ -275,7 +275,7 @@ void main() {
         expect(tracker.personalBests.containsKey('tutorial_1'), isTrue);
         expect(tracker.personalBests['tutorial_1']?.value, equals(120));
         expect(tracker.personalBests['tutorial_1']?.category,
-            equals('fastest_completion'));
+            equals('fastest_completion'),);
       });
 
       test('ProgressTracker should update global statistics correctly', () {
