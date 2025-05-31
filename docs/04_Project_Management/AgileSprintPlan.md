@@ -891,19 +891,20 @@ Version: v0.2.0
 
 **Technical Tasks:**
 
-- [ ] **T2.10**: Implement `AetherShard` collectible using `lib/entities/collectible.dart` base class.
+- [x] **T2.10**: ✅ Implement `AetherShard` collectible using `lib/entities/collectible.dart` base class.
 
   - **Effort**: 5 hours
   - **Assignee**: Gameplay Dev
   - **Dependencies**: T1.9.4 (scaffolded Collectible), T2.7 (PlayerStats for Aether value), A2.1 (Aether Shard sprite)
   - **Acceptance Criteria**: AetherShard entities can be placed in world, detected by player collision, trigger pickup events.
   - **Granular Steps:**
-    - [ ] **T2.10.1**: Create AetherShard class extending Collectible base.
-    - [ ] **T2.10.2**: Add AetherShard sprite rendering with SpriteComponent.
-    - [ ] **T2.10.3**: Implement collision detection for player interaction.
-    - [ ] **T2.10.4**: Add pickup animation and visual feedback (placeholder if full animation not ready).
-    - [ ] **T2.10.5**: Implement Aether value assignment to AetherShard (e.g., how much Aether it gives).
-    - [ ] **T2.10.6**: Test AetherShard placement and pickup mechanics.
+    - [x] **T2.10.1**: ✅ Create AetherShard class extending Collectible base.
+    - [x] **T2.10.2**: ✅ Add AetherShard sprite rendering with SpriteComponent.
+    - [x] **T2.10.3**: ✅ Implement collision detection for player interaction.
+    - [x] **T2.10.4**: ✅ Add pickup animation and visual feedback (placeholder if full animation not ready).
+    - [x] **T2.10.5**: ✅ Implement Aether value assignment to AetherShard (e.g., how much Aether it gives).
+    - [x] **T2.10.6**: ✅ Test AetherShard placement and pickup mechanics.
+  - **✅ Completion Notes**: Successfully implemented AetherShard collectible extending Collectible base class. Added comprehensive collision detection with Player entities through CollisionComponent integration. Implemented visual feedback with pulsing animation and glowing effect using RectangleComponent with customizable colors. Added configurable Aether value assignment (default: 10 Aether per shard). Integrated pickup mechanics that trigger AetherCollectedEvent for PlayerStats integration. Created comprehensive test suite covering creation, collision detection, pickup mechanics, visual setup, and PlayerStats integration. All 7 AetherShard tests are passing, confirming proper functionality across all acceptance criteria.
 
 - [ ] **T2.11**: Implement pickup mechanics and PlayerStats integration.
 
@@ -1022,6 +1023,54 @@ Version: v0.2.0
     - [ ] **QA2.1.6**: Performance test with new physics systems and collectibles.
     - [ ] **QA2.1.7**: Integration test with Sprint 1 features (basic movement, camera).
     - [ ] **QA2.1.8**: Document bugs and create issue list for Sprint 3, and review against Sprint 2 Design Cohesion Checklist.
+
+##### **v0.2.0.6 - "Live Test World Integration"** (Days 11-12)
+
+**Goal**: Create a proper test level using our Level system and integrate AetherShards into a live, playable test environment to validate Sprint 2 mechanics.
+
+**Technical Tasks:**
+
+- [ ] **T2.17**: Create test level JSON file and enhance level loading pipeline
+
+  - **Effort**: 3 hours
+  - **Dependencies**: T3.1 ✅, T3.2 ✅ (Level enhancements from Sprint 3)
+  - **Acceptance Criteria**: Complete test level JSON with platforms, spawn points, and AetherShard placements
+  - **Granular Steps:**
+    - **T2.17.1**: Create `assets/levels/sprint2_test_level.json` with multiple platform layouts, 5-8 AetherShard spawn points, player spawn point, and level bounds
+    - **T2.17.2**: Enhance GameWorld to use LevelLoader instead of hardcoded platforms
+    - **T2.17.3**: Test level loading and entity spawning functionality
+    - **T2.17.4**: Validate level bounds and camera behavior
+
+- [ ] **T2.18**: Integrate AetherShard spawning into level system
+
+  - **Effort**: 2 hours
+  - **Dependencies**: T2.10 ✅ (AetherShard implementation), T2.17
+  - **Acceptance Criteria**: AetherShards spawn from level data and are properly integrated with game systems
+  - **Granular Steps:**
+    - **T2.18.1**: Add AetherShard entity spawning to LevelLoader
+    - **T2.18.2**: Integrate AetherShard collision detection with Player
+    - **T2.18.3**: Test pickup mechanics in live environment
+    - **T2.18.4**: Verify PlayerStats integration works in real gameplay
+
+- [ ] **T2.19**: Create live test environment validation
+  - **Effort**: 2 hours
+  - **Dependencies**: T2.18
+  - **Acceptance Criteria**: Complete test level is playable with all Sprint 2 mechanics functional
+  - **Granular Steps:**
+    - **T2.19.1**: Test complete gameplay loop (movement → jumping → collection)
+    - **T2.19.2**: Validate physics systems work in level environment
+    - **T2.19.3**: Test camera bounds and level constraints
+    - **T2.19.4**: Verify system integration and performance
+
+**Success Criteria:**
+
+- ✅ Test level loads from JSON without errors
+- ✅ Player spawns at correct position with working movement/jumping
+- ✅ AetherShards are visible and collectible
+- ✅ PlayerStats updates correctly when AetherShards are collected
+- ✅ Camera follows player within level bounds
+- ✅ All Sprint 2 physics mechanics work in level environment
+- ✅ GameWorld properly coordinates between level loading and game systems
 
 #### 🏆 Sprint Success Criteria
 

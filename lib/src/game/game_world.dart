@@ -12,6 +12,7 @@ class GameWorld extends Component {
   Player? _player;
   // List to track all platforms in the world for system registration
   final List<Platform> _platforms = <Platform>[];
+
   @override
   Future<void> onLoad() async {
     print('🌍 [DEBUG] GameWorld.onLoad() - Starting world initialization');
