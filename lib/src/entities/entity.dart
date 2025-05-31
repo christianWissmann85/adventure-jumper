@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 
 import '../components/adv_sprite_component.dart';
@@ -32,6 +34,7 @@ abstract class Entity extends PositionComponent {
   String _type = 'entity';
   @override
   Future<void> onLoad() async {
+    print('[Entity] onLoad() called - id: $_id, type: $_type');
     await super.onLoad();
 
     // Create and add required components
@@ -42,6 +45,23 @@ abstract class Entity extends PositionComponent {
 
     // Setup entity-specific components after components are added
     await setupEntity();
+    print(
+        '[Entity] onLoad() completed - id: $_id, type: $_type, children: ${children.length}');
+  }
+
+  @override
+  void onMount() {
+    print('[Entity] onMount() called - id: $_id, type: $_type');
+    super.onMount();
+    print(
+        '[Entity] onMount() completed - id: $_id, type: $_type, isMounted: $isMounted');
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    print(
+        '[Entity] onGameResize() called - id: $_id, type: $_type, size: $size');
+    super.onGameResize(size);
   }
 
   @override
@@ -77,6 +97,17 @@ abstract class Entity extends PositionComponent {
   /// Deactivate the entity
   void deactivate() {
     _isActive = false;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    // Add debug print to track Entity render calls
+    print(
+      '[Entity] RENDER METHOD CALLED - id: $_id, type: $_type, children: ${children.length}',
+    );
+
+    // Always call super.render to ensure the component tree is processed correctly
+    super.render(canvas);
   }
 
   /// Get entity ID

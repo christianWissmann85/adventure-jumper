@@ -309,6 +309,21 @@ class AetherComponent extends Component {
     );
   }
 
+  /// Set Aether regeneration rate
+  void setAetherRegenRate(double regenRate) {
+    if (regenRate < 0) regenRate = 0; // Prevent negative regeneration rates
+
+    _aetherRegenRate = regenRate;
+
+    // Fire event for regeneration rate change
+    _fireAetherChangedEvent(
+      _currentAether,
+      _currentAether,
+      0,
+      'set_regen_rate',
+    );
+  }
+
   /// Check if an ability is unlocked
   bool hasAbility(String abilityName) {
     return _unlockedAbilities.contains(abilityName);

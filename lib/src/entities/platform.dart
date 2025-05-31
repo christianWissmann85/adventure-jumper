@@ -103,7 +103,8 @@ class Platform extends Entity {
   Future<void> setupPlatform() async {
     // Initialize sprite component (inherited from Entity)
     sprite = AdvSpriteComponent(
-      spriteSize: size,
+      position: Vector2.zero(), // Relative to this platform
+      size: size,
       opacity: 1.0,
     );
     add(sprite!);

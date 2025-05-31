@@ -178,20 +178,18 @@ void main() {
         // Verify max Aether was changed
         expect(aetherComponent.maxAether, equals(150));
       });
-
       test('should handle regeneration rate modification requests', () {
-        // Request to change regen rate (this will be implemented later)
+        // Verify initial regeneration rate
+        expect(aetherComponent.aetherRegenRate, equals(5)); // Default value
+
+        // Request to change regen rate
         aetherSystem.requestSetRegenRate(testEntity, 8, reason: 'boost');
 
         // Process the entity to handle pending requests
         aetherSystem.processEntity(testEntity, 1.0);
 
-        // For now, this just logs that the feature needs implementation
-        // In the future, this would modify the component's regen rate
-        expect(
-          () => aetherSystem.processEntity(testEntity, 1.0),
-          returnsNormally,
-        );
+        // Verify regeneration rate was changed
+        expect(aetherComponent.aetherRegenRate, equals(8));
       });
     });
 

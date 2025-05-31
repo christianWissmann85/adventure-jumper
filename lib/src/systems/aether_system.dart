@@ -241,8 +241,7 @@ class AetherSystem extends BaseSystem {
         aetherComponent.setMaxAether(request.amount);
         break;
       case AetherOperation.setRegenRate:
-        // This would require adding a setter to AetherComponent
-        // For now, we log that this feature needs to be implemented
+        aetherComponent.setAetherRegenRate(request.amount);
         break;
     }
 

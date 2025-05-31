@@ -33,17 +33,24 @@ class Player extends Entity {
           id: 'player',
           type: 'player',
         );
-
   @override
   Future<void> setupEntity() async {
+    print('[Player] setupEntity() called - size: $size');
+
     // Initialize physics component (inherited from Entity)
     physics = PhysicsComponent();
-    add(physics!); // Initialize sprite component (inherited from Entity)
+    add(physics!);
+
+    // Initialize sprite component (inherited from Entity)
     sprite = AdvSpriteComponent(
-      spriteSize: size,
+      size:
+          size, // Now using PositionComponent's size parameter instead of spriteSize
       opacity: 1.0,
     );
-    add(sprite!); // Create a temporary fallback visual using DebugRectangleComponent
+    add(sprite!);
+    print('[Player] AdvSpriteComponent added to player');
+
+    // Create a temporary fallback visual using DebugRectangleComponent
     // This ensures the player is visible while sprites load and provides extensive debug logging
     final DebugRectangleComponent playerFallback = DebugRectangleComponent(
       size: size,
@@ -79,6 +86,9 @@ class Player extends Entity {
     // Implementation needed: Load player sprites
     // Implementation needed: Set initial position
     // Implementation needed: Configure physics properties
+
+    print(
+        '[Player] setupEntity() completed - total children: ${children.length}');
   }
 
   /// Handle input action changes from InputComponent

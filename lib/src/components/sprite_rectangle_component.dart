@@ -134,10 +134,18 @@ class SpriteRectangleComponent extends RectangleComponent {
       DebugConfig.spritePrint(
         '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, opacity: $_opacity',
       );
+
+      // Add more visible debug print for initial render calls
+      print(
+          '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, size: $size, position: $position, mounted: $isMounted');
     } else if (_renderCallCount % 60 == 0) {
       DebugConfig.spritePrint(
         '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount (every 60th logged)',
       );
+
+      // Add more visible debug print for periodic render calls
+      print(
+          '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, size: $size, position: $position');
     }
 
     // Only render if we have a sprite
@@ -192,7 +200,9 @@ class SpriteRectangleComponent extends RectangleComponent {
       // Draw flash effect if enabled
       if (_isFlashing && _flashVisible) {
         canvas.drawRect(
-            destRect, Paint()..color = Colors.white.withOpacity(0.5));
+          destRect,
+          Paint()..color = Colors.white.withOpacity(0.5),
+        );
       }
     } catch (e) {
       DebugConfig.spritePrint(

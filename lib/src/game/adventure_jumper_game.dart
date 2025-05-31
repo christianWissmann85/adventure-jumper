@@ -1,5 +1,6 @@
 // filepath: c:\Users\User\source\repos\Cascade\adventure-jumper\lib\src\game\adventure_jumper_game.dart
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -55,17 +56,25 @@ class AdventureJumperGame extends FlameGame
     _logger.fine('Physics system initialized');
 
     // Set up keyboard event forwarding to input system
-    // The input system will handle keyboard events and distribute to entities
-    _setupInputHandlers();
-
-    // Initialize camera
+    // The input system will handle keyboard events and distribute to entities    _setupInputHandlers(); // Initialize camera
     gameCamera = GameCamera();
     camera.viewfinder.add(gameCamera);
     _logger.fine('Game camera initialized'); // Initialize game world
+    print('🎮 [DEBUG] AdventureJumperGame.onLoad() - Creating GameWorld');
     gameWorld = GameWorld();
+    print(
+        '🎮 [DEBUG] AdventureJumperGame.onLoad() - Adding GameWorld to game (not camera)');
     add(gameWorld);
-    _logger.fine('Game world initialized'); // Wait for world to load
+    _logger.fine('Game world initialized');
+
+    // Wait for world to load
+    print(
+      '🎮 [DEBUG] AdventureJumperGame.onLoad() - Waiting for GameWorld to load',
+    );
     await gameWorld.loaded;
+    print(
+      '🎮 [DEBUG] AdventureJumperGame.onLoad() - GameWorld loaded successfully',
+    );
 
     // Add a test debug rectangle directly to the game to verify basic rendering
     final DebugRectangleComponent gameTestRect = DebugRectangleComponent(
@@ -77,7 +86,8 @@ class AdventureJumperGame extends FlameGame
     );
     add(gameTestRect);
     _logger.info(
-        'Added test debug rectangle to game - position: ${gameTestRect.position}, size: ${gameTestRect.size}');
+      'Added test debug rectangle to game - position: ${gameTestRect.position}, size: ${gameTestRect.size}',
+    );
 
     // Initialize the game HUD
     final screenSize = Vector2(size.x, size.y);
@@ -123,9 +133,16 @@ class AdventureJumperGame extends FlameGame
 
     // TODO(game): Load initial assets
     // TODO(game): Initialize input handlers
-    // TODO(game): Set up game state management
+    // TODO(game): Set up game state management    _logger.info('Game initialization complete');
+  }
 
-    _logger.info('Game initialization complete');
+  @override
+  void render(ui.Canvas canvas) {
+    print('🎮 RENDER DEBUG: AdventureJumperGame.render() called');
+    super.render(canvas);
+    print(
+      '🎮 RENDER DEBUG: AdventureJumperGame.render() super.render(canvas) completed',
+    );
   }
 
   // Input handling methods

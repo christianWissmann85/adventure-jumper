@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flame/components.dart';
 
 import '../entities/platform.dart';
@@ -6,17 +8,23 @@ import '../systems/physics_system.dart';
 
 /// Game world container and state management
 /// Handles world loading, entity management, and level transitions
-class GameWorld extends World {
+class GameWorld extends Component {
   Player? _player;
   // List to track all platforms in the world for system registration
   final List<Platform> _platforms = <Platform>[];
   @override
   Future<void> onLoad() async {
+    print('🌍 [DEBUG] GameWorld.onLoad() - Starting world initialization');
+
     // Create and add a test player entity for Sprint 1
+    print('🌍 [DEBUG] GameWorld.onLoad() - Setting up test player');
     await _setupTestPlayer();
 
     // Create and add test platforms for Sprint 1
+    print('🌍 [DEBUG] GameWorld.onLoad() - Setting up test platforms');
     await _setupTestPlatforms();
+
+    print('🌍 [DEBUG] GameWorld.onLoad() - World initialization complete');
 
     // TODO(world): Load initial level/world
     // TODO(world): Initialize world entities
@@ -25,17 +33,27 @@ class GameWorld extends World {
 
   /// Set up a test player for Sprint 1 keyboard input testing
   Future<void> _setupTestPlayer() async {
+    print(
+      '🌍 [DEBUG] GameWorld._setupTestPlayer() - Creating player at (100, 300)',
+    );
+
     // Create player at a test position
     _player = Player(
       position: Vector2(100, 300), // Starting position
       size: Vector2(32, 48), // Player size
     );
 
+    print('🌍 [DEBUG] GameWorld._setupTestPlayer() - Adding player to world');
     // Add player to the world
     add(_player!);
 
+    print(
+      '🌍 [DEBUG] GameWorld._setupTestPlayer() - Waiting for player to load',
+    );
     // Wait for player to fully load
     await _player!.loaded;
+
+    print('🌍 [DEBUG] GameWorld._setupTestPlayer() - Player setup complete');
   }
 
   /// Set up test platforms for Sprint 1 testing
@@ -119,4 +137,16 @@ class GameWorld extends World {
 
   /// Get all platforms for external system integration
   List<Platform> get platforms => _platforms;
+
+  @override
+  void render(Canvas canvas) {
+    print(
+      '🌍 [DEBUG] GameWorld.render() called - children: ${children.length}',
+    );
+
+    // Always call super.render to ensure child components are rendered
+    super.render(canvas);
+
+    print('🌍 [DEBUG] GameWorld.render() completed');
+  }
 }

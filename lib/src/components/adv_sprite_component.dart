@@ -6,7 +6,8 @@ import 'sprite_rectangle_component.dart';
 
 /// Component that handles sprite rendering for entities
 /// Uses SpriteRectangleComponent to bypass SpriteComponent mounting issues
-class AdvSpriteComponent extends Component {
+/// Now extends PositionComponent to ensure proper integration with Flame's rendering hierarchy
+class AdvSpriteComponent extends PositionComponent {
   AdvSpriteComponent({
     String? spritePath,
     Sprite? sprite,
@@ -16,20 +17,36 @@ class AdvSpriteComponent extends Component {
     bool? flipVertically,
     double? opacity,
     int? priority,
-  }) {
+    // PositionComponent properties
+    super.position,
+    super.size,
+    super.scale,
+    super.angle,
+    super.anchor,
+  }) : super(
+          priority: priority,
+        ) {
     if (sprite != null) _sprite = sprite;
-    if (spriteSize != null) _spriteSize = spriteSize;
+    // spriteSize is now handled by the inherited PositionComponent's size property
     if (spriteOffset != null) _spriteOffset = spriteOffset;
     if (flipHorizontally != null) _flipHorizontally = flipHorizontally;
     if (flipVertically != null) _flipVertically = flipVertically;
     if (opacity != null) _opacity = opacity;
     if (priority != null) _renderPriority = priority;
+
+    // Set size from sprite if not explicitly provided and spriteSize was passed
+    if (size == Vector2.zero()) {
+      if (spriteSize != null) {
+        size = spriteSize;
+      } else if (sprite != null) {
+        size = sprite.srcSize;
+      }
+    }
   }
 
   // Sprite properties
   Sprite? _sprite;
   SpriteAnimation? _currentAnimation;
-  Vector2 _spriteSize = Vector2.zero();
   Vector2 _spriteOffset = Vector2.zero();
   bool _flipHorizontally = false;
   bool _flipVertically = false;
@@ -44,53 +61,41 @@ class AdvSpriteComponent extends Component {
   // Working sprite component reference (uses RectangleComponent base)
   SpriteRectangleComponent? _spriteRectangleComponent;
   SpriteAnimationComponent? _animationComponent;
-
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    DebugConfig.spritePrint('[AdvSpriteComponent] onLoad() called');
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] onLoad() called - Now a PositionComponent',
+    );
 
-    if (parent is PositionComponent) {
-      final PositionComponent parentComp = parent as PositionComponent;
-
-      // Initialize based on sprite or animation
+    // If size hasn't been set explicitly, derive it from sprite or animation
+    if (size == Vector2.zero()) {
       if (_sprite != null) {
-        _createSpriteRectangleComponent();
-        parentComp.add(_spriteRectangleComponent!);
-        DebugConfig.spritePrint(
-          '[AdvSpriteComponent] Added SpriteRectangleComponent to parent',
-        );
-      } else if (_currentAnimation != null) {
-        _createAnimationComponent();
-        parentComp.add(_animationComponent!);
-        DebugConfig.spritePrint(
-          '[AdvSpriteComponent] Added AnimationComponent to parent',
-        );
+        size = _sprite!.srcSize;
+      } else if (_currentAnimation != null &&
+          _currentAnimation!.frames.isNotEmpty) {
+        size = _currentAnimation!.frames.first.sprite.srcSize;
       }
+    }
+
+    // Initialize based on sprite or animation
+    if (_sprite != null) {
+      _createSpriteRectangleComponent();
+      add(_spriteRectangleComponent!);
+      DebugConfig.spritePrint(
+        '[AdvSpriteComponent] Added SpriteRectangleComponent to self',
+      );
+    } else if (_currentAnimation != null) {
+      _createAnimationComponent();
+      add(_animationComponent!);
+      DebugConfig.spritePrint(
+        '[AdvSpriteComponent] Added AnimationComponent to self',
+      );
     }
   }
 
   // Layer for rendering order
   int get renderLayer => _renderPriority;
-
-  // Sprite dimensions
-  Vector2 get size {
-    if (_spriteSize != Vector2.zero()) {
-      return _spriteSize;
-    }
-
-    // Return natural sprite size if no custom size set
-    if (_sprite != null) {
-      return Vector2(_sprite!.srcSize.x, _sprite!.srcSize.y);
-    }
-
-    if (_currentAnimation != null && _currentAnimation!.frames.isNotEmpty) {
-      final firstFrame = _currentAnimation!.frames.first.sprite;
-      return Vector2(firstFrame.srcSize.x, firstFrame.srcSize.y);
-    }
-
-    return Vector2.zero();
-  }
 
   // Set a sprite
   void setSprite(Sprite sprite) {
@@ -156,7 +161,7 @@ class AdvSpriteComponent extends Component {
           '[AdvSpriteComponent] Creating new sprite rectangle component',
         );
         _createSpriteRectangleComponent();
-        (parent as PositionComponent).add(_spriteRectangleComponent!);
+        add(_spriteRectangleComponent!);
         DebugConfig.spritePrint(
           '[AdvSpriteComponent] Added new sprite rectangle component',
         );
@@ -187,12 +192,10 @@ class AdvSpriteComponent extends Component {
         );
         _animationComponent!.removeFromParent();
         _animationComponent = null;
-      }
-
-      // Create new animation component
+      } // Create new animation component
       if (_currentAnimation != null) {
         _createAnimationComponent();
-        (parent as PositionComponent).add(_animationComponent!);
+        add(_animationComponent!);
         DebugConfig.spritePrint(
           '[AdvSpriteComponent] Added new animation component',
         );
@@ -303,7 +306,12 @@ class AdvSpriteComponent extends Component {
 
   // Debug status
   void printDebugStatus() {
-    DebugConfig.spritePrint('[AdvSpriteComponent] Debug Status:');
+    DebugConfig.spritePrint(
+      '[AdvSpriteComponent] Debug Status (as PositionComponent):',
+    );
+    DebugConfig.spritePrint(
+      '  - Position: $position, Size: $size, Anchor: $anchor, Priority: $priority',
+    );
     DebugConfig.spritePrint(
       '  - SpriteRectangleComponent exists: ${_spriteRectangleComponent != null}',
     );
@@ -327,7 +335,14 @@ class AdvSpriteComponent extends Component {
         '  - SpriteRectangleComponent size: ${_spriteRectangleComponent!.size}',
       );
       DebugConfig.spritePrint(
-        '  - SpriteRectangleComponent position: ${_spriteRectangleComponent!.position}',
+        '  - SpriteRectangleComponent position (relative): ${_spriteRectangleComponent!.position}',
+      );
+      DebugConfig.spritePrint(
+        '  - SpriteRectangleComponent opacity: ${_spriteRectangleComponent!.opacity}',
+      );
+      // Note: Flip states are private in SpriteRectangleComponent, using AdvSpriteComponent's values
+      DebugConfig.spritePrint(
+        '  - SpriteRectangleComponent flip H/V: $_flipHorizontally/$_flipVertically',
       );
     }
 
@@ -376,6 +391,12 @@ class AdvSpriteComponent extends Component {
     DebugConfig.spritePrint(
       '[AdvSpriteComponent] render() called - hasSprite: ${_sprite != null}, hasAnimation: ${_currentAnimation != null}',
     );
+
+    // Add a more visible debug print to ensure we can see if render is called
+    print(
+        '[AdvSpriteComponent] RENDER METHOD CALLED - hasSprite: ${_sprite != null}, hasAnimation: ${_currentAnimation != null}');
+
+    // Make sure to call super.render() to allow child components to render
     super.render(canvas);
   }
 }
