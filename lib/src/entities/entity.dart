@@ -27,11 +27,14 @@ abstract class Entity extends PositionComponent {
   // Optional components (may be null if not needed)
   PhysicsComponent? physics;
   AdvSpriteComponent? sprite;
-
   // Entity state
   bool _isActive = true;
   String _id = '';
   String _type = 'entity';
+
+  // Collision callback - this is assignable from external code
+  Function(Entity)? onCollision;
+
   @override
   Future<void> onLoad() async {
     print('[Entity] onLoad() called - id: $_id, type: $_type');
@@ -46,7 +49,8 @@ abstract class Entity extends PositionComponent {
     // Setup entity-specific components after components are added
     await setupEntity();
     print(
-        '[Entity] onLoad() completed - id: $_id, type: $_type, children: ${children.length}');
+      '[Entity] onLoad() completed - id: $_id, type: $_type, children: ${children.length}',
+    );
   }
 
   @override
@@ -54,13 +58,15 @@ abstract class Entity extends PositionComponent {
     print('[Entity] onMount() called - id: $_id, type: $_type');
     super.onMount();
     print(
-        '[Entity] onMount() completed - id: $_id, type: $_type, isMounted: $isMounted');
+      '[Entity] onMount() completed - id: $_id, type: $_type, isMounted: $isMounted',
+    );
   }
 
   @override
   void onGameResize(Vector2 size) {
     print(
-        '[Entity] onGameResize() called - id: $_id, type: $_type, size: $size');
+      '[Entity] onGameResize() called - id: $_id, type: $_type, size: $size',
+    );
     super.onGameResize(size);
   }
 
@@ -84,9 +90,10 @@ abstract class Entity extends PositionComponent {
     // Override in subclasses
   }
 
-  /// Handle collision with another entity
-  void onCollision(Entity other) {
-    // Override in subclasses
+  /// Trigger collision with another entity
+  void triggerCollision(Entity other) {
+    // Call collision callback if set
+    onCollision?.call(other);
   }
 
   /// Activate the entity

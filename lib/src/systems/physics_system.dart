@@ -156,8 +156,16 @@ class PhysicsSystem extends BaseFlameSystem {
 
   @override
   bool canProcessEntity(Entity entity) {
-    // Only process entities with physics components
-    return entity.physics != null;
+    // Process entities with physics components for full physics simulation
+    if (entity.physics != null) return true;
+
+    // Also process collectibles for collision detection (they don't need physics but need collision)
+    if (entity.type == 'collectible') return true;
+
+    // Process other entities that need collision detection but not full physics
+    // Add more entity types here as needed
+
+    return false;
   }
 
   @override
@@ -320,6 +328,16 @@ class PhysicsSystem extends BaseFlameSystem {
   void detectCollisions() {
     if (!_enableCollision) return;
 
+    print(
+      '[PhysicsSystem] detectCollisions() called with ${entities.length} entities',
+    );
+    for (int i = 0; i < entities.length; i++) {
+      final Entity entity = entities[i];
+      print(
+        '[PhysicsSystem] Entity $i: ${entity.type}, position: ${entity.position}, size: ${entity.size}, active: ${entity.isActive}',
+      );
+    }
+
     // Simple N^2 collision detection for small entity counts
     // For larger games, this would be optimized with spatial partitioning
     for (int i = 0; i < entities.length; i++) {
@@ -439,16 +457,26 @@ class PhysicsSystem extends BaseFlameSystem {
 
       // If both are vertical or both are horizontal, prioritize deeper penetrations
       return b.penetrationDepth.compareTo(a.penetrationDepth);
-    });
-
-    // Process all collisions
+    }); // Process all collisions
+    print('[PhysicsSystem] Processing ${_collisions.length} collisions');
     for (final CollisionData collision in _collisions) {
+      print(
+        '[PhysicsSystem] Collision between ${collision.entityA.type} and ${collision.entityB.type}',
+      );
+
       // Apply collision resolution using enhanced collision data
       resolveCollisionWithData(collision, dt);
 
-      // Notify entities of the collision
-      collision.entityA.onCollision(collision.entityB);
-      collision.entityB.onCollision(collision.entityA);
+      // Notify entities of the collision using null-safe calls
+      print(
+        '[PhysicsSystem] Calling onCollision for ${collision.entityA.type}: ${collision.entityA.onCollision != null}',
+      );
+      collision.entityA.onCollision?.call(collision.entityB);
+
+      print(
+        '[PhysicsSystem] Calling onCollision for ${collision.entityB.type}: ${collision.entityB.onCollision != null}',
+      );
+      collision.entityB.onCollision?.call(collision.entityA);
     }
   }
 

@@ -142,9 +142,9 @@ class AetherShard extends Collectible {
     // Additional shard-specific update logic can go here
     // The base floating and pulsing effects are handled by the parent class
   }
-
   @override
   void onCollected() {
+    print('[AetherShard] onCollected() called - _aetherValue: $_aetherValue');
     if (_isBeingCollected) return; // Prevent double collection
     _isBeingCollected = true;
 
@@ -225,67 +225,91 @@ class AetherShard extends Collectible {
 
   /// Give Aether to the player
   void _giveAetherToPlayer() {
+    print('[AetherShard] _giveAetherToPlayer() called');
     // Find the player entity to give Aether to
     Entity? playerEntity = _findPlayerEntity();
+    print('[AetherShard] Found player entity: $playerEntity');
 
     if (playerEntity is Player) {
+      print('[AetherShard] Player entity found, looking for PlayerStats');
       // Get player stats component
       final PlayerStats? playerStats =
           playerEntity.children.whereType<PlayerStats>().isNotEmpty
               ? playerEntity.children.whereType<PlayerStats>().first
               : null;
 
+      print('[AetherShard] PlayerStats found: $playerStats');
       if (playerStats != null) {
+        print(
+          '[AetherShard] Calling collectAetherShard with value: $_aetherValue',
+        );
         // Use the collectAetherShard method which handles both shard counting
         // and current Aether restoration
         playerStats.collectAetherShard(_aetherValue);
+        print('[AetherShard] collectAetherShard completed');
+      } else {
+        print(
+          '[AetherShard] ERROR: PlayerStats component not found in player children',
+        );
+        print(
+          '[AetherShard] Player children: ${playerEntity.children.map((c) => c.runtimeType).toList()}',
+        );
       }
+    } else {
+      print('[AetherShard] ERROR: Player entity not found or wrong type');
     }
   }
 
   /// Find the player entity in the game world
   Entity? _findPlayerEntity() {
+    print('[AetherShard] _findPlayerEntity() called');
     // Walk up the component tree to find the game world
     Component? current = parent;
+    print('[AetherShard] Starting search from parent: $current');
     while (current != null && current.parent != null) {
       current = current.parent;
+      print('[AetherShard] Moving up to: $current');
     }
 
     if (current != null) {
+      print('[AetherShard] Searching for player in root: $current');
       // Search for player entity in the world
       return _findPlayerInComponent(current);
     }
 
+    print('[AetherShard] ERROR: No root component found');
     return null;
   }
 
   /// Recursively search for player entity
   Entity? _findPlayerInComponent(Component component) {
+    print('[AetherShard] Searching in component: ${component.runtimeType}');
     // Check if this component is a Player
     if (component is Player) {
+      print('[AetherShard] Found Player: $component');
       return component;
     }
 
     // Search in children
     for (final Component child in component.children) {
+      print('[AetherShard] Checking child: ${child.runtimeType}');
       if (child is Player) {
+        print('[AetherShard] Found Player in children: $child');
         return child;
       }
 
       // Recursively search in child's children
       final Entity? found = _findPlayerInComponent(child);
       if (found != null) {
+        print('[AetherShard] Found Player in child subtree: $found');
         return found;
       }
     }
 
+    print(
+      '[AetherShard] No Player found in component: ${component.runtimeType}',
+    );
     return null;
-  }
-
-  @override
-  void onCollision(Entity other) {
-    // The base Collectible class already handles auto-collection on player contact
-    super.onCollision(other);
   }
 
   // Getters

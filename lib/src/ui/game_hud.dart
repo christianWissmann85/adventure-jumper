@@ -25,7 +25,6 @@ class GameHUD extends PositionComponent {
   final double padding;
   final double barHeight;
   final bool showFps;
-
   // UI Components
   late final HealthBar _healthBar;
   late final AetherBar _aetherBar;
@@ -33,28 +32,44 @@ class GameHUD extends PositionComponent {
 
   // UI state
   bool _isVisible = true;
+  bool _isInitialized = false;
   @override
   Future<void> onLoad() async {
+    print('[GameHUD] onLoad() starting...');
     await super.onLoad();
 
+    print('[GameHUD] Creating health bar...');
     // Create UI components
     _createHealthBar();
+    print('[GameHUD] Health bar created, children count: ${children.length}');
+
+    print('[GameHUD] Creating aether bar...');
     _createAetherBar();
+    print('[GameHUD] Aether bar created, children count: ${children.length}');
 
     // Add FPS counter if enabled
     if (showFps) {
+      print('[GameHUD] Creating FPS counter...');
       _createFpsCounter();
+      print(
+        '[GameHUD] FPS counter created, children count: ${children.length}',
+      );
     }
 
+    print('[GameHUD] Subscribing to player events...');
     // Subscribe to player events
     _eventBus.addListener(_handlePlayerEvent);
+
+    // Mark as initialized
+    _isInitialized = true;
+    print('[GameHUD] onLoad() completed - total children: ${children.length}');
   }
 
   @override
   void update(double dt) {
     super.update(dt);
 
-    if (!_isVisible) return;
+    if (!_isVisible || !_isInitialized) return;
 
     // Update UI components with player stats
     _updateFromPlayer();
@@ -62,10 +77,14 @@ class GameHUD extends PositionComponent {
 
   /// Create the health bar component
   void _createHealthBar() {
+    print('[GameHUD] _createHealthBar() called - player: $_player');
     // Position at top left with padding
     final Vector2 position = Vector2(padding, padding);
     final double width = screenSize.x * 0.25; // 25% of screen width
 
+    print(
+      '[GameHUD] Creating HealthBar with maxHealth: ${_player?.health.maxHealth ?? 100}, currentHealth: ${_player?.health.currentHealth ?? 100}',
+    );
     _healthBar = HealthBar(
       position: position,
       size: Vector2(width, barHeight),
@@ -73,15 +92,21 @@ class GameHUD extends PositionComponent {
       currentHealth: _player?.health.currentHealth ?? 100,
     );
 
+    print('[GameHUD] Adding HealthBar to GameHUD...');
     add(_healthBar);
+    print('[GameHUD] HealthBar added successfully');
   }
 
   /// Create the aether energy bar component
   void _createAetherBar() {
+    print('[GameHUD] _createAetherBar() called - player: $_player');
     // Position below health bar
     final Vector2 position = Vector2(padding, padding * 2 + barHeight);
     final double width = screenSize.x * 0.25; // 25% of screen width
 
+    print(
+      '[GameHUD] Creating AetherBar with maxAether: ${_player?.aether.maxAether ?? 100}, currentAether: ${_player?.aether.currentAether ?? 0}',
+    );
     _aetherBar = AetherBar(
       position: position,
       size: Vector2(width, barHeight),
@@ -89,7 +114,9 @@ class GameHUD extends PositionComponent {
       currentAether: _player?.aether.currentAether ?? 0,
     );
 
+    print('[GameHUD] Adding AetherBar to GameHUD...');
     add(_aetherBar);
+    print('[GameHUD] AetherBar added successfully');
   }
 
   /// Create the FPS counter component
@@ -141,8 +168,8 @@ class GameHUD extends PositionComponent {
 
   /// Handle player events
   void _handlePlayerEvent(PlayerEvent event) {
-    // Only process events when HUD is visible
-    if (!_isVisible) return;
+    // Only process events when HUD is visible and initialized
+    if (!_isVisible || !_isInitialized) return;
 
     // Check for aether change events specifically
     if (event is PlayerAetherChangedEvent) {

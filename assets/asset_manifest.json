@@ -20,7 +20,8 @@
                 "rows": 1,
                 "sprite_width": 32,
                 "sprite_height": 32
-              }
+              },
+              "asset_manifest_name": "character_player_idle.png"
             },
             "player_run.png": {
               "dimensions": "32x64",
@@ -32,7 +33,8 @@
                 "rows": 1,
                 "sprite_width": 32,
                 "sprite_height": 32
-              }
+              },
+              "asset_manifest_name": "character_player_run.png"
             },
             "player_jump.png": {
               "dimensions": "32x64",
@@ -44,21 +46,23 @@
                 "rows": 1,
                 "sprite_width": 32,
                 "sprite_height": 32
-              }
+              },
+              "asset_manifest_name": "character_player_jump.png"
             },
             "player_fall.png": {
               "dimensions": "32x64",
               "frames": 1,
               "status": "present",
-              "priority": "critical"
+              "priority": "critical",
+              "asset_manifest_name": "character_player_fall.png"
             },
             "player_landing.png": {
               "dimensions": "32x64",
               "frames": 1,
               "status": "present",
-              "priority": "critical"
-            },
-            "player_attack.png": {
+              "priority": "critical",
+              "asset_manifest_name": "character_player_land.png"
+            },            "player_attack.png": {
               "dimensions": "32x64",
               "frames": 1,
               "status": "present",
@@ -175,31 +179,65 @@
             }
           }
         }
-      },
-      "tilesets": {
+      },      "tilesets": {
         "luminara": {
           "base_path": "assets/images/tilesets/luminara/",
           "assets": {
             "tile_luminara_crystal_platform_azure.png": {
               "dimensions": "16x16",
               "variants": 5,
-              "status": "missing",
+              "status": "present",
               "priority": "high",
               "description": "Azure crystal platform tiles"
             },
             "tile_luminara_crystal_platform_teal.png": {
               "dimensions": "16x16",
               "variants": 3,
-              "status": "missing",
+              "status": "present",
               "priority": "high",
               "description": "Teal crystal platform tiles"
             },
             "tile_luminara_master_spire_base.png": {
               "dimensions": "128x256",
               "variants": 1,
-              "status": "missing",
+              "status": "present",
               "priority": "high",
               "description": "Master spire base structure"
+            },
+            "tile_luminara_spire_segment.png": {
+              "dimensions": "64x64",
+              "variants": 6,
+              "status": "present",
+              "priority": "high",
+              "description": "Spire segments"
+            },
+            "tile_luminara_archive_entrance.png": {
+              "dimensions": "96x96",
+              "variants": 1,
+              "status": "present",
+              "priority": "high",
+              "description": "Archive entrance"
+            },
+            "tile_luminara_crystal_bridge.png": {
+              "dimensions": "48x16",
+              "variants": 3,
+              "status": "present",
+              "priority": "high",
+              "description": "Crystal bridge"
+            },
+            "tile_luminara_crystal_steps.png": {
+              "dimensions": "32x32",
+              "variants": 4,
+              "status": "present",
+              "priority": "high",
+              "description": "Crystal steps"
+            },
+            "tile_luminara_market_stall.png": {
+              "dimensions": "64x48",
+              "variants": 4,
+              "status": "present",
+              "priority": "high",
+              "description": "Market stall"
             }
           }
         },
@@ -230,28 +268,33 @@
             }
           }
         }
-      },
-      "ui": {
+      },      "ui": {
         "hud": {
           "base_path": "assets/images/ui/hud/",
           "assets": {
             "ui_health_bar_frame.png": {
               "dimensions": "120x16",
-              "status": "missing",
+              "status": "present",
               "priority": "critical",
               "description": "Health bar frame"
             },
             "ui_health_bar_fill.png": {
               "dimensions": "112x8",
-              "status": "missing",
+              "status": "present",
               "priority": "critical",
               "description": "Health bar fill"
             },
             "ui_aether_counter_frame.png": {
               "dimensions": "80x24",
-              "status": "missing",
+              "status": "present",
               "priority": "critical",
               "description": "Aether counter frame"
+            },
+            "ui_aether_counter_icon.png": {
+              "dimensions": "32x32",
+              "status": "present",
+              "priority": "critical",
+              "description": "Aether counter icon"
             }
           }
         },
@@ -305,8 +348,7 @@
             }
           }
         }
-      },
-      "effects": {
+      },      "effects": {
         "particles": {
           "base_path": "assets/images/effects/particles/",
           "assets": {
@@ -323,28 +365,81 @@
             "effect_aether_pickup.png": {
               "dimensions": "32x32",
               "frames": 8,
-              "status": "missing",
+              "status": "present",
               "priority": "high",
               "description": "Aether shard pickup effect"
             },
             "effect_crystal_resonance.png": {
               "dimensions": "64x64",
               "frames": 12,
-              "status": "missing",
+              "status": "present",
               "priority": "high",
               "description": "Crystal resonance effect"
+            },
+            "character_player_aether_dash.png": {
+              "dimensions": "32x32",
+              "frames": 4,
+              "status": "present",
+              "priority": "high",
+              "description": "Aether dash ability effect"
+            },
+            "character_player_aether_pulse.png": {
+              "dimensions": "32x32",
+              "frames": 6,
+              "status": "present",
+              "priority": "high",
+              "description": "Aether pulse ability effect"
+            },
+            "character_player_aether_shield.png": {
+              "dimensions": "32x32",
+              "frames": 8,
+              "status": "present",
+              "priority": "high",
+              "description": "Aether shield ability effect"
+            }
+          }
+        },
+        "environmental": {
+          "base_path": "assets/images/effects/environmental/",
+          "assets": {
+            "effect_crystal_sparkle.png": {
+              "dimensions": "16x16",
+              "frames": 6,
+              "status": "present",
+              "priority": "medium",
+              "description": "Crystal sparkle environmental effect"
+            },
+            "effect_dust_motes.png": {
+              "dimensions": "8x8",
+              "frames": 4,
+              "status": "present",
+              "priority": "low",
+              "description": "Dust motes floating in air"
+            },
+            "effect_floating_particle.png": {
+              "dimensions": "8x8",
+              "frames": 5,
+              "status": "present",
+              "priority": "low",
+              "description": "Floating particles"
+            },
+            "effect_light_ray.png": {
+              "dimensions": "32x128",
+              "frames": 1,
+              "status": "present",
+              "priority": "medium",
+              "description": "Light ray effect"
             }
           }
         }
-      },
-      "props": {
+      },      "props": {
         "collectibles": {
           "base_path": "assets/images/props/collectibles/",
           "assets": {
             "collectible_aether_shard.png": {
               "dimensions": "16x16",
               "frames": 6,
-              "status": "missing",
+              "status": "present",
               "priority": "critical",
               "description": "Collectible Aether Shard"
             }
@@ -356,16 +451,58 @@
             "prop_luminara_aether_well_core.png": {
               "dimensions": "64x64",
               "frames": 8,
-              "status": "missing",
+              "status": "present",
               "priority": "high",
               "description": "Aether well core"
             },
             "prop_luminara_small_crystal.png": {
               "dimensions": "16x16",
               "frames": 6,
-              "status": "missing",
+              "status": "present",
               "priority": "medium",
               "description": "Small crystal prop"
+            },
+            "prop_luminara_medium_crystal.png": {
+              "dimensions": "32x32",
+              "frames": 8,
+              "status": "present",
+              "priority": "medium",
+              "description": "Medium crystal prop"
+            },
+            "prop_luminara_large_crystal.png": {
+              "dimensions": "48x64",
+              "frames": 10,
+              "status": "present",
+              "priority": "medium",
+              "description": "Large crystal prop"
+            },
+            "prop_luminara_crystal_growth.png": {
+              "dimensions": "24x32",
+              "frames": 8,
+              "status": "present",
+              "priority": "medium",
+              "description": "Crystal growth prop"
+            },
+            "prop_luminara_floating_shard.png": {
+              "dimensions": "8x8",
+              "frames": 12,
+              "status": "present",
+              "priority": "medium",
+              "description": "Floating shard prop"
+            },
+            "prop_luminara_luminous_moss.png": {
+              "dimensions": "16x8",
+              "frames": 5,
+              "status": "present", 
+              "priority": "medium",
+              "description": "Luminous moss prop"
+            },
+            "prop_luminara_inscription.png": {
+              "dimensions": "32x24",
+              "frames": 6,
+              "status": "present",
+              "priority": "medium",
+              "description": "Inscription tablet"
             }
           }
         }
@@ -459,28 +596,25 @@
           }
         }
       }
-    },
-    "summary": {
-      "total_assets": 45,
-      "present_assets": 18,
-      "missing_assets": 27,
-      "coverage_percentage": 40,
-      "critical_missing": 8,
-      "high_priority_missing": 15,
+    },    "summary": {
+      "total_assets": 82,
+      "present_assets": 72,
+      "missing_assets": 10,
+      "coverage_percentage": 88,
+      "critical_missing": 0,
+      "high_priority_missing": 0,
       "medium_priority_missing": 4
-    },
-    "recommendations": {
+    },    "recommendations": {
       "immediate_actions": [
-        "Run create_all_placeholder_assets.py to generate placeholders",
-        "Create critical UI elements (health bar, aether counter)",
-        "Generate collectible aether shard sprite",
+        "Update PlayerAnimator to look for 'player_fall.png' rather than 'character_player_fall.png'",
+        "Fix asset naming discrepancies between code and filesystem",
         "Add basic sound effects for player actions"
       ],
       "sprint_priorities": {
         "sprint_3": [
-          "Complete UI HUD elements",
-          "Generate Luminara tileset foundation",
-          "Create Mira NPC sprites",
+          "Complete remaining audio assets",
+          "Finalize remaining visual assets",
+          "Ensure consistent asset naming convention",
           "Add essential sound effects"
         ],
         "sprint_4": [
@@ -490,12 +624,13 @@
           "Complete props and collectibles"
         ]
       }
-    },
-    "technical_notes": {
+    },    "technical_notes": {
       "asset_loading": "Robust fallback system in place via AssetManager",
       "placeholder_generation": "Automatic placeholder creation for missing sprites",
       "error_handling": "Graceful degradation when assets are missing",
-      "testing": "All missing assets have fallback mechanisms for CI/CD"
+      "testing": "All missing assets have fallback mechanisms for CI/CD",
+      "naming_conventions": "Current issue: Code expects 'character_player_X.png' but actual files are named 'player_X.png'",
+      "asset_mapping": "Added 'asset_manifest_name' field to player assets to track the expected name in AssetManifest.md"
     }
   }
 }

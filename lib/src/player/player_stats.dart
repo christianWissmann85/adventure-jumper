@@ -142,20 +142,29 @@ class PlayerStats extends Component {
 
     // Fire Aether changed event
     _fireAetherChangedEvent(oldAether, _currentAether, amount, 'restoration');
-  }
-
-  /// Collect Aether shards with validation and ability unlock checks
+  }  /// Collect Aether shards with validation and ability unlock checks
   void collectAetherShard(int amount) {
-    if (amount < 0) return; // Prevent negative collection
+    print('[PlayerStats] collectAetherShard called with amount: $amount');
+    print('[PlayerStats] Before - currentAether: $_currentAether, aetherShards: $_aetherShards');
+    
+    if (amount < 0) {
+      print('[PlayerStats] Negative amount rejected');
+      return; // Prevent negative collection
+    }
 
     _aetherShards += amount;
 
     // Also add to current Aether (shards can be converted to usable Aether)
+    // Cap Aether at maximum value like other restoration methods
     final int oldAether = _currentAether;
     _currentAether = (_currentAether + amount).clamp(0, _maxAether);
 
-    // Fire Aether changed event
-    _fireAetherChangedEvent(oldAether, _currentAether, amount, 'collect_shard');
+    print('[PlayerStats] After - currentAether: $_currentAether, aetherShards: $_aetherShards');
+    print('[PlayerStats] Firing event with oldAether: $oldAether, newAether: $_currentAether');
+
+    // Fire Aether changed event with actual change amount
+    final int actualChange = _currentAether - oldAether;
+    _fireAetherChangedEvent(oldAether, _currentAether, actualChange, 'collect_shard');
 
     // Check for ability unlocks based on total shards collected
     _checkAbilityUnlocks();

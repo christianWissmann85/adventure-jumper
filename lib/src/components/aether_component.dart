@@ -367,4 +367,7 @@ class AetherComponent extends Component {
       List<String>.unmodifiable(_unlockedAbilities);
   Map<String, bool> get abilityStates =>
       Map<String, bool>.unmodifiable(_abilityActive);
+
+  /// Set whether aether regeneration is active
+  set isActive(bool value) => _isActive = value;
 }

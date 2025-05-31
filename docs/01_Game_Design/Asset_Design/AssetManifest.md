@@ -95,21 +95,21 @@ assets/images/
 
 #### Base Sprites
 
-| Asset Name  | Filename                    | Dimensions | Frames | Status     | Sprint |
-| ----------- | --------------------------- | ---------- | ------ | ---------- | ------ |
-| Player Idle | `character_player_idle.png` | 32x32      | 6      | 📋 Planned | 2      |
-| Player Run  | `character_player_run.png`  | 32x32      | 8      | 📋 Planned | 2      |
-| Player Jump | `character_player_jump.png` | 32x32      | 3      | 📋 Planned | 2      |
-| Player Fall | `character_player_fall.png` | 32x32      | 2      | 📋 Planned | 2      |
-| Player Land | `character_player_land.png` | 32x32      | 3      | 📋 Planned | 2      |
+| Asset Name  | Filename                    | Actual Filename      | Dimensions | Frames | Status     | Sprint |
+| ----------- | --------------------------- | -------------------- | ---------- | ------ | ---------- | ------ |
+| Player Idle | `character_player_idle.png` | `player_idle.png`    | 32x64      | 1      | ✅ Present | 2      |
+| Player Run  | `character_player_run.png`  | `player_run.png`     | 32x64      | 1      | ✅ Present | 2      |
+| Player Jump | `character_player_jump.png` | `player_jump.png`    | 32x64      | 1      | ✅ Present | 2      |
+| Player Fall | `character_player_fall.png` | `player_fall.png`    | 32x64      | 1      | ✅ Present | 2      |
+| Player Land | `character_player_land.png` | `player_landing.png` | 32x64      | 1      | ✅ Present | 2      |
 
 #### Aether Abilities
 
-| Asset Name    | Filename                             | Dimensions | Frames | Status     | Sprint |
-| ------------- | ------------------------------------ | ---------- | ------ | ---------- | ------ |
-| Aether Dash   | `character_player_aether_dash.png`   | 32x32      | 4      | 📋 Planned | 6      |
-| Aether Pulse  | `character_player_aether_pulse.png`  | 32x32      | 6      | 📋 Planned | 8      |
-| Aether Shield | `character_player_aether_shield.png` | 32x32      | 8      | 📋 Planned | 12     |
+| Asset Name    | Filename                             | Actual Filename                      | Dimensions | Frames | Status     | Sprint |
+| ------------- | ------------------------------------ | ------------------------------------ | ---------- | ------ | ---------- | ------ |
+| Aether Dash   | `character_player_aether_dash.png`   | `character_player_aether_dash.png`   | 32x32      | 4      | ✅ Present | 6      |
+| Aether Pulse  | `character_player_aether_pulse.png`  | `character_player_aether_pulse.png`  | 32x32      | 6      | ✅ Present | 8      |
+| Aether Shield | `character_player_aether_shield.png` | `character_player_aether_shield.png` | 32x32      | 8      | ✅ Present | 12     |
 
 ### 3.2 NPCs
 

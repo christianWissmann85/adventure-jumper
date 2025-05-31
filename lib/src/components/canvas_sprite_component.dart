@@ -142,14 +142,16 @@ class CanvasSpriteComponent extends PositionComponent {
   Future<void> onLoad() async {
     await super.onLoad();
     DebugConfig.spritePrint(
-        '[CanvasSpriteComponent] Component loaded successfully');
+      '[CanvasSpriteComponent] Component loaded successfully',
+    );
   }
 
   @override
   void onMount() {
     super.onMount();
     DebugConfig.spritePrint(
-        '[CanvasSpriteComponent] Component mounted successfully');
+      '[CanvasSpriteComponent] Component mounted successfully',
+    );
   }
 
   /// Set the sprite image directly

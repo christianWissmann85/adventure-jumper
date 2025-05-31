@@ -63,7 +63,8 @@ class AdventureJumperGame extends FlameGame
     print('🎮 [DEBUG] AdventureJumperGame.onLoad() - Creating GameWorld');
     gameWorld = GameWorld();
     print(
-        '🎮 [DEBUG] AdventureJumperGame.onLoad() - Adding GameWorld to game (not camera)');
+      '🎮 [DEBUG] AdventureJumperGame.onLoad() - Adding GameWorld to game (not camera)',
+    );
     add(gameWorld);
     _logger.fine('Game world initialized');
 

@@ -38,6 +38,7 @@ dependencies:
   logging: ^1.2.0  # Logging infrastructure
   path: ^1.9.1  # Path utilities
   path_provider: ^2.1.2  # For handling assets
+  provider: ^6.1.1  # State management for UI
   shared_preferences: ^2.2.2  # For game state management
   vector_math: ^2.1.4  # Vector mathematics
 

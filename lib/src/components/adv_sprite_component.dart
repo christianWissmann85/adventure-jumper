@@ -394,7 +394,8 @@ class AdvSpriteComponent extends PositionComponent {
 
     // Add a more visible debug print to ensure we can see if render is called
     print(
-        '[AdvSpriteComponent] RENDER METHOD CALLED - hasSprite: ${_sprite != null}, hasAnimation: ${_currentAnimation != null}');
+      '[AdvSpriteComponent] RENDER METHOD CALLED - hasSprite: ${_sprite != null}, hasAnimation: ${_currentAnimation != null}',
+    );
 
     // Make sure to call super.render() to allow child components to render
     super.render(canvas);

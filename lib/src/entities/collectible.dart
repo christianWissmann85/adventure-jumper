@@ -54,13 +54,23 @@ class Collectible extends Entity {
   // Animation tracking
   double _animationTime = 0;
   Vector2 _originalPosition = Vector2.zero();
-
   @override
   Future<void> setupEntity() async {
     await super.setupEntity();
 
     // Setup collectible-specific components and properties
     await setupCollectible();
+
+    // Setup default collision handler for auto-collection
+    onCollision = _handleCollision;
+  }
+
+  /// Handle collision with another entity
+  void _handleCollision(Entity other) {
+    // Auto-collect on player contact if enabled
+    if (_autoCollect && other.type == 'player') {
+      collect();
+    }
   }
 
   @override
@@ -136,7 +146,8 @@ class Collectible extends Entity {
   /// Apply floating effect animation
   void applyFloatEffect(double dt) {
     // Simple sine wave floating motion
-    final double newY = _originalPosition.y + sin(_animationTime * _floatFrequency) * _floatAmplitude;
+    final double newY = _originalPosition.y +
+        sin(_animationTime * _floatFrequency) * _floatAmplitude;
     position.y = newY;
   }
 
@@ -145,16 +156,6 @@ class Collectible extends Entity {
     // Simple scale pulsing
     final double pulse = 1.0 + (sin(_animationTime * _pulseFrequency) * 0.1);
     scale = Vector2.all(pulse);
-  }
-
-  @override
-  void onCollision(Entity other) {
-    super.onCollision(other);
-
-    // Auto-collect on player contact if enabled
-    if (_autoCollect && other.type == 'player') {
-      collect();
-    }
   }
 
   // Getters

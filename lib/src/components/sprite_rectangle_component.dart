@@ -137,7 +137,8 @@ class SpriteRectangleComponent extends RectangleComponent {
 
       // Add more visible debug print for initial render calls
       print(
-          '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, size: $size, position: $position, mounted: $isMounted');
+        '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, size: $size, position: $position, mounted: $isMounted',
+      );
     } else if (_renderCallCount % 60 == 0) {
       DebugConfig.spritePrint(
         '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount (every 60th logged)',
@@ -145,7 +146,8 @@ class SpriteRectangleComponent extends RectangleComponent {
 
       // Add more visible debug print for periodic render calls
       print(
-          '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, size: $size, position: $position');
+        '[SpriteRectangleComponent] RENDER CALL #$_renderCallCount - sprite: ${_sprite != null}, size: $size, position: $position',
+      );
     }
 
     // Only render if we have a sprite

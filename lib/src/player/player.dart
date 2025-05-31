@@ -18,9 +18,7 @@ import 'player_stats.dart';
 class Player extends Entity {
   late PlayerController controller;
   late PlayerAnimator animator;
-  late PlayerStats stats;
-
-  // Additional components specific to Player
+  late PlayerStats stats; // Additional components specific to Player
   late HealthComponent health;
   late AetherComponent aether;
   late InputComponent input;
@@ -36,6 +34,9 @@ class Player extends Entity {
   @override
   Future<void> setupEntity() async {
     print('[Player] setupEntity() called - size: $size');
+
+    // Set up collision callback to handle interactions with other entities
+    onCollision = _handleCollision;
 
     // Initialize physics component (inherited from Entity)
     physics = PhysicsComponent();
@@ -88,7 +89,8 @@ class Player extends Entity {
     // Implementation needed: Configure physics properties
 
     print(
-        '[Player] setupEntity() completed - total children: ${children.length}');
+      '[Player] setupEntity() completed - total children: ${children.length}',
+    );
   }
 
   /// Handle input action changes from InputComponent
@@ -194,5 +196,28 @@ class Player extends Entity {
       'justLanded': physics?.justLanded ?? false,
       'justLeftGround': physics?.justLeftGround ?? false,
     };
+  }
+
+  /// Handle collision with another entity
+  void _handleCollision(Entity other) {
+    print('[Player] _handleCollision called with ${other.type} entity');
+
+    // Handle different types of collisions
+    switch (other.type) {
+      case 'collectible':
+        // Collectibles handle their own pickup logic
+        // Player just acknowledges the collision
+        print('[Player] Collision with collectible acknowledged');
+        break;
+      case 'enemy':
+        // Handle enemy collisions (damage, etc.)
+        break;
+      case 'platform':
+        // Handle platform/environment collisions
+        break;
+      default:
+        // Handle other collision types
+        break;
+    }
   }
 }
