@@ -1,7 +1,8 @@
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart' show Color, Paint;
+import 'package:flutter/material.dart' show Color;
 
 import '../components/adv_sprite_component.dart';
+import '../components/debug_rectangle_component.dart';
 import '../components/physics_component.dart';
 import 'entity.dart';
 
@@ -62,23 +63,45 @@ class Platform extends Entity {
   bool _movingToEnd = true;
   @override
   Future<void> setupEntity() async {
+    print(
+      'PHASE 1 DEBUG: Platform.setupEntity() - Starting setup for platform',
+    );
+    print('  Platform type: $_platformType');
+    print('  Platform ID: $id');
+    print('  Platform position: $position');
+    print('  Platform size: $size');
+    print('  Is moving platform: $_isMoving');
+    print('  Is one-way platform: $_isOneWay');
+
     await super.setupEntity();
+    print('  Base entity setup completed');
 
     // Setup platform-specific physics - platforms usually have static physics
+    print('  Setting up PhysicsComponent...');
     physics = PhysicsComponent()
       ..isStatic = !_isMoving
       ..isSensor = _isOneWay;
 
     add(physics!);
+    print(
+      '    PhysicsComponent added: isStatic=${physics!.isStatic}, isSensor=${physics!.isSensor}',
+    );
 
     // Configure collision component for platform boundaries
+    print('  Configuring CollisionComponent...');
     collision.setHitboxSize(size);
     collision.isOneWay = _isOneWay;
     collision.addCollisionTag('platform');
     collision.addCollisionTag(_platformType);
+    print(
+      '    CollisionComponent configured: hitboxSize=${collision.hitboxSize}, isOneWay=${collision.isOneWay}',
+    );
+    print('    Collision tags: ${collision.collisionTags}');
 
     // Additional platform setup
+    print('  Calling setupPlatform()...');
     await setupPlatform();
+    print('PHASE 1 DEBUG: Platform.setupEntity() - Setup completed');
   }
 
   @override
@@ -109,14 +132,20 @@ class Platform extends Entity {
     );
     add(sprite!);
 
-    // For now, create a placeholder sprite using a colored rectangle
-    // In the future, this will load actual platform sprites from assets
-    // We'll create a temporary sprite representation using RectangleComponent
-    final RectangleComponent platformSprite = RectangleComponent(
+    // For now, create a visible platform using DebugRectangleComponent (same as player fallback)
+    // This ensures platforms are clearly visible while we debug rendering issues
+    final DebugRectangleComponent platformVisual = DebugRectangleComponent(
       size: size,
-      paint: Paint()..color = _getPlatformColor(),
+      position: Vector2.zero(), // Relative to this platform
+      color: _getPlatformColor(),
+      debugName: 'Platform_$_platformType',
+      priority: 10, // Higher priority to ensure it renders on top
     );
-    add(platformSprite);
+    add(platformVisual);
+
+    print(
+      '[Platform] Added DebugRectangleComponent for platform type: $_platformType, size: $size, position: $position',
+    );
 
     // TODO: Replace with actual sprite loading in future sprints
     // Example: await sprite!.setSprite(await Sprite.load('platforms/${_platformType}_platform.png'));

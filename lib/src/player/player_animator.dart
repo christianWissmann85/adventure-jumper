@@ -50,21 +50,25 @@ class PlayerAnimator extends Component {
         // Verify sprites were loaded for test environment
         if (_sprites.isEmpty || !_sprites.containsKey(AnimationState.fall)) {
           DebugConfig.animatorPrint(
-              '[PlayerAnimator] Test placeholder sprites not created properly, retrying...');
+            '[PlayerAnimator] Test placeholder sprites not created properly, retrying...',
+          );
           // Try direct creation for any missing sprites, especially fall
           if (!_sprites.containsKey(AnimationState.fall)) {
             _sprites[AnimationState.fall] =
                 await _createAnimatedPlaceholder(32, 64, 'fall');
             DebugConfig.animatorPrint(
-                '[PlayerAnimator] Created fall placeholder sprite directly');
+              '[PlayerAnimator] Created fall placeholder sprite directly',
+            );
 
             // Create animation if needed
             if (!_animations.containsKey(AnimationState.fall)) {
               _animations[AnimationState.fall] = SpriteAnimation.spriteList(
-                  [_sprites[AnimationState.fall]!],
-                  stepTime: 0.2);
+                [_sprites[AnimationState.fall]!],
+                stepTime: 0.2,
+              );
               DebugConfig.animatorPrint(
-                  '[PlayerAnimator] Created fall animation from directly created sprite');
+                '[PlayerAnimator] Created fall animation from directly created sprite',
+              );
             }
           }
         }
@@ -73,7 +77,8 @@ class PlayerAnimator extends Component {
         for (final state in AnimationState.values) {
           if (!_sprites.containsKey(state)) {
             DebugConfig.animatorPrint(
-                '[PlayerAnimator] Missing sprite for ${state.name}, creating placeholder');
+              '[PlayerAnimator] Missing sprite for ${state.name}, creating placeholder',
+            );
             _sprites[state] =
                 await _createAnimatedPlaceholder(32, 64, state.name);
             if (!_animations.containsKey(state)) {
@@ -85,27 +90,32 @@ class PlayerAnimator extends Component {
       } else {
         // In normal runtime, try to load actual animations, fall back to placeholders
         DebugConfig.animatorPrint(
-            '[PlayerAnimator] Attempting to load actual sprite assets...');
+          '[PlayerAnimator] Attempting to load actual sprite assets...',
+        );
         bool actualAnimationsLoaded = false;
 
         try {
           await _loadActualAnimations();
           actualAnimationsLoaded = true;
           DebugConfig.animatorPrint(
-              '[PlayerAnimator] Successfully loaded actual sprite assets');
+            '[PlayerAnimator] Successfully loaded actual sprite assets',
+          );
         } catch (e) {
           // Log the specific asset loading error but continue with fallback
           DebugConfig.animatorPrint(
-              '[PlayerAnimator] Asset loading failed: $e');
+            '[PlayerAnimator] Asset loading failed: $e',
+          );
           DebugConfig.animatorPrint(
-              '[PlayerAnimator] Falling back to placeholder animations');
+            '[PlayerAnimator] Falling back to placeholder animations',
+          );
         }
 
         // If actual animations failed to load, use placeholders
         if (!actualAnimationsLoaded) {
           await _createPlaceholderAnimations();
           DebugConfig.animatorPrint(
-              '[PlayerAnimator] Placeholder animations created successfully');
+            '[PlayerAnimator] Placeholder animations created successfully',
+          );
         }
       }
 
@@ -113,7 +123,8 @@ class PlayerAnimator extends Component {
       if (player.sprite != null && _sprites.containsKey(AnimationState.idle)) {
         player.sprite!.setSprite(_sprites[AnimationState.idle]!);
         DebugConfig.animatorPrint(
-            '[PlayerAnimator] Initial idle animation set on player');
+          '[PlayerAnimator] Initial idle animation set on player',
+        );
       } else {
         DebugConfig.animatorPrint(
           '[PlayerAnimator] Warning: Could not set initial animation - missing idle sprite or player sprite component',
@@ -521,7 +532,8 @@ class PlayerAnimator extends Component {
     // Ultimate fallback - use idle sprite or first available sprite
     if (_sprites.containsKey(AnimationState.idle)) {
       DebugConfig.animatorPrint(
-          '[PlayerAnimator] Fallback to idle sprite for $_currentState state');
+        '[PlayerAnimator] Fallback to idle sprite for $_currentState state',
+      );
       player.sprite!.setSprite(_sprites[AnimationState.idle]!);
       if (DebugConfig.enableComponentHierarchyLogging) {
         player.sprite!.printDebugStatus();

@@ -5,105 +5,30 @@ import 'package:flame/components.dart';
 import '../entities/platform.dart';
 import '../player/player.dart';
 import '../systems/physics_system.dart';
+import '../world/level.dart';
+import '../world/level_loader.dart';
 
 /// Game world container and state management
 /// Handles world loading, entity management, and level transitions
 class GameWorld extends Component {
   Player? _player;
   // List to track all platforms in the world for system registration
-  final List<Platform> _platforms = <Platform>[];
-
+  final List<Platform> _platforms = <Platform>[]; // Level management
+  Level? _currentLevel;
+  final LevelLoader _levelLoader = LevelLoader();
+  String _currentLevelId = 'sprint2_test_level';
   @override
   Future<void> onLoad() async {
     print('🌍 [DEBUG] GameWorld.onLoad() - Starting world initialization');
 
-    // Create and add a test player entity for Sprint 1
-    print('🌍 [DEBUG] GameWorld.onLoad() - Setting up test player');
-    await _setupTestPlayer();
-
-    // Create and add test platforms for Sprint 1
-    print('🌍 [DEBUG] GameWorld.onLoad() - Setting up test platforms');
-    await _setupTestPlatforms();
+    // Load the Sprint 2 test level instead of hardcoded setup
+    print('🌍 [DEBUG] GameWorld.onLoad() - Loading Sprint 2 test level');
+    await loadLevel(_currentLevelId);
 
     print('🌍 [DEBUG] GameWorld.onLoad() - World initialization complete');
 
-    // TODO(world): Load initial level/world
     // TODO(world): Initialize world entities
     // TODO(world): Set up world systems
-  }
-
-  /// Set up a test player for Sprint 1 keyboard input testing
-  Future<void> _setupTestPlayer() async {
-    print(
-      '🌍 [DEBUG] GameWorld._setupTestPlayer() - Creating player at (100, 300)',
-    );
-
-    // Create player at a test position
-    _player = Player(
-      position: Vector2(100, 300), // Starting position
-      size: Vector2(32, 48), // Player size
-    );
-
-    print('🌍 [DEBUG] GameWorld._setupTestPlayer() - Adding player to world');
-    // Add player to the world
-    add(_player!);
-
-    print(
-      '🌍 [DEBUG] GameWorld._setupTestPlayer() - Waiting for player to load',
-    );
-    // Wait for player to fully load
-    await _player!.loaded;
-
-    print('🌍 [DEBUG] GameWorld._setupTestPlayer() - Player setup complete');
-  }
-
-  /// Set up test platforms for Sprint 1 testing
-  Future<void> _setupTestPlatforms() async {
-    // Create a ground platform
-    final Platform ground = Platform(
-      position: Vector2(0, 450), // Ground level
-      size: Vector2(800, 50), // Wide ground platform
-      platformType: 'solid',
-    );
-
-    // Create some additional platforms for testing
-    final Platform platform1 = Platform(
-      position: Vector2(200, 350),
-      size: Vector2(150, 20),
-      platformType: 'grass',
-    );
-
-    final Platform platform2 = Platform(
-      position: Vector2(450, 280),
-      size: Vector2(100, 20),
-      platformType: 'ice',
-    );
-
-    // Create a one-way platform for testing jump-through functionality
-    final Platform oneWayPlatform = Platform(
-      position: Vector2(300, 200),
-      size: Vector2(120, 10), // Thinner than normal platforms
-      platformType: 'grass',
-      isOneWay: true, // Can be jumped through from below
-    );
-
-    // Add platforms to the world
-    add(ground);
-    add(platform1);
-    add(platform2);
-    add(oneWayPlatform);
-
-    // Wait for platforms to load
-    await ground.loaded;
-    await platform1.loaded;
-    await platform2.loaded;
-    await oneWayPlatform.loaded;
-
-    // Store platform references for later registration with physics system
-    _platforms.add(ground);
-    _platforms.add(platform1);
-    _platforms.add(platform2);
-    _platforms.add(oneWayPlatform);
   }
 
   /// Get the player for external system integration
@@ -111,12 +36,129 @@ class GameWorld extends Component {
 
   /// Load a specific level
   Future<void> loadLevel(String levelId) async {
-    // TODO(world): Implement level loading
+    print('🌍 [DEBUG] GameWorld.loadLevel() - Loading level: $levelId');
+
+    try {
+      // Clear existing level content
+      if (_currentLevel != null) {
+        unloadLevel();
+      }
+
+      // Load the new level
+      _currentLevel = await _levelLoader.loadLevel(levelId);
+      _currentLevelId = levelId;
+
+      // Add level to world
+      add(_currentLevel!);
+
+      // Set up player from level spawn point
+      await _setupPlayerFromLevel();
+
+      // Register platforms with our tracking list
+      _updatePlatformsList();
+
+      print('🌍 [DEBUG] GameWorld.loadLevel() - Level loaded successfully');
+    } catch (e) {
+      print(
+        '🌍 [ERROR] GameWorld.loadLevel() - Failed to load level $levelId: $e',
+      );
+      // Fallback to hardcoded setup if level loading fails
+      await _setupFallbackLevel();
+    }
+  }
+
+  /// Set up player from level data
+  Future<void> _setupPlayerFromLevel() async {
+    if (_currentLevel == null) return;
+
+    final Vector2 spawnPoint =
+        _currentLevel!.playerSpawnPoint ?? Vector2(100, 300);
+
+    print(
+      '🌍 [DEBUG] GameWorld._setupPlayerFromLevel() - Creating player at $spawnPoint',
+    );
+
+    // Create player at level spawn point
+    _player = Player(
+      position: spawnPoint,
+      size: Vector2(32, 48), // Player size
+    );
+
+    // Add player to the world
+    add(_player!);
+
+    // Wait for player to fully load
+    await _player!.loaded;
+
+    print(
+      '🌍 [DEBUG] GameWorld._setupPlayerFromLevel() - Player setup complete',
+    );
+  }
+
+  /// Update platforms list from current level
+  void _updatePlatformsList() {
+    _platforms.clear();
+    if (_currentLevel != null) {
+      _platforms.addAll(_currentLevel!.platforms);
+    }
+  }
+
+  /// Fallback to hardcoded setup if level loading fails
+  Future<void> _setupFallbackLevel() async {
+    print(
+      '🌍 [DEBUG] GameWorld._setupFallbackLevel() - Setting up fallback level',
+    );
+
+    // Create fallback player
+    _player = Player(
+      position: Vector2(100, 300),
+      size: Vector2(32, 48),
+    );
+    add(_player!);
+    await _player!.loaded;
+
+    // Create basic fallback platforms
+    final List<Platform> fallbackPlatforms = [
+      Platform(
+        position: Vector2(0, 450),
+        size: Vector2(800, 50),
+        platformType: 'solid',
+      ),
+      Platform(
+        position: Vector2(200, 350),
+        size: Vector2(150, 20),
+        platformType: 'grass',
+      ),
+    ];
+
+    for (final platform in fallbackPlatforms) {
+      add(platform);
+      await platform.loaded;
+      _platforms.add(platform);
+    }
+
+    print(
+      '🌍 [DEBUG] GameWorld._setupFallbackLevel() - Fallback level setup complete',
+    );
   }
 
   /// Unload current level
   void unloadLevel() {
-    // TODO(world): Implement level unloading
+    if (_currentLevel != null) {
+      _currentLevel!.removeFromParent();
+      _currentLevel = null;
+    }
+
+    // Clear platforms list
+    _platforms.clear();
+
+    // Remove player if it exists
+    if (_player != null) {
+      _player!.removeFromParent();
+      _player = null;
+    }
+
+    print('🌍 [DEBUG] GameWorld.unloadLevel() - Level unloaded');
   }
 
   /// Add entity to world
@@ -130,10 +172,47 @@ class GameWorld extends Component {
   }
 
   /// Register all platforms with physics system
-  void registerPlatformsWithPhysics(PhysicsSystem physicsSystem) {
-    for (final Platform platform in _platforms) {
-      physicsSystem.addEntity(platform);
+  Future<void> registerPlatformsWithPhysics(PhysicsSystem physicsSystem) async {
+    print(
+      'PHASE 1 DEBUG: GameWorld.registerPlatformsWithPhysics() - Starting registration',
+    );
+    print('  Total platforms to register: ${_platforms.length}');
+    print('  PhysicsSystem entity count before: ${physicsSystem.entityCount}');
+
+    // CRITICAL FIX: Wait for all platforms to be fully loaded before registration
+    print('  Waiting for all platforms to be fully loaded...');
+    for (int i = 0; i < _platforms.length; i++) {
+      final Platform platform = _platforms[i];
+      print('    Waiting for platform $i to load...');
+      await platform.loaded;
+      print('    Platform $i loaded successfully');
     }
+    print('  All platforms are now fully loaded');
+
+    for (int i = 0; i < _platforms.length; i++) {
+      final Platform platform = _platforms[i];
+      print('  Registering platform $i:');
+      print('    Platform type: ${platform.type}');
+      print('    Platform ID: ${platform.id}');
+      print('    Platform position: ${platform.position}');
+      print('    Platform size: ${platform.size}');
+      print('    Platform isActive: ${platform.isActive}');
+      print('    Platform has physics: ${platform.physics != null}');
+
+      // Check if physics system can process this entity
+      final bool canProcess = physicsSystem.canProcessEntity(platform);
+      print('    PhysicsSystem.canProcessEntity(): $canProcess');
+
+      physicsSystem.addEntity(platform);
+      print(
+        '    Platform registered. PhysicsSystem entity count now: ${physicsSystem.entityCount}',
+      );
+    }
+
+    print(
+      'PHASE 1 DEBUG: GameWorld.registerPlatformsWithPhysics() - Registration completed',
+    );
+    print('  PhysicsSystem final entity count: ${physicsSystem.entityCount}');
   }
 
   /// Get all platforms for external system integration

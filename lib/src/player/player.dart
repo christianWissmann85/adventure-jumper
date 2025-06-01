@@ -33,14 +33,27 @@ class Player extends Entity {
         );
   @override
   Future<void> setupEntity() async {
+    await super.setupEntity();
     print('[Player] setupEntity() called - size: $size');
 
     // Set up collision callback to handle interactions with other entities
-    onCollision = _handleCollision;
+    onCollision =
+        _handleCollision; // Initialize physics component (inherited from Entity)
+    // CRITICAL FIX: Set bounciness to 0 to prevent bouncing off platforms
+    physics = PhysicsComponent(
+      bounciness: 0.0, // No bouncing for stable platform landing
+    );
+    add(physics!); // CRITICAL FIX: Configure collision component for player boundaries
+    // This enables collision detection with platforms and other entities
+    collision.setHitboxSize(size);
+    collision.addCollisionTag('player');
+    collision.addCollisionTag('entity');
 
-    // Initialize physics component (inherited from Entity)
-    physics = PhysicsComponent();
-    add(physics!);
+    // Debug logging to confirm collision setup
+    print(
+      '[Player] Collision hitbox configured: size=$size, tags=[player, entity]',
+    );
+    print('[Player] Collision component active: ${collision.isActive}');
 
     // Initialize sprite component (inherited from Entity)
     sprite = AdvSpriteComponent(
@@ -80,17 +93,24 @@ class Player extends Entity {
     controller = PlayerController(this);
     animator = PlayerAnimator(this);
     stats = PlayerStats();
+    print('[Player] Adding PlayerController to component tree...');
     add(controller);
+    print('[Player] PlayerController added successfully');
     add(animator);
-    add(stats);
-
-    // Implementation needed: Load player sprites
+    add(stats); // Implementation needed: Load player sprites
     // Implementation needed: Set initial position
     // Implementation needed: Configure physics properties
 
     print(
       '[Player] setupEntity() completed - total children: ${children.length}',
     );
+
+    // Debug: List all children
+    print('[Player] Children list:');
+    for (int i = 0; i < children.length; i++) {
+      final child = children.elementAt(i);
+      print('  Child $i: ${child.runtimeType}');
+    }
   }
 
   /// Handle input action changes from InputComponent

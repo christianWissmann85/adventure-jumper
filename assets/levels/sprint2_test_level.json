@@ -1,0 +1,403 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "Sprint 2 Test Level - First Leap",
+    "author": "Adventure Jumper Team",
+    "description": "Test level designed to validate Sprint 2 core player mechanics: jump physics, collision detection, edge detection, and AetherShard collection",
+    "nextLevel": null,
+    "parTime": 90,
+    "theme": "luminara_test"
+  },
+  "properties": {
+    "id": "sprint2_test",
+    "name": "Sprint 2 Test Level",
+    "width": 1600,
+    "height": 900,
+    "gravity": 1200,
+    "backgroundPath": "images/backgrounds/luminara_test_background.png",
+    "musicPath": "audio/music/luminara_theme.ogg",
+    "ambientSoundPath": "audio/sfx/luminara_ambient.ogg",
+    "biomeType": "luminara"
+  },
+  "bounds": {
+    "left": 0,
+    "right": 1600,
+    "top": 0,
+    "bottom": 900
+  },
+  "cameraBounds": {
+    "left": -50,
+    "right": 1650,
+    "top": -50,
+    "bottom": 950
+  },
+  "geometry": {
+    "platforms": [      {
+        "id": "main_ground",
+        "type": "solid",
+        "x": 0,
+        "y": 800,
+        "width": 1600,
+        "height": 100,
+        "properties": {
+          "material": "crystal",
+          "friction": 0.8
+        }
+      },
+      {
+        "id": "safety_ground",
+        "type": "solid",
+        "x": -200,
+        "y": 950,
+        "width": 2000,
+        "height": 50,
+        "properties": {
+          "material": "stone",
+          "friction": 0.9
+        }
+      },
+      {
+        "id": "jump_test_platform_1",
+        "type": "solid",
+        "x": 200,
+        "y": 650,
+        "width": 150,
+        "height": 20,
+        "properties": {
+          "material": "grass",
+          "friction": 0.6
+        }
+      },
+      {
+        "id": "jump_test_platform_2",
+        "type": "solid",
+        "x": 450,
+        "y": 500,
+        "width": 120,
+        "height": 20,
+        "properties": {
+          "material": "ice",
+          "friction": 0.3
+        }
+      },
+      {
+        "id": "edge_detection_platform",
+        "type": "solid",
+        "x": 700,
+        "y": 600,
+        "width": 100,
+        "height": 20,
+        "properties": {
+          "material": "stone",
+          "friction": 0.7
+        }
+      },
+      {
+        "id": "one_way_platform",
+        "type": "solid",
+        "x": 950,
+        "y": 550,
+        "width": 120,
+        "height": 10,
+        "properties": {
+          "material": "grass",
+          "friction": 0.6,
+          "oneWay": true
+        }
+      },
+      {
+        "id": "collection_platform_1",
+        "type": "solid",
+        "x": 1200,
+        "y": 400,
+        "width": 100,
+        "height": 20,
+        "properties": {
+          "material": "crystal",
+          "friction": 0.8
+        }
+      },
+      {
+        "id": "final_platform",
+        "type": "solid",
+        "x": 1400,
+        "y": 300,
+        "width": 150,
+        "height": 20,
+        "properties": {
+          "material": "aether_crystal",
+          "friction": 1.0
+        }
+      }
+    ],
+    "boundaries": [
+      {
+        "id": "left_wall",
+        "type": "wall",
+        "vertices": [
+          {"x": -10, "y": 0},
+          {"x": -10, "y": 900},
+          {"x": 0, "y": 900},
+          {"x": 0, "y": 0}
+        ]
+      },
+      {
+        "id": "right_wall",
+        "type": "wall",
+        "vertices": [
+          {"x": 1600, "y": 0},
+          {"x": 1600, "y": 900},
+          {"x": 1610, "y": 900},
+          {"x": 1610, "y": 0}
+        ]
+      },
+      {
+        "id": "kill_zone",
+        "type": "killZone",
+        "vertices": [
+          {"x": -10, "y": 900},
+          {"x": 1610, "y": 900},
+          {"x": 1610, "y": 950},
+          {"x": -10, "y": 950}
+        ]
+      }
+    ],
+    "triggerZones": [
+      {
+        "id": "jump_test_zone",
+        "type": "test_zone",
+        "x": 200,
+        "y": 600,
+        "width": 400,
+        "height": 150,
+        "properties": {
+          "testType": "jump_mechanics",
+          "description": "Tests basic jumping and air control"
+        }
+      },
+      {
+        "id": "edge_detection_zone",
+        "type": "test_zone",
+        "x": 650,
+        "y": 550,
+        "width": 200,
+        "height": 100,
+        "properties": {
+          "testType": "edge_detection",
+          "description": "Tests edge detection system with narrow platform"
+        }
+      },
+      {
+        "id": "collection_zone",
+        "type": "test_zone",
+        "x": 1150,
+        "y": 300,
+        "width": 400,
+        "height": 200,
+        "properties": {
+          "testType": "aether_collection",
+          "description": "Tests AetherShard pickup mechanics"
+        }
+      }
+    ]
+  },  "spawnPoints": {
+    "player_start": {
+      "type": "player",
+      "x": 100,
+      "y": 720,
+      "properties": {
+        "facing": "right",
+        "spawnType": "default"
+      }
+    },
+    "checkpoint_1": {
+      "type": "checkpoint",
+      "x": 500,
+      "y": 450,
+      "properties": {
+        "checkpointId": "jump_section"
+      }
+    },
+    "checkpoint_2": {
+      "type": "checkpoint",
+      "x": 1000,
+      "y": 500,
+      "properties": {
+        "checkpointId": "collection_section"
+      }
+    }
+  },
+  "entitySpawnDefinitions": [
+    {
+      "id": "aether_shard_1",
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 275,
+      "y": 600,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    {
+      "id": "aether_shard_2",
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 525,
+      "y": 450,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    {
+      "id": "aether_shard_3",
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 775,
+      "y": 550,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    {
+      "id": "aether_shard_4",
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 1025,
+      "y": 500,
+      "properties": {
+        "value": 10,
+        "glowIntensity": 1.2,
+        "pulseRate": 0.8
+      }
+    },
+    {
+      "id": "aether_shard_5",
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 1250,
+      "y": 350,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    {
+      "id": "aether_shard_6",
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 1475,
+      "y": 250,
+      "properties": {
+        "value": 15,
+        "glowIntensity": 1.5,
+        "pulseRate": 0.6
+      }
+    }
+  ],
+  "entitySpawnGroups": [
+    {
+      "id": "tutorial_shards",
+      "entities": ["aether_shard_1", "aether_shard_2", "aether_shard_3"],
+      "spawnConditions": {
+        "trigger": "always"
+      }
+    },
+    {
+      "id": "advanced_shards",
+      "entities": ["aether_shard_4", "aether_shard_5", "aether_shard_6"],
+      "spawnConditions": {
+        "trigger": "always"
+      }
+    }
+  ],
+  "environment": {
+    "lighting": {
+      "ambientColor": 4290822336,
+      "ambientIntensity": 0.6,
+      "lightSources": [
+        {
+          "position": {"x": 800, "y": 400},
+          "color": 4294951936,
+          "intensity": 0.9,
+          "radius": 400,
+          "properties": {
+            "type": "crystal_light"
+          }
+        },
+        {
+          "position": {"x": 1475, "y": 250},
+          "color": 4294901760,
+          "intensity": 1.2,
+          "radius": 150,
+          "properties": {
+            "type": "aether_glow"
+          }
+        }
+      ]
+    },
+    "weather": {
+      "type": "clear",
+      "intensity": 0.0,
+      "properties": {}
+    },
+    "ambientEffects": [
+      {
+        "type": "aether_particles",
+        "properties": {
+          "count": 15,
+          "area": {"x": 0, "y": 0, "width": 1600, "height": 700},
+          "speed": "slow",
+          "color": "blue"
+        }
+      },
+      {
+        "type": "crystal_sparkles",
+        "properties": {
+          "count": 8,
+          "area": {"x": 1200, "y": 200, "width": 400, "height": 300},
+          "sparkleRate": 2.0
+        }
+      }
+    ],
+    "backgroundLayers": [
+      {
+        "imagePath": "images/backgrounds/luminara_test_far.png",
+        "scrollFactor": 0.1,
+        "zIndex": -3
+      },
+      {
+        "imagePath": "images/backgrounds/luminara_test_mid.png",
+        "scrollFactor": 0.3,
+        "zIndex": -2
+      },
+      {
+        "imagePath": "images/backgrounds/luminara_test_near.png",
+        "scrollFactor": 0.7,
+        "zIndex": -1
+      }
+    ]
+  },
+  "playerSpawn": {
+    "x": 100,
+    "y": 750
+  },
+  "levelGoals": {
+    "primary": {
+      "type": "collect_all_shards",
+      "description": "Collect all 6 AetherShards to complete the test level",
+      "targetCount": 6
+    },
+    "secondary": {
+      "type": "complete_under_time",
+      "description": "Complete the level in under 90 seconds",
+      "targetTime": 90.0
+    }
+  }
+}

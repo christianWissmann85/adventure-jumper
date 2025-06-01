@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
+import '../entities/aether_shard.dart';
 import '../entities/collectible.dart';
 import '../entities/enemy.dart';
 import '../entities/hazard.dart';
@@ -110,7 +111,6 @@ class Level extends Component {
       );
 
   // Lifecycle methods
-
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -123,6 +123,9 @@ class Level extends Component {
 
     // Validate level data
     await _validateLevelData();
+
+    // Spawn all entities defined in the level
+    await spawnAllEntities();
 
     _isLoaded = true;
   }
@@ -624,10 +627,68 @@ class Level extends Component {
 
   /// Spawn collectible from definition
   Future<void> _spawnCollectible(EntitySpawnDefinition definition) async {
-    // Collectible spawning will be implemented when Collectible class is enhanced
-    // For now, we'll create a placeholder
     print(
-      'Collectible spawn: ${definition.entitySubtype} at (${definition.x}, ${definition.y})',
+      'Level._spawnCollectible() - Spawning ${definition.entityType}/${definition.entitySubtype} at (${definition.x}, ${definition.y})',
+    );
+
+    try {
+      // Handle different collectible types
+      switch (definition.entityType.toLowerCase()) {
+        case 'aether_shard':
+          await _spawnAetherShard(definition);
+          break;
+        case 'collectible':
+          // Handle generic collectibles based on subtype
+          if (definition.entitySubtype?.toLowerCase() == 'aether_shard') {
+            await _spawnAetherShard(definition);
+          } else {
+            // Generic collectible spawning for other types
+            print(
+              'Generic collectible spawn: ${definition.entitySubtype} at (${definition.x}, ${definition.y})',
+            );
+          }
+          break;
+        default:
+          print(
+            'Unknown collectible type: ${definition.entityType}/${definition.entitySubtype}',
+          );
+      }
+    } catch (e) {
+      print('Error spawning collectible ${definition.id}: $e');
+    }
+  }
+
+  /// Spawn AetherShard from definition
+  Future<void> _spawnAetherShard(EntitySpawnDefinition definition) async {
+    final Vector2 position = Vector2(definition.x, definition.y);
+
+    // Get AetherShard value from properties
+    final int aetherValue = definition.properties['value'] as int? ?? 5;
+
+    // Get size from properties or use default
+    final double size = definition.properties['size'] as double? ?? 16.0;
+
+    print(
+      'Level._spawnAetherShard() - Creating AetherShard with value $aetherValue at $position',
+    );
+
+    // Create the AetherShard
+    final AetherShard aetherShard = AetherShard(
+      position: position,
+      aetherValue: aetherValue,
+      size: Vector2.all(size),
+      id: definition.id,
+    );
+
+    // Add to level and collectibles list
+    add(aetherShard);
+    collectibles.add(aetherShard);
+
+    // Wait for it to load
+    await aetherShard.loaded;
+
+    print(
+      'Level._spawnAetherShard() - AetherShard ${definition.id} spawned successfully',
     );
   }
 
@@ -716,10 +777,28 @@ class Level extends Component {
   Future<void> loadSpawnDefinitionsFromData(
     Map<String, dynamic> levelData,
   ) async {
-    // Load entity spawn definitions (new format)
+    // Load entity spawn definitions (supports both array and map formats)
     if (levelData.containsKey('entitySpawnDefinitions')) {
-      final Map<String, dynamic> spawnDefs =
-          levelData['entitySpawnDefinitions'] as Map<String, dynamic>;
+      final dynamic spawnData = levelData['entitySpawnDefinitions'];
+      Map<String, dynamic> spawnDefs;
+
+      // Handle both array format and map format
+      if (spawnData is List<dynamic>) {
+        // Convert array format to map format
+        spawnDefs = <String, dynamic>{};
+        for (final dynamic item in spawnData) {
+          if (item is Map<String, dynamic> && item.containsKey('id')) {
+            final String id = item['id'] as String;
+            spawnDefs[id] = item;
+          }
+        }
+      } else if (spawnData is Map<String, dynamic>) {
+        // Already in map format
+        spawnDefs = spawnData;
+      } else {
+        // Invalid format, skip
+        return;
+      }
 
       for (final MapEntry<String, dynamic> entry in spawnDefs.entries) {
         final String id = entry.key;

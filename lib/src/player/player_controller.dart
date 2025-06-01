@@ -3,7 +3,6 @@
 import 'dart:developer' as developer;
 
 import 'package:flame/components.dart';
-import 'package:flutter/services.dart';
 
 import '../events/player_events.dart';
 import '../game/game_config.dart';
@@ -21,7 +20,7 @@ enum JumpState {
 /// Handles input processing, movement commands, and action triggers
 ///
 /// Will be properly integrated with the game in Sprint 2
-class PlayerController extends Component with KeyboardHandler {
+class PlayerController extends Component {
   PlayerController(this.player);
   final Player player;
   bool _moveLeft = false;
@@ -47,18 +46,50 @@ class PlayerController extends Component with KeyboardHandler {
   // T2.6.3: Edge detection state tracking
   bool _wasNearLeftEdge = false;
   bool _wasNearRightEdge = false;
-
   // Legacy variables for compatibility (will be removed)
   bool _isJumping = false;
   bool _canJump = true;
 
+  // Respawn system variables
+  final double _fallThreshold =
+      1200.0; // Y position threshold for falling off the world
+  Vector2? _lastSafePosition; // Last known safe position for respawn
+  double _safePositionUpdateTimer = 0.0; // Timer to update safe position
+  static const double _safePositionUpdateInterval =
+      0.5; // Update safe position every 0.5 seconds  @override
   @override
   Future<void> onLoad() async {
-    // Implementation needed: Initialize input handling
+    try {
+      developer.log(
+        'PlayerController.onLoad() called',
+        name: 'PlayerController.onLoad',
+      );
+      // Initialize respawn system
+      _lastSafePosition = player.position.clone();
+      // Implementation needed: Initialize input handling
+      developer.log(
+        'PlayerController.onLoad() completed',
+        name: 'PlayerController.onLoad',
+      );
+    } catch (e, stackTrace) {
+      developer.log(
+        'ERROR in PlayerController.onLoad(): $e',
+        name: 'PlayerController.onLoad',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      rethrow;
+    }
   }
+
   @override
   void update(double dt) {
     super.update(dt);
+
+    developer.log(
+      'PlayerController.update() called - dt: $dt',
+      name: 'PlayerController.update',
+    );
 
     // Track delta time for deceleration calculations
     _lastDeltaTime = dt;
@@ -67,6 +98,9 @@ class PlayerController extends Component with KeyboardHandler {
     _updateJumpStateMachine(dt); // T2.3.4: Update timers
     _updateTimers(dt);
 
+    // Update respawn system
+    _updateRespawnSystem(dt);
+
     // T2.13.4: Update movement smoothing
     _updateMovementSmoothing(dt);
 
@@ -74,13 +108,19 @@ class PlayerController extends Component with KeyboardHandler {
     _updateEdgeDetection();
 
     // Reset input tracking for this frame
-    _hasInputThisFrame = false;
-
-    // Process movement inputs
+    _hasInputThisFrame = false; // Process movement inputs
     if (_moveLeft) {
+      developer.log(
+        'Processing _moveLeft input in update()',
+        name: 'PlayerController.update',
+      );
       _movePlayerLeft(dt);
       _hasInputThisFrame = true;
     } else if (_moveRight) {
+      developer.log(
+        'Processing _moveRight input in update()',
+        name: 'PlayerController.update',
+      );
       _movePlayerRight(dt);
       _hasInputThisFrame = true;
     } else {
@@ -97,12 +137,25 @@ class PlayerController extends Component with KeyboardHandler {
 
   /// Handle input action changes from InputComponent
   void handleInputAction(String actionName, bool actionValue) {
+    developer.log(
+      'handleInputAction called: $actionName = $actionValue',
+      name: 'PlayerController.handleInputAction',
+    );
+
     switch (actionName) {
       case 'move_left':
         _moveLeft = actionValue;
+        developer.log(
+          'Set _moveLeft = $actionValue',
+          name: 'PlayerController.handleInputAction',
+        );
         break;
       case 'move_right':
         _moveRight = actionValue;
+        developer.log(
+          'Set _moveRight = $actionValue',
+          name: 'PlayerController.handleInputAction',
+        );
         break;
       case 'jump':
         // T2.3.4: Track jump button state for variable height
@@ -115,6 +168,10 @@ class PlayerController extends Component with KeyboardHandler {
         if (actionValue && !_jump) {
           _jump = true;
         }
+        developer.log(
+          'Set jump input: _jumpInputHeld = $_jumpInputHeld, _jump = $_jump',
+          name: 'PlayerController.handleInputAction',
+        );
         break;
       default:
         // Handle other actions in future sprints
@@ -160,7 +217,23 @@ class PlayerController extends Component with KeyboardHandler {
 
   /// Handle movement to the right - T2.13.2: Enhanced with acceleration & T2.13.3: Air control
   void _movePlayerRight(double dt) {
-    if (player.physics == null) return;
+    developer.log(
+      '_movePlayerRight called with dt: $dt',
+      name: 'PlayerController._movePlayerRight',
+    );
+
+    if (player.physics == null) {
+      developer.log(
+        'CRITICAL: player.physics is NULL! Cannot move player.',
+        name: 'PlayerController._movePlayerRight',
+      );
+      return;
+    }
+
+    developer.log(
+      'player.physics is available, proceeding with movement',
+      name: 'PlayerController._movePlayerRight',
+    );
 
     // Determine if we're in air and get appropriate parameters
     final bool isInAir = !player.physics!.isOnGround;
@@ -272,12 +345,12 @@ class PlayerController extends Component with KeyboardHandler {
     // Update jump cooldown timer
     if (_jumpCooldownTimer > 0) {
       _jumpCooldownTimer -= dt;
-    }
-
-    // Update coyote timer
-    if (_coyoteTimer > 0 && !player.physics!.isOnGround) {
+    } // Update coyote timer
+    if (_coyoteTimer > 0 &&
+        player.physics != null &&
+        !player.physics!.isOnGround) {
       _coyoteTimer -= dt;
-    } else if (player.physics!.isOnGround) {
+    } else if (player.physics != null && player.physics!.isOnGround) {
       _coyoteTimer = GameConfig.jumpCoyoteTime;
     }
 
@@ -486,14 +559,6 @@ class PlayerController extends Component with KeyboardHandler {
     }
   }
 
-  // Input handling methods
-  @override
-  bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    // Direct keyboard handling - this is supplementary to InputComponent
-    // InputComponent handles the primary input processing
-    return false;
-  }
-
   /// Reset input state
   void resetInputState() {
     _moveLeft = false;
@@ -613,5 +678,51 @@ class PlayerController extends Component with KeyboardHandler {
       playerPosition: player.position.clone(),
     );
     PlayerEventBus.instance.fireEvent(event);
+  }
+
+  /// Update respawn system - check for falls and update safe position
+  void _updateRespawnSystem(double dt) {
+    if (player.physics == null) return;
+
+    // Update safe position timer
+    _safePositionUpdateTimer += dt;
+
+    // Check if player has fallen off the world
+    if (player.position.y > _fallThreshold) {
+      _respawnPlayer();
+      return;
+    }
+
+    // Update safe position if player is on ground and enough time has passed
+    if (player.physics!.isOnGround &&
+        _safePositionUpdateTimer >= _safePositionUpdateInterval) {
+      _lastSafePosition = player.position.clone();
+      _safePositionUpdateTimer = 0.0;
+    }
+  }
+
+  /// Respawn the player to the last safe position
+  void _respawnPlayer() {
+    _lastSafePosition ??= Vector2(100, 300); // Reset player position
+    player.position = _lastSafePosition!.clone();
+
+    // Reset physics velocity and state
+    if (player.physics != null) {
+      player.physics!.setVelocity(Vector2.zero());
+      // Set player on ground at respawn position for consistent state
+      player.physics!.setOnGround(true);
+    }
+
+    // CRITICAL FIX: Reset all input state to prevent stuck movement after respawn
+    resetInputState();
+
+    // Fire respawn event
+    _fireRespawnEvent();
+  }
+
+  /// Fire respawn event for other systems to react
+  void _fireRespawnEvent() {
+    // This can be expanded to fire a custom respawn event if needed
+    developer.log('Player respawned to position: $_lastSafePosition');
   }
 }

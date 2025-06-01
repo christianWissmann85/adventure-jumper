@@ -399,5 +399,716 @@ void main() {
         rethrow;
       }
     });
+
+    testWidgets('should parse AetherShard spawn definitions from level JSON',
+        (WidgetTester tester) async {
+      // Test JSON with AetherShard spawn definitions
+      const String aetherShardTestJson = '''
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "AetherShard Test Level",
+    "author": "Adventure Jumper Team"
+  },
+  "properties": {
+    "id": "aether_shard_test",
+    "name": "AetherShard Test Level",
+    "width": 1200,
+    "height": 800,
+    "gravity": 1200
+  },
+  "bounds": {
+    "left": 0,
+    "right": 1200,
+    "top": 0,
+    "bottom": 800
+  },
+  "cameraBounds": {
+    "left": -50,
+    "right": 1250,
+    "top": -50,
+    "bottom": 850
+  },
+  "geometry": {
+    "platforms": [
+      {
+        "id": "main_platform",
+        "type": "solid",
+        "x": 0,
+        "y": 700,
+        "width": 1200,
+        "height": 100,
+        "properties": {}
+      }
+    ],
+    "walls": [],
+    "triggerZones": []
+  },
+  "spawnPoints": {
+    "player_start": {
+      "entityType": "player",
+      "x": 100,
+      "y": 650,
+      "properties": {}
+    }
+  },
+  "entitySpawnDefinitions": {
+    "standard_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 300,
+      "y": 600,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8
+      }
+    },
+    "enhanced_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 600,
+      "y": 500,
+      "properties": {
+        "value": 10,
+        "glowIntensity": 1.2
+      }
+    },
+    "rare_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "rare",
+      "x": 900,
+      "y": 400,
+      "properties": {
+        "value": 15,
+        "glowIntensity": 1.5
+      }
+    }
+  }
+}
+      ''';
+
+      try {
+        fakeAssetBundle.addAsset(
+          'assets/levels/aether_shard_test.json',
+          aetherShardTestJson,
+        );
+
+        final Level level = await levelLoader.loadLevel('aether_shard_test');
+
+        // Verify AetherShard spawn definitions were parsed
+        final aetherShardDefs = level.entitySpawnDefinitions.values
+            .where((def) => def.entityType == 'aether_shard')
+            .toList();
+
+        expect(
+          aetherShardDefs.length,
+          equals(3),
+          reason: 'Should have 3 AetherShard spawn definitions',
+        );
+
+        // Verify specific shard definitions
+        final standardShard = level.entitySpawnDefinitions['standard_shard_1'];
+        expect(standardShard, isNotNull);
+        expect(standardShard!.entityType, equals('aether_shard'));
+        expect(standardShard.entitySubtype, equals('standard'));
+        expect(standardShard.x, equals(300));
+        expect(standardShard.y, equals(600));
+        expect(standardShard.properties['value'], equals(5));
+
+        final enhancedShard = level.entitySpawnDefinitions['enhanced_shard_1'];
+        expect(enhancedShard, isNotNull);
+        expect(enhancedShard!.entityType, equals('aether_shard'));
+        expect(enhancedShard.entitySubtype, equals('enhanced'));
+        expect(enhancedShard.properties['value'], equals(10));
+
+        final rareShard = level.entitySpawnDefinitions['rare_shard_1'];
+        expect(rareShard, isNotNull);
+        expect(rareShard!.entityType, equals('aether_shard'));
+        expect(rareShard.entitySubtype, equals('rare'));
+        expect(rareShard.properties['value'], equals(15));
+      } catch (e) {
+        rethrow;
+      }
+    });
+
+    testWidgets(
+        'should validate sprint2_test_level AetherShard definitions (T2.18.1)',
+        (WidgetTester tester) async {
+      // Test with actual sprint2_test_level.json format
+      const String sprint2TestJson = '''
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "Sprint 2 Test Level",
+    "author": "Adventure Jumper Team"
+  },
+  "properties": {
+    "id": "sprint2_test_validation",
+    "name": "Sprint 2 Test Level",
+    "width": 1600,
+    "height": 900,
+    "gravity": 1200
+  },
+  "bounds": {
+    "left": 0,
+    "right": 1600,
+    "top": 0,
+    "bottom": 900
+  },
+  "cameraBounds": {
+    "left": -50,
+    "right": 1650,
+    "top": -50,
+    "bottom": 950
+  },
+  "geometry": {
+    "platforms": [
+      {
+        "id": "main_ground",
+        "type": "solid",
+        "x": 0,
+        "y": 800,
+        "width": 1600,
+        "height": 100,
+        "properties": {}
+      }
+    ],
+    "walls": [],
+    "triggerZones": []
+  },
+  "spawnPoints": {
+    "player_start": {
+      "entityType": "player",
+      "x": 100,
+      "y": 750,
+      "properties": {}
+    }
+  },
+  "entitySpawnDefinitions": {
+    "aether_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 200,
+      "y": 600,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_2": {
+      "entityType": "aether_shard", 
+      "entitySubtype": "standard",
+      "x": 525,
+      "y": 450,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_3": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard", 
+      "x": 775,
+      "y": 550,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_4": {
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 1025,
+      "y": 500,
+      "properties": {
+        "value": 10,
+        "glowIntensity": 1.2,
+        "pulseRate": 0.8
+      }
+    },
+    "aether_shard_5": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 1250,
+      "y": 350,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_6": {
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 1475,
+      "y": 250,
+      "properties": {
+        "value": 15,
+        "glowIntensity": 1.5,
+        "pulseRate": 0.6
+      }
+    }
+  }
+}
+      ''';
+
+      try {
+        fakeAssetBundle.addAsset(
+          'assets/levels/sprint2_test_validation.json',
+          sprint2TestJson,
+        );
+
+        final Level level =
+            await levelLoader.loadLevel('sprint2_test_validation');
+
+        // Verify all 6 AetherShard definitions from sprint2_test_level
+        final aetherShardDefs = level.entitySpawnDefinitions.values
+            .where((def) => def.entityType == 'aether_shard')
+            .toList();
+
+        expect(
+          aetherShardDefs.length,
+          equals(6),
+          reason: 'Sprint 2 test level should have 6 AetherShard definitions',
+        );
+
+        // Verify specific shards with expected values
+        final shard1 = level.entitySpawnDefinitions['aether_shard_1'];
+        expect(shard1, isNotNull);
+        expect(shard1!.properties['value'], equals(5));
+        expect(shard1.x, equals(200));
+        expect(shard1.y, equals(600));
+
+        final shard4 = level.entitySpawnDefinitions['aether_shard_4'];
+        expect(shard4, isNotNull);
+        expect(shard4!.properties['value'], equals(10));
+        expect(shard4.entitySubtype, equals('enhanced'));
+
+        final shard6 = level.entitySpawnDefinitions['aether_shard_6'];
+        expect(shard6, isNotNull);
+        expect(shard6!.properties['value'], equals(15));
+        expect(shard6.x, equals(1475));
+        expect(shard6.y, equals(250));
+
+        // Verify value distribution matches sprint2_test_level.json
+        final standardShards =
+            aetherShardDefs.where((def) => def.properties['value'] == 5).length;
+        final enhancedShards = aetherShardDefs
+            .where((def) => def.properties['value'] == 10)
+            .length;
+        final rareShards = aetherShardDefs
+            .where((def) => def.properties['value'] == 15)
+            .length;
+
+        expect(standardShards, equals(4)); // shards 1, 2, 3, 5
+        expect(enhancedShards, equals(1)); // shard 4
+        expect(rareShards, equals(1)); // shard 6
+
+        // Verify total aether value in level
+        final totalAetherValue = aetherShardDefs
+            .map((def) => def.properties['value'] as int)
+            .reduce((a, b) => a + b);
+        expect(totalAetherValue, equals(45)); // 5+5+5+10+5+15 = 45
+      } catch (e) {
+        rethrow;
+      }
+    });
+  });
+  group('AetherShard Spawning Integration Tests (T2.18.1)', () {
+    late LevelLoader levelLoader;
+    late FakeAssetBundle fakeAssetBundle;
+
+    setUp(() {
+      fakeAssetBundle = FakeAssetBundle();
+      levelLoader = LevelLoader(assetBundle: fakeAssetBundle);
+      levelLoader.enableCaching = false; // Disable caching for tests
+    });
+
+    testWidgets('should parse and spawn AetherShards from entity definitions',
+        (WidgetTester tester) async {
+      // Test JSON with AetherShard spawn definitions
+      const String aetherShardTestJson = '''
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "AetherShard Test Level",
+    "author": "Adventure Jumper Team"
+  },
+  "properties": {
+    "id": "aether_shard_test",
+    "name": "AetherShard Test Level",
+    "width": 1200,
+    "height": 800,
+    "gravity": 1200
+  },
+  "bounds": {
+    "left": 0,
+    "right": 1200,
+    "top": 0,
+    "bottom": 800
+  },
+  "cameraBounds": {
+    "left": -50,
+    "right": 1250,
+    "top": -50,
+    "bottom": 850
+  },
+  "geometry": {
+    "platforms": [
+      {
+        "id": "main_platform",
+        "type": "solid",
+        "x": 0,
+        "y": 700,
+        "width": 1200,
+        "height": 100,
+        "properties": {}
+      }
+    ],
+    "walls": [],
+    "triggerZones": []
+  },
+  "spawnPoints": {
+    "player_start": {
+      "entityType": "player",
+      "x": 100,
+      "y": 650,
+      "properties": {}
+    }
+  },
+  "entitySpawnDefinitions": {
+    "standard_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 300,
+      "y": 600,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8
+      }
+    },
+    "enhanced_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 600,
+      "y": 500,
+      "properties": {
+        "value": 10,
+        "glowIntensity": 1.2
+      }
+    },
+    "rare_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "rare",
+      "x": 900,
+      "y": 400,
+      "properties": {
+        "value": 15,
+        "glowIntensity": 1.5
+      }
+    }
+  }
+}
+      ''';
+
+      try {
+        fakeAssetBundle.addAsset(
+          'assets/levels/aether_shard_test.json',
+          aetherShardTestJson,
+        );
+
+        final Level level = await levelLoader.loadLevel('aether_shard_test');
+
+        // Verify AetherShard spawn definitions were parsed
+        final aetherShardDefs = level.entitySpawnDefinitions.values
+            .where((def) => def.entityType == 'aether_shard')
+            .toList();
+
+        expect(
+          aetherShardDefs.length,
+          equals(3),
+          reason: 'Should have 3 AetherShard spawn definitions',
+        );
+
+        // Verify specific shard definitions
+        final standardShard = level.entitySpawnDefinitions['standard_shard_1'];
+        expect(standardShard, isNotNull);
+        expect(standardShard!.entityType, equals('aether_shard'));
+        expect(standardShard.entitySubtype, equals('standard'));
+        expect(standardShard.x, equals(300));
+        expect(standardShard.y, equals(600));
+        expect(standardShard.properties['value'], equals(5));
+
+        final enhancedShard = level.entitySpawnDefinitions['enhanced_shard_1'];
+        expect(enhancedShard, isNotNull);
+        expect(enhancedShard!.entityType, equals('aether_shard'));
+        expect(enhancedShard.entitySubtype, equals('enhanced'));
+        expect(enhancedShard.properties['value'], equals(10));
+
+        final rareShard = level.entitySpawnDefinitions['rare_shard_1'];
+        expect(rareShard, isNotNull);
+        expect(rareShard!.entityType, equals('aether_shard'));
+        expect(rareShard.entitySubtype, equals('rare'));
+        expect(rareShard.properties['value'], equals(15));
+      } catch (e) {
+        rethrow;
+      }
+    });
+
+    testWidgets(
+        'should handle AetherShard spawning with missing properties gracefully',
+        (WidgetTester tester) async {
+      const String minimalShardJson = '''
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "Minimal AetherShard Test",
+    "author": "Test"
+  },
+  "properties": {
+    "id": "minimal_shard_test",
+    "name": "Minimal Shard Test",
+    "width": 800,
+    "height": 600,
+    "gravity": 1200
+  },
+  "bounds": {
+    "left": 0,
+    "right": 800,
+    "top": 0,
+    "bottom": 600
+  },
+  "cameraBounds": {
+    "left": 0,
+    "right": 800,
+    "top": 0,
+    "bottom": 600
+  },
+  "geometry": {
+    "platforms": [],
+    "walls": [],
+    "triggerZones": []
+  },
+  "spawnPoints": {
+    "player_start": {
+      "entityType": "player",
+      "x": 100,
+      "y": 500,
+      "properties": {}
+    }
+  },
+  "entitySpawnDefinitions": {
+    "minimal_shard": {
+      "entityType": "aether_shard",
+      "x": 400,
+      "y": 300,
+      "properties": {}
+    }
+  }
+}
+      ''';
+
+      try {
+        fakeAssetBundle.addAsset(
+          'assets/levels/minimal_shard_test.json',
+          minimalShardJson,
+        );
+
+        // Should not throw even with minimal properties
+        final Level level = await levelLoader.loadLevel('minimal_shard_test');
+
+        final shardDef = level.entitySpawnDefinitions['minimal_shard'];
+        expect(shardDef, isNotNull);
+        expect(shardDef!.entityType, equals('aether_shard'));
+        expect(shardDef.x, equals(400));
+        expect(shardDef.y, equals(300));
+
+        // Should handle missing subtype and properties gracefully
+        expect(shardDef.entitySubtype, anyOf(isNull, isEmpty));
+        expect(shardDef.properties, isNotNull);
+      } catch (e) {
+        rethrow;
+      }
+    });
+
+    testWidgets('should parse AetherShards from sprint2_test_level format',
+        (WidgetTester tester) async {
+      // Test with actual sprint2_test_level.json format
+      const String sprint2TestJson = '''
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "Sprint 2 Test Level",
+    "author": "Adventure Jumper Team"
+  },
+  "properties": {
+    "id": "sprint2_test",
+    "name": "Sprint 2 Test Level",
+    "width": 1600,
+    "height": 900,
+    "gravity": 1200
+  },
+  "bounds": {
+    "left": 0,
+    "right": 1600,
+    "top": 0,
+    "bottom": 900
+  },
+  "cameraBounds": {
+    "left": -50,
+    "right": 1650,
+    "top": -50,
+    "bottom": 950
+  },
+  "geometry": {
+    "platforms": [
+      {
+        "id": "main_ground",
+        "type": "solid",
+        "x": 0,
+        "y": 800,
+        "width": 1600,
+        "height": 100,
+        "properties": {}
+      }
+    ],
+    "walls": [],
+    "triggerZones": []
+  },
+  "spawnPoints": {
+    "player_start": {
+      "entityType": "player",
+      "x": 100,
+      "y": 750,
+      "properties": {}
+    }
+  },
+  "entitySpawnDefinitions": {
+    "aether_shard_1": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 200,
+      "y": 600,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_2": {
+      "entityType": "aether_shard", 
+      "entitySubtype": "standard",
+      "x": 525,
+      "y": 450,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_3": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard", 
+      "x": 775,
+      "y": 550,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_4": {
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 1025,
+      "y": 500,
+      "properties": {
+        "value": 10,
+        "glowIntensity": 1.2,
+        "pulseRate": 0.8
+      }
+    },
+    "aether_shard_5": {
+      "entityType": "aether_shard",
+      "entitySubtype": "standard",
+      "x": 1250,
+      "y": 350,
+      "properties": {
+        "value": 5,
+        "glowIntensity": 0.8,
+        "pulseRate": 1.2
+      }
+    },
+    "aether_shard_6": {
+      "entityType": "aether_shard",
+      "entitySubtype": "enhanced",
+      "x": 1475,
+      "y": 250,
+      "properties": {
+        "value": 15,
+        "glowIntensity": 1.5,
+        "pulseRate": 0.6
+      }
+    }
+  }
+}
+      ''';
+
+      try {
+        fakeAssetBundle.addAsset(
+          'assets/levels/sprint2_test.json',
+          sprint2TestJson,
+        );
+
+        final Level level = await levelLoader.loadLevel('sprint2_test');
+
+        // Verify all 6 AetherShard definitions from sprint2_test_level
+        final aetherShardDefs = level.entitySpawnDefinitions.values
+            .where((def) => def.entityType == 'aether_shard')
+            .toList();
+
+        expect(
+          aetherShardDefs.length,
+          equals(6),
+          reason: 'Sprint 2 test level should have 6 AetherShard definitions',
+        );
+
+        // Verify specific shards with expected values
+        final shard1 = level.entitySpawnDefinitions['aether_shard_1'];
+        expect(shard1, isNotNull);
+        expect(shard1!.properties['value'], equals(5));
+        expect(shard1.x, equals(200));
+        expect(shard1.y, equals(600));
+
+        final shard4 = level.entitySpawnDefinitions['aether_shard_4'];
+        expect(shard4, isNotNull);
+        expect(shard4!.properties['value'], equals(10));
+        expect(shard4.entitySubtype, equals('enhanced'));
+
+        final shard6 = level.entitySpawnDefinitions['aether_shard_6'];
+        expect(shard6, isNotNull);
+        expect(shard6!.properties['value'], equals(15));
+        expect(shard6.x, equals(1475));
+        expect(shard6.y, equals(250));
+
+        // Verify value distribution
+        final standardShards =
+            aetherShardDefs.where((def) => def.properties['value'] == 5).length;
+        final enhancedShards = aetherShardDefs
+            .where((def) => def.properties['value'] == 10)
+            .length;
+        final rareShards = aetherShardDefs
+            .where((def) => def.properties['value'] == 15)
+            .length;
+        expect(standardShards, equals(4)); // shards 1, 2, 3, 5
+        expect(enhancedShards, equals(1)); // shard 4
+        expect(rareShards, equals(1)); // shard 6
+      } catch (e) {
+        rethrow;
+      }
+    });
   });
 }

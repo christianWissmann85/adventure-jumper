@@ -34,9 +34,22 @@ abstract class BaseFlameSystem extends Component implements System {
   /// Register an entity with this system if it has the required components
   @override
   void addEntity(Entity entity) {
+    print('PHASE 1 DEBUG: BaseFlameSystem.addEntity() called');
+    print('  Entity type: ${entity.type}');
+    print('  Entity ID: ${entity.id}');
+    print('  Current entities count: ${_entities.length}');
+    print('  canProcessEntity(): ${canProcessEntity(entity)}');
+    print('  Entity already in list: ${_entities.contains(entity)}');
+
     if (canProcessEntity(entity) && !_entities.contains(entity)) {
       _entities.add(entity);
+      print('  Entity successfully added. New count: ${_entities.length}');
       onEntityAdded(entity);
+      print('  onEntityAdded() callback completed');
+    } else {
+      print(
+        '  Entity NOT added - canProcess: ${canProcessEntity(entity)}, alreadyExists: ${_entities.contains(entity)}',
+      );
     }
   }
 

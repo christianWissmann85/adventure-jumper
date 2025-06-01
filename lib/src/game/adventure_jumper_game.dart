@@ -8,7 +8,6 @@ import 'package:flutter/material.dart' show Color, KeyEventResult;
 import 'package:flutter/services.dart' show KeyEvent, LogicalKeyboardKey;
 import 'package:logging/logging.dart';
 
-import '../components/debug_rectangle_component.dart';
 import '../debug/debug_config.dart';
 import '../debug/visual_debug_overlay.dart';
 import '../systems/input_system.dart';
@@ -77,7 +76,7 @@ class AdventureJumperGame extends FlameGame
       '🎮 [DEBUG] AdventureJumperGame.onLoad() - GameWorld loaded successfully',
     );
 
-    // Add a test debug rectangle directly to the game to verify basic rendering
+    /*// Add a test debug rectangle directly to the game to verify basic rendering
     final DebugRectangleComponent gameTestRect = DebugRectangleComponent(
       size: Vector2(80, 80),
       position: Vector2(200, 200), // Top-left area, should be clearly visible
@@ -88,7 +87,7 @@ class AdventureJumperGame extends FlameGame
     add(gameTestRect);
     _logger.info(
       'Added test debug rectangle to game - position: ${gameTestRect.position}, size: ${gameTestRect.size}',
-    );
+    );*/
 
     // Initialize the game HUD
     final screenSize = Vector2(size.x, size.y);
@@ -118,18 +117,35 @@ class AdventureJumperGame extends FlameGame
 
       // Register player with physics system
       physicsSystem.addEntity(gameWorld.player!);
-      _logger.fine('Player registered with physics system');
-
-      // Set camera to follow player
+      _logger.fine(
+        'Player registered with physics system',
+      ); // Set camera to follow player
       gameCamera.follow(gameWorld.player!);
       gameCamera.setFollowSpeed(8.0); // Responsive camera following
-      // Set camera bounds - create a reasonable world boundary
-      gameCamera.setBounds(math.Rectangle<int>(-100, -100, 1200, 800));
-      _logger.fine('Camera configured to follow player');
-    }
+      // Set camera bounds to include the game world coordinates (Y=650-1000 for platforms and player)
+      gameCamera.setBounds(math.Rectangle<int>(-200, 600, 1600, 500));
 
-    // Register all platforms with physics system
-    gameWorld.registerPlatformsWithPhysics(physicsSystem);
+      // Set initial camera position to player location for immediate visibility
+      camera.viewfinder.position = gameWorld.player!.position.clone();
+
+      _logger.fine(
+        'Camera configured to follow player with bounds: left=-200, top=600, width=1600, height=500 (bottom=1100)',
+      );
+    } // Register all platforms with physics system
+    _logger.info(
+      'PHASE 1 DEBUG: Starting platform registration with PhysicsSystem',
+    );
+    _logger.info(
+      '  PhysicsSystem entity count before registration: ${physicsSystem.entityCount}',
+    );
+    _logger.info('  GameWorld platforms count: ${gameWorld.platforms.length}');
+
+    await gameWorld.registerPlatformsWithPhysics(physicsSystem);
+
+    _logger.info('PHASE 1 DEBUG: Platform registration completed');
+    _logger.info(
+      '  PhysicsSystem entity count after registration: ${physicsSystem.entityCount}',
+    );
     _logger.fine('Platforms registered with physics system');
 
     // TODO(game): Load initial assets

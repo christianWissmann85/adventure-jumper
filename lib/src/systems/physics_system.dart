@@ -105,10 +105,12 @@ class PhysicsSystem extends BaseFlameSystem {
   final List<double> _frameTimes = [];
   double _averageFrameTime = 0;
   final int _maxFrameTimeSamples = 60;
-
   // Collision processing
   final List<CollisionData> _collisions = <CollisionData>[];
   final Map<String, List<Entity>> _spatialHash = {};
+
+  // PHASE 1 DEBUG: Entity count logging
+  int _logCounter = 0;
 
   @override
   void update(double dt) {
@@ -126,6 +128,21 @@ class PhysicsSystem extends BaseFlameSystem {
 
   @override
   void processSystem(double dt) {
+    // PHASE 1 DEBUG: Periodic entity count logging
+    _logCounter++;
+    if (_logCounter % 120 == 0) {
+      // Log every 2 seconds at 60fps
+      logger.info(
+        'PHASE 1 DEBUG: PhysicsSystem.processSystem() entity count: ${entities.length}',
+      );
+      for (int i = 0; i < entities.length; i++) {
+        final Entity entity = entities[i];
+        logger.info(
+          '  Entity $i: type=${entity.type}, id=${entity.id}, active=${entity.isActive}',
+        );
+      }
+    }
+
     // Apply scaled time
     final double scaledDt = dt * _timeScale;
 
@@ -170,14 +187,38 @@ class PhysicsSystem extends BaseFlameSystem {
 
   @override
   void onEntityAdded(Entity entity) {
+    // PHASE 1 DEBUG: Log entity registration details
+    logger.info('DEBUG: PhysicsSystem.onEntityAdded() - Adding entity');
+    logger.info('  Entity type: ${entity.type}');
+    logger.info('  Entity ID: ${entity.id}');
+    logger.info('  Has physics component: ${entity.physics != null}');
+    logger.info('  Current entities count before add: ${entities.length}');
+
     // Additional setup for entity when added to system
     if (entity.physics != null) {
+      logger.info('  Physics component details:');
+      logger.info('    Is static: ${entity.physics!.isStatic}');
+      logger.info('    Velocity: ${entity.physics!.velocity}');
+      logger.info('    Mass: ${entity.physics!.mass}');
       // Initialize physics properties if needed
     }
+
+    logger.info('  Collision component details:');
+    logger.info('    Is active: ${entity.collision.isActive}');
+    logger.info('    Hitbox size: ${entity.collision.hitboxSize}');
+
+    logger.info('  Entity position: ${entity.position}');
+    logger.info('  Entity size: ${entity.size}');
+    logger.info('  Current entities count after add: ${entities.length}');
   }
 
   @override
   void onEntityRemoved(Entity entity) {
+    // PHASE 1 DEBUG: Log entity removal
+    logger.info('DEBUG: PhysicsSystem.onEntityRemoved() - Removing entity');
+    logger.info('  Entity type: ${entity.type}');
+    logger.info('  Entity ID: ${entity.id}');
+    logger.info('  Current entities count after removal: ${entities.length}');
     // Clean up any resources when entity is removed
   }
 
@@ -235,14 +276,29 @@ class PhysicsSystem extends BaseFlameSystem {
   void integrateVelocity(PhysicsComponent physics, double dt) {
     // Apply acceleration to velocity with delta time integration
     physics.velocity.x += physics.acceleration.x * dt;
-    physics.velocity.y += physics.acceleration.y * dt;
-
-    // Apply velocity to position with delta time integration
+    physics.velocity.y += physics.acceleration.y *
+        dt; // Apply velocity to position with delta time integration
     // The entity that owns this physics component
     if (physics.parent is Entity) {
       final Entity entity = physics.parent as Entity;
+
+      // DEBUG: Log position changes
+      final Vector2 oldPosition = entity.position.clone();
+
       entity.position.x += physics.velocity.x * dt;
       entity.position.y += physics.velocity.y * dt;
+
+      // CRITICAL FIX: Also update the TransformComponent to prevent it from overriding the position
+      entity.transformComponent.setPosition(entity.position);
+
+      // DEBUG: Only log if position actually changed significantly
+      if ((entity.position - oldPosition).length > 0.1) {
+        print(
+          '[PhysicsSystem] integrateVelocity: ${entity.type} position changed from $oldPosition to ${entity.position} (velocity: ${physics.velocity}, dt: $dt)',
+        );
+        print(
+            '[PhysicsSystem] TransformComponent position updated to: ${entity.transformComponent.position}');
+      }
     }
 
     // Reset acceleration after integration
@@ -578,35 +634,59 @@ class PhysicsSystem extends BaseFlameSystem {
         .separationVector; // entityA is movable, so separation is from B to A
     final Vector2 normal = collision.normal;
 
+    print('[PhysicsSystem] resolveCollisionWithSeparation DEBUG:');
+    print(
+      '  Movable entity (${movableEntity.type}): pos=${movableEntity.position}',
+    );
+    print(
+      '  Static entity (${staticEntity.type}): pos=${staticEntity.position}',
+    );
+    print('  Separation vector: $separation');
+    print('  Normal: $normal');
+    print('  Physics velocity before: ${physics.velocity}');
+    print('  Physics isOnGround before: ${physics.isOnGround}');
+
     // Check for one-way platform special handling BEFORE applying separation
     if (staticEntity is Platform && staticEntity.isOneWay) {
       // For one-way platforms, only allow landing from above
       if (normal.y < 0 && physics.velocity.y > 0) {
         // Valid landing on one-way platform from above
+        print('  ONE-WAY PLATFORM: Landing from above detected');
         // Apply position correction to prevent sinking
         movableEntity.position += separation;
+        print('  Position after separation: ${movableEntity.position}');
 
         // Update physics state
         physics.setOnGround(true);
         physics.velocity.y = 0; // Stop downward motion
+        print('  Set onGround=true, velocity.y=0');
 
         // End early - we handled this collision
         return;
       } else {
         // Not landing from above - don't collide with one-way platforms
+        print(
+          '  ONE-WAY PLATFORM: Not landing from above - ignoring collision',
+        );
         return;
       }
     }
 
     // Standard collision resolution (for solid obstacles)
+    print('  SOLID COLLISION: Applying standard resolution');
 
     // Apply position correction to prevent sinking
+    print('  Applying separation: ${movableEntity.position} += $separation');
     movableEntity.position += separation;
+    print('  Position after separation: ${movableEntity.position}');
 
     // Handle ground detection
     if (normal.y < -0.5) {
       // If normal points mostly upward
+      print('  GROUND DETECTED: Setting onGround=true (normal.y=${normal.y})');
       physics.setOnGround(true);
+    } else {
+      print('  NO GROUND: normal.y=${normal.y} (not < -0.5)');
     }
 
     // Reflect velocity based on collision normal for bouncy objects
@@ -623,34 +703,54 @@ class PhysicsSystem extends BaseFlameSystem {
 
         // Apply bounciness factor
         physics.velocity.setFrom(reflection * physics.bounciness);
+        print('  BOUNCY: Applied reflection velocity: ${physics.velocity}');
       }
     } else {
       // For non-bouncy objects, just zero out velocity in the normal direction
       if (normal.y.abs() > normal.x.abs()) {
         // Vertical collision
+        print('  VELOCITY: Zeroing Y velocity (was ${physics.velocity.y})');
         physics.velocity.y = 0;
       } else {
         // Horizontal collision
+        print('  VELOCITY: Zeroing X velocity (was ${physics.velocity.x})');
         physics.velocity.x = 0;
       }
+      print('  Final velocity: ${physics.velocity}');
     }
+
+    print(
+      '  Final physics state: isOnGround=${physics.isOnGround}, velocity=${physics.velocity}',
+    );
   }
 
   /// T2.4.1: Calculate collision data between entities
   CollisionData calculateCollisionData(Entity entityA, Entity entityB) {
+    print('[PhysicsSystem] calculateCollisionData DEBUG:');
+    print(
+      '  EntityA (${entityA.type}): pos=${entityA.position}, size=${entityA.size}',
+    );
+    print(
+      '  EntityB (${entityB.type}): pos=${entityB.position}, size=${entityB.size}',
+    );
+
     // Calculate centers
     final Vector2 centerA = entityA.position + (entityA.size * 0.5);
     final Vector2 centerB = entityB.position + (entityB.size * 0.5);
+    print('  CenterA: $centerA, CenterB: $centerB');
 
     // Calculate distance
     final Vector2 distance = centerA - centerB;
+    print('  Distance vector (A-B): $distance');
 
     // Calculate combined half-sizes
     final Vector2 combinedHalfSize = (entityA.size + entityB.size) * 0.5;
+    print('  Combined half-size: $combinedHalfSize');
 
     // Calculate overlap
     final double overlapX = combinedHalfSize.x - distance.x.abs();
     final double overlapY = combinedHalfSize.y - distance.y.abs();
+    print('  OverlapX: $overlapX, OverlapY: $overlapY');
 
     // Calculate separation vector (smallest movement to resolve collision)
     Vector2 separationVector;
@@ -663,13 +763,19 @@ class PhysicsSystem extends BaseFlameSystem {
       separationVector = Vector2(overlapX * signX, 0);
       normal = Vector2(signX, 0);
       penetrationDepth = overlapX;
+      print('  HORIZONTAL collision detected');
     } else {
       // Vertical collision
       final double signY = distance.y > 0 ? 1 : -1;
       separationVector = Vector2(0, overlapY * signY);
       normal = Vector2(0, signY);
       penetrationDepth = overlapY;
+      print('  VERTICAL collision detected');
     }
+
+    print('  Separation vector: $separationVector');
+    print('  Normal: $normal');
+    print('  Penetration depth: $penetrationDepth');
 
     // Calculate contact point (approximate at center of overlap)
     final Vector2 contactPoint = centerA - (separationVector * 0.5);

@@ -1,3 +1,4 @@
+import 'package:adventure_jumper/src/components/adv_sprite_component.dart';
 import 'package:adventure_jumper/src/components/physics_component.dart';
 import 'package:adventure_jumper/src/player/player.dart';
 import 'package:adventure_jumper/src/player/player_animator.dart';
@@ -12,14 +13,19 @@ void main() {
     late PlayerAnimator animator;
     late PlayerController controller;
     late PhysicsComponent physics;
-
-    setUp(() {
+    setUp(() async {
       // Create test player with all required components
       player = Player(position: Vector2(100, 100), size: Vector2(32, 64));
 
       // Initialize physics component
       physics = PhysicsComponent();
       player.physics = physics;
+
+      // Initialize sprite component (essential for PlayerAnimator)
+      player.sprite = AdvSpriteComponent(
+        size: player.size,
+        opacity: 1.0,
+      );
 
       // Initialize controller component
       controller = PlayerController(player);
@@ -144,9 +150,10 @@ void main() {
       physics.setVelocity(Vector2(50, 100));
       controller.update(0.016);
       animator.updateAnimationState();
-      expect(animator.getCurrentState(), equals(AnimationState.fall));
-
-      // Transition to landing
+      expect(
+        animator.getCurrentState(),
+        equals(AnimationState.fall),
+      ); // Transition to landing
       physics.setOnGround(true);
       controller.update(0.016);
       animator.updateAnimationState();
@@ -157,6 +164,9 @@ void main() {
         isTrue,
         reason: 'Should be in landing or run state after landing',
       );
+
+      // Wait for landing timer to elapse (0.1 seconds + buffer)
+      controller.update(0.12);
 
       // Back to running when grounded
       physics.setVelocity(Vector2(50, 0));
@@ -217,18 +227,19 @@ void main() {
       // Verify: Should be idle
       expect(animator.getCurrentState(), equals(AnimationState.idle));
     });
-
     test('Fallback physics detection - airborne states', () {
-      // Setup: Remove controller to test physics fallback
+      // Setup: Test airborne animation states using controller integration
       physics.setOnGround(false);
 
-      // Test upward movement (jumping)
+      // Test upward movement (jumping) - need to sync controller state
       physics.setVelocity(Vector2(0, -50));
+      controller.update(0.016); // Sync controller jump state machine
       animator.updateAnimationState();
       expect(animator.getCurrentState(), equals(AnimationState.jump));
 
       // Test downward movement (falling)
       physics.setVelocity(Vector2(0, 50));
+      controller.update(0.016); // Sync controller jump state machine
       animator.updateAnimationState();
       expect(animator.getCurrentState(), equals(AnimationState.fall));
     });

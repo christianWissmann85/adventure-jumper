@@ -18,20 +18,19 @@ class GameConfig {
       280; // pixels per second (enhanced base speed for better flow)
   static const double friction =
       0.65; // Further reduced for maximum responsiveness
-
   // Jump Parameters - T2.13.1: Optimized for expressive movement and sub-2-frame response
   static const double jumpForce =
-      -540; // pixels/second (enhanced for better arc feel)
+      -720; // pixels/second (increased for better platform reach)
   static const double jumpHoldForce =
-      -200; // Additional force when holding jump (increased for variable height expression)
+      -280; // Additional force when holding jump (increased for variable height expression)
   static const double jumpCutOffMultiplier =
       0.35; // Velocity multiplier for jump cut-off (more responsive cut-off)
   static const double minJumpHeight =
-      -240; // Minimum jump velocity (enhanced for better minimum jump)
+      -320; // Minimum jump velocity (enhanced for better minimum jump)
   static const double maxJumpHeight =
-      -680; // Maximum jump velocity with hold (increased ceiling for expression)
+      -880; // Maximum jump velocity with hold (increased ceiling for expression)
   static const double jumpHoldMaxTime =
-      0.22; // Maximum time to hold jump (optimized timing for skill expression)
+      0.25; // Maximum time to hold jump (slightly longer for higher jumps)
   static const double jumpBufferTime =
       0.15; // Jump input buffer time (more generous for combo flow)
   static const double jumpCoyoteTime =
