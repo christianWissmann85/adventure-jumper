@@ -219,7 +219,8 @@ void main() {
         // Trigger respawn
         game.triggerPlayerRespawn();
         game.update(
-            0.016); // Player should be at a different position (respawn point)
+          0.016,
+        ); // Player should be at a different position (respawn point)
         final afterRespawnPosition = game.player.position;
         expect(
           afterRespawnPosition.x,
@@ -235,7 +236,8 @@ void main() {
         print('[DEBUG] initialPosition.x: ${initialPosition.x}');
         print('[DEBUG] afterRespawnPosition.x: ${afterRespawnPosition.x}');
         print(
-            '[DEBUG] Respawn position difference: ${(initialPosition.x - afterRespawnPosition.x).abs()}');
+          '[DEBUG] Respawn position difference: ${(initialPosition.x - afterRespawnPosition.x).abs()}',
+        );
 
         // Test movement after respawn (this validates the movement system works)
         print(
@@ -264,7 +266,8 @@ void main() {
         expect(afterRespawnPosition.x, isNot(equals(initialPosition.x)));
 
         print(
-            '✅ Respawn system functioning - player repositioned successfully');
+          '✅ Respawn system functioning - player repositioned successfully',
+        );
 
         // Release the key to clean up input state
         game.simulateKeyRelease(LogicalKeyboardKey.arrowLeft);

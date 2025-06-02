@@ -235,7 +235,9 @@ class MathUtils {
     final double tt = t * t;
     final double uu = u * u;
 
-    return (p1 - p0) * (3 * uu) + (p2 - p1) * (6 * u * t) + (p3 - p2) * (3 * tt);
+    return (p1 - p0) * (3 * uu) +
+        (p2 - p1) * (6 * u * t) +
+        (p3 - p2) * (3 * tt);
   }
 
   /// Calculate spring force for physics simulations
@@ -291,7 +293,9 @@ class MathUtils {
     // Simple pseudo-random function based on coordinates
     int n = (x * 374761393 + y * 668265263 + seed).toInt();
     n = (n << 13) ^ n;
-    return 1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0;
+    return 1.0 -
+        ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) /
+            1073741824.0;
   }
 
   /// Calculate fractal noise (multiple octaves of Perlin noise)
@@ -331,5 +335,20 @@ class MathUtils {
   /// Check if a number is a power of 2
   static bool isPowerOfTwo(int n) {
     return n > 0 && (n & (n - 1)) == 0;
+  }
+
+  /// Check if a Vector2 has finite components (no NaN or infinity)
+  static bool isVector2Finite(Vector2 vector) {
+    return vector.x.isFinite && vector.y.isFinite;
+  }
+
+  /// Check if a Vector2 is valid (finite and not null)
+  static bool isVector2Valid(Vector2? vector) {
+    return vector != null && isVector2Finite(vector);
+  }
+
+  /// Create a zero Vector2 safely
+  static Vector2 zeroVector() {
+    return Vector2.zero();
   }
 }

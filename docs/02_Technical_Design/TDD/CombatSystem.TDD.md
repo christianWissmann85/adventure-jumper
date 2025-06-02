@@ -2,18 +2,30 @@
 
 ## 1. Overview
 
-Defines the implementation of the combat system including attack mechanics, hit detection, damage calculations, status effects, and enemy interaction patterns.
+Defines the implementation of the combat system including attack mechanics, hit detection, damage calculations, status effects, and enemy interaction patterns with integration to the physics-movement coordination system.
 
-*For game design specifications, see [Combat System Design](../../01_Game_Design/Mechanics/CombatSystem_Design.md).*
+_For game design specifications, see [Combat System Design](../../01_Game_Design/Mechanics/CombatSystem_Design.md)._
+
+> **Related Documents:**
+>
+> - [Combat System Design](../../01_Game_Design/Mechanics/CombatSystem_Design.md) - Game design specifications
+> - [SystemIntegration TDD](SystemIntegration.TDD.md) - Cross-system communication protocols and coordination patterns
+> - [PhysicsSystem TDD](PhysicsSystem.TDD.md) - Physics coordination for combat movement mechanics
+> - [MovementSystem TDD](MovementSystem.TDD.md) - Movement system integration for combat locomotion
+> - [CollisionSystem TDD](CollisionSystem.TDD.md) - Collision detection for combat hit detection
+> - [PlayerCharacter TDD](PlayerCharacter.TDD.md) - Player combat capabilities and coordination
+> - [Physics-Movement Refactor Action Plan](../../action-plan-physics-movement-refactor.md) - Refactor strategy and integration patterns
 
 ### Purpose
+
 - Implement responsive and satisfying combat mechanics
-- Handle hit detection and damage calculations
+- Handle hit detection and damage calculations with physics coordination
 - Manage combat state transitions and timing
-- Integrate melee and ranged attack systems
-- Support parrying, dodging, and defensive mechanics
+- Integrate melee and ranged attack systems with movement coordination
+- Support parrying, dodging, and defensive mechanics using physics-movement patterns
 
 ### Scope
+
 - Attack execution and timing
 - Hit detection algorithms
 - Damage calculation and application
@@ -32,7 +44,7 @@ class CombatSystem extends BaseSystem {
   // Hit detection coordination
   // Damage application
   // Combat state management
-  
+
   @override
   bool canProcessEntity(Entity entity) {
     // Check if entity has health component or is combat-capable
@@ -40,7 +52,7 @@ class CombatSystem extends BaseSystem {
            entity is Player ||
            entity is Enemy;
   }
-  
+
   @override
   void processEntity(Entity entity, double dt) {
     // Combat is mainly event-driven rather than per-frame processing
@@ -66,6 +78,7 @@ class HitDetection {
 ```
 
 ### Key Responsibilities
+
 - **CombatSystem**: Orchestrates all combat interactions and state
 - **AttackController**: Manages individual attack execution and properties
 - **HitDetection**: Handles precise collision detection for combat
@@ -73,6 +86,7 @@ class HitDetection {
 ## 3. Data Structures
 
 ### Attack Data
+
 ```dart
 class AttackData {
   final String id;
@@ -111,6 +125,7 @@ class HitboxFrame {
 ```
 
 ### Damage System
+
 ```dart
 class DamageInfo {
   final double rawDamage;
@@ -145,6 +160,7 @@ class DamageResult {
 The combat system uses a multi-phase approach to hit detection:
 
 1. **Broad Phase**
+
    - Spatial partitioning using quadtree
    - Filter potential collisions by attack range
 
@@ -158,13 +174,13 @@ bool detectHit(Entity attacker, Entity target, AttackData attack, int currentFra
   if (target.hasComponent<InvulnerableComponent>() || !isHitboxActiveOnFrame(attack, currentFrame)) {
     return false;
   }
-  
+
   // Get current hitbox data
   var hitbox = getActiveHitboxForFrame(attack, currentFrame);
-  
+
   // Transform hitbox by attacker's position and facing direction
   var worldHitbox = transformHitboxToWorldSpace(hitbox, attacker);
-  
+
   // Check collision with target's hurtbox
   return intersects(worldHitbox, target.getComponent<HurtboxComponent>().shape);
 }
@@ -176,35 +192,35 @@ bool detectHit(Entity attacker, Entity target, AttackData attack, int currentFra
 DamageResult calculateDamage(Entity target, DamageInfo info) {
   // Get target's defense stats
   var defense = target.getComponent<DefenseComponent>();
-  
+
   // Base damage reduction
   double reduction = calculateReduction(defense.value, info.type);
   double actualDamage = max(info.rawDamage * (1 - reduction), 0);
-  
+
   // Critical hit
   bool critical = false;
   if (Random().nextDouble() < info.source.getComponent<AttackComponent>().criticalChance) {
     critical = true;
     actualDamage *= 1.5;  // Critical multiplier
   }
-  
+
   // Check for block
   bool blocked = false;
   if (target.hasComponent<BlockComponent>() && isAttackBlockable(info, target)) {
     blocked = true;
     actualDamage *= 0.2;  // Block reduces damage by 80%
   }
-  
+
   // Apply damage resistance from effects
   for (var effect in target.getComponent<StatusEffectComponent>().activeEffects) {
     if (effect is DamageResistanceEffect && effect.damageType == info.type) {
       actualDamage *= (1 - effect.resistanceAmount);
     }
   }
-  
+
   // Calculate which effects are successfully applied
   var appliedEffects = calculateEffectApplication(target, info.statusEffects);
-  
+
   return DamageResult(
     actualDamage: actualDamage,
     wasCritical: critical,
@@ -222,14 +238,14 @@ DamageResult calculateDamage(Entity target, DamageInfo info) {
 abstract class CombatInterface {
   // Attack execution
   Future<void> executeAttack(Entity source, String attackId);
-  
+
   // Damage application
   DamageResult applyDamage(Entity target, DamageInfo damage);
-  
+
   // Status effect management
   void applyStatusEffect(Entity target, StatusEffect effect);
   void removeStatusEffect(Entity target, String effectId);
-  
+
   // Combat state queries
   bool isEntityAttacking(Entity entity);
   bool canEntityAttack(Entity entity);
@@ -239,12 +255,25 @@ abstract class CombatInterface {
 
 ## 6. Dependencies
 
-This system depends on:
-- **Physics System** - For collision detection fundamentals
-- **Animation System** - To sync attacks with visual representation
-- **Input System** - For player attack commands
-- **Entity System** - To access component data
-- **Aether System** - For special attacks and ability costs
+### System Dependencies
+
+- **Physics System**: For collision detection fundamentals and combat movement coordination (Priority: 80)
+- **Movement System**: For combat movement integration and locomotion coordination (Priority: 90)
+- **Collision System**: For hit detection and combat collision events (Priority: 70)
+- **Animation System**: To sync attacks with visual representation
+- **Input System**: For player attack commands and combat input processing (Priority: 100)
+- **Entity System**: To access component data and entity management
+- **Aether System**: For special attacks and ability costs
+- **Audio System**: For combat audio feedback and sound effects (Priority: 20)
+
+### Physics-Movement Integration Dependencies
+
+- **IPhysicsCoordinator**: Interface for physics state queries supporting combat movement mechanics
+- **IMovementCoordinator**: Interface for movement coordination during combat actions
+- **ICollisionNotifier**: Interface for combat hit detection and collision event handling
+- **Combat Timing Coordination**: Combat system respects execution order for proper physics-movement integration
+- **State Synchronization**: Combat state synchronized with physics and movement systems
+- **Combat Movement Patterns**: Combat actions integrated with movement request-response protocols
 
 ## 7. File Structure
 
@@ -273,12 +302,14 @@ lib/
 ## 8. Performance Considerations
 
 ### Optimization Techniques
+
 - **Spatial Partitioning** - Quadtrees for broad-phase collision detection
 - **Hitbox Pooling** - Reuse hitbox objects to reduce GC pressure
 - **Prioritized Processing** - Focus hit detection on relevant entities only
 - **Inactive Entity Skipping** - Don't process entities outside active range
 
 ### Memory Usage
+
 - Reuse common hitbox shapes
 - Pool damage and hit result objects
 - Limit max simultaneous attacks processed
@@ -286,16 +317,19 @@ lib/
 ## 9. Testing Strategy
 
 ### Unit Tests
+
 - Test damage calculation with various defense values
 - Verify hitbox collision in different orientations
 - Validate status effect application rules
 
 ### Integration Tests
+
 - Test combat flow between different entity types
 - Verify audio and visual feedback synchronization
 - Test performance under many simultaneous combat interactions
 
 ### Play Testing
+
 - Measure attack responsiveness (frames between input and effect)
 - Evaluate hit detection accuracy
 - Test edge cases like simultaneous attacks

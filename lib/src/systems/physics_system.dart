@@ -9,6 +9,10 @@ import '../utils/collision_utils.dart';
 import '../utils/constants.dart';
 import '../utils/edge_detection_utils.dart';
 import 'base_flame_system.dart';
+import 'interfaces/movement_request.dart';
+import 'interfaces/movement_response.dart';
+import 'interfaces/physics_coordinator.dart';
+import 'interfaces/physics_state.dart';
 
 // Logger for physics system
 final Logger logger = Logger('PhysicsSystem');
@@ -87,7 +91,7 @@ class CollisionData {
 /// // Register an entity for physics processing
 /// physicsSystem.addEntity(player);
 /// ```
-class PhysicsSystem extends BaseFlameSystem {
+class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
   PhysicsSystem({
     Vector2? gravity,
     double? timeScale,
@@ -297,7 +301,8 @@ class PhysicsSystem extends BaseFlameSystem {
           '[PhysicsSystem] integrateVelocity: ${entity.type} position changed from $oldPosition to ${entity.position} (velocity: ${physics.velocity}, dt: $dt)',
         );
         print(
-            '[PhysicsSystem] TransformComponent position updated to: ${entity.transformComponent.position}');
+          '[PhysicsSystem] TransformComponent position updated to: ${entity.transformComponent.position}',
+        );
       }
     }
 
@@ -906,11 +911,448 @@ class PhysicsSystem extends BaseFlameSystem {
 
   /// Get current time scale
   double get timeScale => _timeScale;
-
   // Helper method to clear all entities
   void clearAllEntities() {
     entities.clear();
     _collisions.clear();
+  }
+
+  // ============================================================================
+  // IPhysicsCoordinator Implementation
+  // ============================================================================
+
+  // Feature flag for interface enablement
+  bool _interfaceEnabled = true;
+
+  @override
+  void setInterfaceEnabled(bool enabled) {
+    _interfaceEnabled = enabled;
+  }
+
+  @override
+  bool get isInterfaceEnabled => _interfaceEnabled;
+
+  // Helper method to find entity by ID
+  Entity? _findEntityById(int entityId) {
+    try {
+      return entities.firstWhere((entity) => entity.hashCode == entityId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  Future<MovementResponse> requestMovement(
+    int entityId,
+    Vector2 direction,
+    double speed,
+  ) async {
+    if (!_interfaceEnabled) {
+      return MovementResponse.failed(
+        request: MovementRequest.movement(
+          entityId: entityId,
+          direction: direction,
+          speed: speed,
+        ),
+        reason: 'Physics coordinator interface is disabled',
+      );
+    }
+
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return MovementResponse.failed(
+        request: MovementRequest.movement(
+          entityId: entityId,
+          direction: direction,
+          speed: speed,
+        ),
+        reason: 'Entity not found: $entityId',
+      );
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return MovementResponse.failed(
+        request: MovementRequest.movement(
+          entityId: entityId,
+          direction: direction,
+          speed: speed,
+        ),
+        reason: 'Entity does not have physics component: $entityId',
+      );
+    }
+
+    // Validate direction vector
+    if (!direction.x.isFinite || !direction.y.isFinite) {
+      return MovementResponse.failed(
+        request: MovementRequest.movement(
+          entityId: entityId,
+          direction: direction,
+          speed: speed,
+        ),
+        reason: 'Direction vector is not finite',
+      );
+    }
+
+    // Validate speed
+    if (speed < 0 || !speed.isFinite) {
+      return MovementResponse.failed(
+        request: MovementRequest.movement(
+          entityId: entityId,
+          direction: direction,
+          speed: speed,
+        ),
+        reason: 'Speed must be non-negative and finite',
+      );
+    } // Apply movement by setting target velocity
+    final Vector2 targetVelocity = direction.normalized() * speed;
+    physics.velocity.setFrom(targetVelocity);
+
+    // Create a movement request to use in the response
+    final movementRequest = MovementRequest.movement(
+      entityId: entityId,
+      direction: direction,
+      speed: speed,
+    );
+
+    return MovementResponse.success(
+      request: movementRequest,
+      actualVelocity: Vector2.copy(physics.velocity),
+      actualPosition: Vector2.copy(entity.position),
+      isGrounded: physics.isOnGround,
+    );
+  }
+
+  @override
+  Future<MovementResponse> requestJump(int entityId, double force) async {
+    // Create a jump request to use in all responses
+    final jumpRequest = MovementRequest.jump(
+      entityId: entityId,
+      force: force,
+    );
+
+    if (!_interfaceEnabled) {
+      return MovementResponse.failed(
+        request: jumpRequest,
+        reason: 'Physics coordinator interface is disabled',
+      );
+    }
+
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return MovementResponse.failed(
+        request: jumpRequest,
+        reason: 'Entity not found: $entityId',
+      );
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return MovementResponse.failed(
+        request: jumpRequest,
+        reason: 'Entity does not have physics component: $entityId',
+      );
+    }
+
+    // Check if entity can jump (typically must be grounded)
+    if (!physics.isOnGround) {
+      return MovementResponse.failed(
+        request: jumpRequest,
+        reason: 'Entity must be grounded to jump',
+      );
+    }
+
+    // Validate force
+    if (force <= 0 || !force.isFinite) {
+      return MovementResponse.failed(
+        request: jumpRequest,
+        reason: 'Jump force must be positive and finite',
+      );
+    }
+
+    // Apply jump force (upward velocity)
+    physics.velocity.y = -force; // Negative Y is upward in screen coordinates
+    physics.setOnGround(false); // Entity is no longer grounded after jump
+
+    return MovementResponse.success(
+      request: jumpRequest,
+      actualVelocity: Vector2.copy(physics.velocity),
+      actualPosition: Vector2.copy(entity.position),
+      isGrounded: physics.isOnGround,
+    );
+  }
+
+  @override
+  Future<void> requestStop(int entityId) async {
+    if (!_interfaceEnabled) {
+      return;
+    }
+
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return;
+    }
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return;
+    }
+
+    // Stop horizontal movement, preserve vertical velocity for gravity
+    physics.velocity.x = 0.0;
+  }
+
+  @override
+  Future<void> requestImpulse(int entityId, Vector2 impulse) async {
+    if (!_interfaceEnabled) {
+      return;
+    }
+
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return;
+    }
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return;
+    }
+
+    // Validate impulse vector
+    if (!impulse.x.isFinite || !impulse.y.isFinite) {
+      return;
+    }
+
+    // Add impulse to current velocity
+    physics.velocity.add(impulse);
+  }
+
+  @override
+  Future<bool> isGrounded(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return false;
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return false;
+    }
+
+    return physics.isOnGround;
+  }
+
+  @override
+  Future<Vector2> getVelocity(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return Vector2.zero();
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return Vector2.zero();
+    }
+
+    return Vector2.copy(physics.velocity);
+  }
+
+  @override
+  Future<Vector2> getPosition(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return Vector2.zero();
+    }
+
+    return Vector2.copy(entity.position);
+  }
+
+  @override
+  Future<bool> hasCollisionBelow(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return false;
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return false;
+    }
+
+    // Check for collision below by examining grounded state and collision data
+    // This is a simplified implementation - could be enhanced to check specific collision directions
+    return physics.isOnGround;
+  }
+
+  @override
+  Future<PhysicsState> getPhysicsState(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return PhysicsState(
+        entityId: entityId,
+        position: Vector2.zero(),
+        velocity: Vector2.zero(),
+        acceleration: Vector2.zero(),
+        mass: 1.0,
+        gravityScale: 1.0,
+        friction: 0.1,
+        restitution: 0.0,
+        isStatic: false,
+        affectedByGravity: true,
+        isGrounded: false,
+        wasGrounded: false,
+        activeCollisions: const [],
+        accumulatedForces: Vector2.zero(),
+        contactPointCount: 0,
+        updateCount: 0,
+        lastUpdateTime: DateTime.now(),
+      );
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return PhysicsState(
+        entityId: entityId,
+        position: Vector2.copy(entity.position),
+        velocity: Vector2.zero(),
+        acceleration: Vector2.zero(),
+        mass: 1.0,
+        gravityScale: 1.0,
+        friction: 0.1,
+        restitution: 0.0,
+        isStatic: false,
+        affectedByGravity: true,
+        isGrounded: false,
+        wasGrounded: false,
+        activeCollisions: const [],
+        accumulatedForces: Vector2.zero(),
+        contactPointCount: 0,
+        updateCount: 0,
+        lastUpdateTime: DateTime.now(),
+      );
+    }
+
+    return PhysicsState(
+      entityId: entityId,
+      position: Vector2.copy(entity.position),
+      velocity: Vector2.copy(physics.velocity),
+      acceleration: Vector2.copy(physics.acceleration),
+      mass: physics.mass,
+      gravityScale: physics.gravityScale,
+      friction: physics.friction,
+      restitution: physics.restitution,
+      isStatic: physics.isStatic,
+      affectedByGravity: physics.affectedByGravity,
+      isGrounded: physics.isOnGround,
+      wasGrounded: physics.wasOnGround,
+      activeCollisions: const [],
+      accumulatedForces: Vector2.zero(),
+      contactPointCount: 0,
+      updateCount: 0,
+      lastUpdateTime: DateTime.now(),
+    );
+  }
+
+  @override
+  Future<void> resetPhysicsState(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return;
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return;
+    }
+
+    // Reset all physics state to clean defaults
+    physics.velocity.setZero();
+    physics.acceleration.setZero();
+    physics.setOnGround(false);
+
+    // Reset physics properties to defaults - use proper getters/setters
+    // Use default constants or reasonable default values
+    physics.setGravityScale(1.0);
+    physics.bounciness = 0.2; // Default restitution/bounciness
+  }
+
+  @override
+  Future<void> clearAccumulatedForces(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return;
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return;
+    }
+
+    // Clear any accumulated forces that might cause physics degradation
+    physics.acceleration.setZero();
+  }
+
+  @override
+  Future<void> setPositionOverride(int entityId, Vector2 position) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return;
+    }
+
+    // Validate position
+    if (!position.x.isFinite || !position.y.isFinite) {
+      return;
+    }
+
+    // Override position directly (for respawn/teleport only)
+    entity.position.setFrom(position);
+
+    // Clear physics state to prevent inconsistencies
+    await clearAccumulatedForces(entityId);
+  }
+
+  @override
+  Future<bool> validateStateConsistency(int entityId) async {
+    final Entity? entity = _findEntityById(entityId);
+    if (entity == null) {
+      return false;
+    }
+
+    final PhysicsComponent? physics = entity.physics;
+    if (physics == null) {
+      return false;
+    }
+
+    // Validate position and velocity are finite
+    if (!entity.position.x.isFinite ||
+        !entity.position.y.isFinite ||
+        !physics.velocity.x.isFinite ||
+        !physics.velocity.y.isFinite ||
+        !physics.acceleration.x.isFinite ||
+        !physics.acceleration.y.isFinite) {
+      return false;
+    }
+
+    // Check for reasonable bounds (prevent extreme values)
+    const double maxPosition = 100000.0;
+    const double maxVelocity = 10000.0;
+
+    if (entity.position.length > maxPosition ||
+        physics.velocity.length > maxVelocity ||
+        physics.acceleration.length > maxVelocity) {
+      return false;
+    }
+
+    // Validate physics properties are within reasonable ranges
+    if (physics.mass <= 0 ||
+        !physics.mass.isFinite ||
+        physics.friction < 0 ||
+        !physics.friction.isFinite ||
+        physics.restitution < 0 ||
+        physics.restitution > 1 ||
+        !physics.restitution.isFinite) {
+      return false;
+    }
+
+    return true;
   }
 
   @override
