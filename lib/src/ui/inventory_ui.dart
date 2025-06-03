@@ -93,13 +93,15 @@ class InventoryUI extends PositionComponent with TapCallbacks {
   /// Create panel for displaying items grid
   void _createItemsPanel() {
     // Panel container
-    final double panelWidth = (_slotSize + _slotPadding * 2) * _gridColumns + 20;
+    final double panelWidth =
+        (_slotSize + _slotPadding * 2) * _gridColumns + 20;
     final double panelHeight = screenSize.y * 0.6;
 
     _itemsPanel = RectangleComponent(
       position: Vector2(screenSize.x * 0.25 - panelWidth / 2, 80),
       size: Vector2(panelWidth, panelHeight),
-      paint: Paint()..color = const Color(0x88333333), // Dark semi-transparent gray
+      paint: Paint()
+        ..color = const Color(0x88333333), // Dark semi-transparent gray
     );
     add(_itemsPanel); // Panel title
     final TextComponent panelTitle = TextComponent(
@@ -145,7 +147,9 @@ class InventoryUI extends PositionComponent with TapCallbacks {
         _itemsPanel.add(slot);
 
         // Add example items to a few slots
-        if ((row == 0 && col == 0) || (row == 1 && col == 2) || (row == 3 && col == 4)) {
+        if ((row == 0 && col == 0) ||
+            (row == 1 && col == 2) ||
+            (row == 3 && col == 4)) {
           final InventoryItemUI item = InventoryItemUI(
             position: Vector2(_slotSize / 2, _slotSize / 2),
             size: Vector2(_slotSize * 0.8, _slotSize * 0.8),
@@ -167,7 +171,8 @@ class InventoryUI extends PositionComponent with TapCallbacks {
     _detailsPanel = RectangleComponent(
       position: Vector2(screenSize.x * 0.7 - panelWidth / 2, 80),
       size: Vector2(panelWidth, panelHeight),
-      paint: Paint()..color = const Color(0x88333333), // Dark semi-transparent gray
+      paint: Paint()
+        ..color = const Color(0x88333333), // Dark semi-transparent gray
     );
 
     add(_detailsPanel);
@@ -214,7 +219,8 @@ class InventoryUI extends PositionComponent with TapCallbacks {
         80 + screenSize.y * 0.27,
       ),
       size: Vector2(panelWidth, panelHeight),
-      paint: Paint()..color = const Color(0x88333333), // Dark semi-transparent gray
+      paint: Paint()
+        ..color = const Color(0x88333333), // Dark semi-transparent gray
     );
 
     add(_equipmentPanel);
@@ -320,7 +326,8 @@ class InventoryUI extends PositionComponent with TapCallbacks {
         ),
       ),
     ); // Panels slide in
-    _itemsPanel.position = Vector2(_itemsPanel.position.x - 100, _itemsPanel.position.y);
+    _itemsPanel.position =
+        Vector2(_itemsPanel.position.x - 100, _itemsPanel.position.y);
     _itemsPanel.add(
       MoveToEffect(
         Vector2(_itemsPanel.position.x + 100, _itemsPanel.position.y),
@@ -330,7 +337,8 @@ class InventoryUI extends PositionComponent with TapCallbacks {
         ),
       ),
     );
-    _detailsPanel.position = Vector2(_detailsPanel.position.x + 100, _detailsPanel.position.y);
+    _detailsPanel.position =
+        Vector2(_detailsPanel.position.x + 100, _detailsPanel.position.y);
     _detailsPanel.add(
       MoveToEffect(
         Vector2(_detailsPanel.position.x - 100, _detailsPanel.position.y),
@@ -340,7 +348,8 @@ class InventoryUI extends PositionComponent with TapCallbacks {
         ),
       ),
     );
-    _equipmentPanel.position = Vector2(_equipmentPanel.position.x + 100, _equipmentPanel.position.y);
+    _equipmentPanel.position =
+        Vector2(_equipmentPanel.position.x + 100, _equipmentPanel.position.y);
     _equipmentPanel.add(
       MoveToEffect(
         Vector2(_equipmentPanel.position.x - 100, _equipmentPanel.position.y),

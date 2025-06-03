@@ -20,7 +20,8 @@ class AudioCacheManager {
   // Audio asset caches
   final Map<String, SoundEffect> _soundEffectCache = <String, SoundEffect>{};
   final Map<String, MusicTrack> _musicTrackCache = <String, MusicTrack>{};
-  final Map<String, AudioAssetInfo> _assetInfoCache = <String, AudioAssetInfo>{};
+  final Map<String, AudioAssetInfo> _assetInfoCache =
+      <String, AudioAssetInfo>{};
 
   // Cache statistics
   int _currentCacheSize = 0;
@@ -135,7 +136,8 @@ class AudioCacheManager {
       await musicTrack.load();
 
       // Music tracks are typically larger, so be more selective about caching
-      if (_canAddToCache(assetInfo.fileSize) && assetInfo.fileSize < maxCacheSize ~/ 4) {
+      if (_canAddToCache(assetInfo.fileSize) &&
+          assetInfo.fileSize < maxCacheSize ~/ 4) {
         _musicTrackCache[name] = musicTrack;
         _currentCacheSize += assetInfo.fileSize;
       }
@@ -264,14 +266,19 @@ class AudioCacheManager {
   /// Load the audio asset manifest
   Future<void> _loadAudioManifest() async {
     try {
-      final String manifestString = await rootBundle.loadString('assets/audio/audio_manifest.json');
+      final String manifestString =
+          await rootBundle.loadString('assets/audio/audio_manifest.json');
       _audioManifest = json.decode(manifestString) as Map<String, dynamic>;
 
       // Cache asset info for quick access
-      final Map<String, dynamic> assets = _audioManifest!['assets'] as Map<String, dynamic>? ?? <String, dynamic>{};
+      final Map<String, dynamic> assets =
+          _audioManifest!['assets'] as Map<String, dynamic>? ??
+              <String, dynamic>{};
       for (final MapEntry<String, dynamic> entry in assets.entries) {
-        final Map<String, dynamic> assetData = entry.value as Map<String, dynamic>;
-        _assetInfoCache[entry.key] = AudioAssetInfo.fromJson(entry.key, assetData);
+        final Map<String, dynamic> assetData =
+            entry.value as Map<String, dynamic>;
+        _assetInfoCache[entry.key] =
+            AudioAssetInfo.fromJson(entry.key, assetData);
       }
     } catch (e) {
       debugPrint('Failed to load audio manifest: $e');
@@ -294,7 +301,9 @@ class AudioCacheManager {
   /// Create default asset info for assets not in manifest
   AudioAssetInfo? _createDefaultAssetInfo(String name) {
     // Try to determine type and path from name
-    if (name.contains('music') || name.contains('bgm') || name.contains('track')) {
+    if (name.contains('music') ||
+        name.contains('bgm') ||
+        name.contains('track')) {
       return AudioAssetInfo(
         name: name,
         filePath: 'audio/music/$name.ogg',
@@ -341,8 +350,11 @@ class AudioCacheManager {
   int get cachedMusicTrackCount => _musicTrackCache.length;
   int get cacheHits => _cacheHits;
   int get cacheMisses => _cacheMisses;
-  double get cacheHitRatio => _cacheHits + _cacheMisses > 0 ? _cacheHits / (_cacheHits + _cacheMisses) : 0.0;
-  double get cacheUsagePercentage => maxCacheSize > 0 ? _currentCacheSize / maxCacheSize : 0.0;
+  double get cacheHitRatio => _cacheHits + _cacheMisses > 0
+      ? _cacheHits / (_cacheHits + _cacheMisses)
+      : 0.0;
+  double get cacheUsagePercentage =>
+      maxCacheSize > 0 ? _currentCacheSize / maxCacheSize : 0.0;
 }
 
 /// Audio asset information
@@ -375,8 +387,12 @@ class AudioAssetInfo {
       volume: (json['volume'] as num?)?.toDouble() ?? 1.0,
       pitch: (json['pitch'] as num?)?.toDouble() ?? 1.0,
       maxInstances: json['maxInstances'] as int? ?? 1,
-      loopStart: json['loopStart'] != null ? Duration(milliseconds: json['loopStart'] as int) : null,
-      loopEnd: json['loopEnd'] != null ? Duration(milliseconds: json['loopEnd'] as int) : null,
+      loopStart: json['loopStart'] != null
+          ? Duration(milliseconds: json['loopStart'] as int)
+          : null,
+      loopEnd: json['loopEnd'] != null
+          ? Duration(milliseconds: json['loopEnd'] as int)
+          : null,
       bpm: (json['bpm'] as num?)?.toDouble(),
       key: json['key'] as String?,
       mood: json['mood'] as String?,

@@ -31,7 +31,10 @@ class AnimationUtils {
   /// Smoother step interpolation (smoother S-curve)
   static double smootherStep(double start, double end, double t) {
     final double clampedT = t.clamp(0.0, 1.0);
-    final double smoothedT = clampedT * clampedT * clampedT * (clampedT * (clampedT * 6.0 - 15.0) + 10.0);
+    final double smoothedT = clampedT *
+        clampedT *
+        clampedT *
+        (clampedT * (clampedT * 6.0 - 15.0) + 10.0);
     return start + (end - start) * smoothedT;
   }
 
@@ -87,7 +90,9 @@ class AnimationUtils {
     }
 
     final double adjustedT = t - 1.0;
-    return -(finalAmplitude * math.pow(2.0, 10.0 * adjustedT) * math.sin((adjustedT - s) * (2.0 * math.pi) / period));
+    return -(finalAmplitude *
+        math.pow(2.0, 10.0 * adjustedT) *
+        math.sin((adjustedT - s) * (2.0 * math.pi) / period));
   }
 
   /// Back interpolation (overshoot)
@@ -211,7 +216,8 @@ class AnimationUtils {
       return 0.5 * scaledT * scaledT * scaledT * scaledT * scaledT;
     }
     final double adjustedT = scaledT - 2.0;
-    return 0.5 * (adjustedT * adjustedT * adjustedT * adjustedT * adjustedT + 2.0);
+    return 0.5 *
+        (adjustedT * adjustedT * adjustedT * adjustedT * adjustedT + 2.0);
   }
 
   /// Apply easing curve to interpolation
@@ -369,7 +375,8 @@ class AnimationUtils {
     double frequency = 1.0,
     double damping = 0.1,
   }) {
-    return math.exp(-damping * time) * math.cos(2.0 * math.pi * frequency * time);
+    return math.exp(-damping * time) *
+        math.cos(2.0 * math.pi * frequency * time);
   }
 
   /// Spring interpolation for smooth animations
@@ -410,8 +417,14 @@ class AnimationUtils {
     int seed = 0,
   }) {
     final math.Random random = math.Random(seed);
-    final double x = (random.nextDouble() - 0.5) * 2.0 * intensity * math.sin(2.0 * math.pi * frequency * time);
-    final double y = (random.nextDouble() - 0.5) * 2.0 * intensity * math.cos(2.0 * math.pi * frequency * time);
+    final double x = (random.nextDouble() - 0.5) *
+        2.0 *
+        intensity *
+        math.sin(2.0 * math.pi * frequency * time);
+    final double y = (random.nextDouble() - 0.5) *
+        2.0 *
+        intensity *
+        math.cos(2.0 * math.pi * frequency * time);
     return Vector2(x, y);
   }
 
@@ -469,7 +482,8 @@ class AnimationUtils {
       );
     }
 
-    final double totalDuration = durations.fold(0, (double sum, double duration) => sum + duration);
+    final double totalDuration =
+        durations.fold(0, (double sum, double duration) => sum + duration);
     final double normalizedTime = (t * totalDuration).clamp(0.0, totalDuration);
 
     double currentTime = 0;
@@ -496,7 +510,8 @@ class AnimationUtils {
       );
     }
 
-    final double totalWeight = weights.fold(0, (double sum, double weight) => sum + weight);
+    final double totalWeight =
+        weights.fold(0, (double sum, double weight) => sum + weight);
     if (totalWeight == 0.0) return 0;
 
     double result = 0;

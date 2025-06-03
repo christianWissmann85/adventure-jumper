@@ -1,9 +1,24 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
+import '../systems/interfaces/collision_notifier.dart' as notifier;
+import '../systems/interfaces/physics_state.dart';
+import '../utils/logger.dart';
+import 'interfaces/collision_integration.dart';
+
+/// PHY-3.1.3: Enhanced CollisionComponent with collision system coordination
+///
 /// Component that handles collision detection and response
 /// Provides utilities for managing hitboxes and collision events
-class CollisionComponent extends Component with CollisionCallbacks {
+///
+/// Key enhancements:
+/// - Collision state management and grounded state tracking
+/// - Collision event generation and physics coordination
+/// - Integration with ICollisionNotifier interface patterns
+/// - Movement validation based on collision state
+class CollisionComponent extends Component
+    with CollisionCallbacks
+    implements ICollisionIntegration {
   CollisionComponent({
     Vector2? hitboxSize,
     Vector2? hitboxOffset,
@@ -38,6 +53,15 @@ class CollisionComponent extends Component with CollisionCallbacks {
   List<String> _collisionTags = <String>['default'];
   // Hitbox components
   ShapeHitbox? _hitbox;
+
+  // PHY-3.1.3: Collision state management
+  final List<CollisionInfo> _activeCollisions = [];
+  notifier.GroundInfo? _groundInfo;
+  bool _isColliding = false;
+  double _lastPhysicsSync = 0.0;
+
+  // Logger for collision events
+  static final _logger = GameLogger.getLogger('CollisionComponent');
 
   @override
   Future<void> onLoad() async {
@@ -141,5 +165,259 @@ class CollisionComponent extends Component with CollisionCallbacks {
       }
     }
     return _hitbox!;
+  }
+
+  // ============================================================================
+  // PHY-3.1.3: ICollisionIntegration Implementation
+  // ============================================================================
+
+  @override
+  Future<void> processCollisionEvent(CollisionEvent event) async {
+    _logger.fine(
+        'Processing collision event: ${event.type} for entity ${event.entityId}',);
+
+    switch (event.type) {
+      case CollisionEventType.collisionStart:
+        _activeCollisions.add(event.collisionInfo);
+        _isColliding = true;
+        onCollisionEnter(event.collisionInfo);
+        break;
+
+      case CollisionEventType.collisionEnd:
+        _activeCollisions.removeWhere(
+            (c) => c.collisionId == event.collisionInfo.collisionId,);
+        _isColliding = _activeCollisions.isNotEmpty;
+        onCollisionExit(event.collisionInfo);
+        break;
+
+      case CollisionEventType.collisionUpdate:
+        // Update existing collision info
+        final index = _activeCollisions.indexWhere(
+            (c) => c.collisionId == event.collisionInfo.collisionId,);
+        if (index >= 0) {
+          _activeCollisions[index] = event.collisionInfo;
+        }
+        break;
+
+      case CollisionEventType.groundContact:
+      case CollisionEventType.groundLost:
+        // Handle through updateGroundState
+        break;
+    }
+  }
+
+  @override
+  Future<void> updateGroundState(notifier.GroundInfo groundInfo) async {
+    final wasGrounded = _groundInfo?.isGrounded ?? false;
+    _groundInfo = groundInfo;
+
+    // Notify if ground state changed
+    if (groundInfo.isGrounded != wasGrounded) {
+      onGroundContact(groundInfo);
+
+      _logger.fine(groundInfo.isGrounded
+          ? 'Ground contact detected'
+          : 'Ground contact lost',);
+    }
+  }
+
+  @override
+  Future<bool> validateMovement(Vector2 movement) async {
+    // Check if movement would cause collision
+    final predictedCollisions = await predictCollisions(movement);
+
+    // Allow movement if no blocking collisions predicted
+    for (final collision in predictedCollisions) {
+      if (collision.collisionType == 'wall' ||
+          collision.collisionType == 'solid') {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @override
+  Future<List<CollisionInfo>> getActiveCollisions() async {
+    return List.unmodifiable(_activeCollisions);
+  }
+
+  @override
+  Future<bool> hasActiveCollisions() async {
+    return _isColliding;
+  }
+
+  @override
+  Future<notifier.GroundInfo?> getGroundInfo() async {
+    return _groundInfo;
+  }
+
+  @override
+  Future<List<CollisionInfo>> predictCollisions(Vector2 movement) async {
+    // This would typically query the collision system for potential collisions
+    // For now, return empty list as this requires collision system integration
+    _logger.fine('Predicting collisions for movement: $movement');
+    return [];
+  }
+
+  @override
+  Future<bool> isMovementBlocked(Vector2 direction) async {
+    // Check active collisions for blocking in the given direction
+    for (final collision in _activeCollisions) {
+      // Check if collision normal opposes movement direction
+      final dotProduct = collision.contactNormal.dot(direction.normalized());
+      if (dotProduct < -0.7) {
+        // Threshold for opposing directions
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  void onCollisionEnter(CollisionInfo collision) {
+    _logger.fine(
+        'Collision entered: ${collision.collisionType} with ${collision.collisionId}',);
+
+    // Handle specific collision types
+    if (collision.collisionType == 'ground') {
+      // Ground collision handled by updateGroundState
+    }
+  }
+
+  @override
+  void onCollisionExit(CollisionInfo collision) {
+    _logger.fine(
+        'Collision exited: ${collision.collisionType} with ${collision.collisionId}',);
+  }
+
+  @override
+  void onGroundContact(notifier.GroundInfo groundInfo) {
+    _logger.fine(groundInfo.isGrounded
+        ? 'Grounded on ${groundInfo.groundSurface.material.name} surface'
+        : 'Left ground',);
+  }
+
+  @override
+  Future<void> syncWithPhysics(PhysicsState physicsState) async {
+    // Sync collision state with physics state
+    _lastPhysicsSync = DateTime.now().millisecondsSinceEpoch / 1000.0;
+
+    // Update ground state from physics
+    if (physicsState.isGrounded != (_groundInfo?.isGrounded ?? false)) {
+      if (physicsState.isGrounded) {
+        // Create ground info from physics state
+        final groundCollision = physicsState.activeCollisions
+            .firstWhere((c) => c.collisionType == 'ground',
+                orElse: () => CollisionInfo.ground(
+                      id: 'physics_ground',
+                      contactPoint: physicsState.position,
+                    ),);
+
+        await updateGroundState(notifier.GroundInfo.grounded(
+          entityId: parent?.hashCode ?? 0,
+          groundNormal: groundCollision.contactNormal,
+          surface: notifier.CollisionSurface.solid(),
+        ),);
+      } else {
+        await updateGroundState(notifier.GroundInfo.airborne(
+          parent?.hashCode ?? 0,
+          _groundInfo?.lastGroundedTime ?? DateTime.now(),
+        ),);
+      }
+    }
+
+    // Sync active collisions
+    _activeCollisions.clear();
+    _activeCollisions.addAll(physicsState.activeCollisions);
+    _isColliding = _activeCollisions.isNotEmpty;
+  }
+
+  @override
+  Future<void> clearCollisionState() async {
+    _activeCollisions.clear();
+    _groundInfo = null;
+    _isColliding = false;
+    _lastPhysicsSync = 0.0;
+
+    _logger.fine('Collision state cleared');
+  }
+
+  // ============================================================================
+  // Flame Collision Callbacks Integration
+  // ============================================================================
+
+  @override
+  void onCollisionStart(
+      Set<Vector2> intersectionPoints, PositionComponent other,) {
+    super.onCollisionStart(intersectionPoints, other);
+
+    // Convert Flame collision to our collision info
+    final collision = CollisionInfo(
+      collisionId: other.hashCode.toString(),
+      collisionType: _determineCollisionType(other),
+      contactPoint: intersectionPoints.first,
+      contactNormal: _calculateContactNormal(intersectionPoints, other),
+    );
+
+    // Process through our system
+    processCollisionEvent(CollisionEvent(
+      entityId: parent?.hashCode.toString() ?? 'unknown',
+      type: CollisionEventType.collisionStart,
+      collisionInfo: collision,
+    ),);
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    super.onCollisionEnd(other);
+
+    // Find and remove the collision
+    final collisionId = other.hashCode.toString();
+    final collision = _activeCollisions.firstWhere(
+      (c) => c.collisionId == collisionId,
+      orElse: () => CollisionInfo(
+        collisionId: collisionId,
+        collisionType: 'unknown',
+        contactPoint: Vector2.zero(),
+        contactNormal: Vector2(0, -1),
+      ),
+    );
+
+    processCollisionEvent(CollisionEvent(
+      entityId: parent?.hashCode.toString() ?? 'unknown',
+      type: CollisionEventType.collisionEnd,
+      collisionInfo: collision,
+    ),);
+  }
+
+  // Helper methods for Flame collision integration
+  String _determineCollisionType(PositionComponent other) {
+    // Determine collision type based on component type or tags
+    final typeName = other.runtimeType.toString().toLowerCase();
+
+    if (typeName.contains('platform') || typeName.contains('ground')) {
+      return 'ground';
+    } else if (typeName.contains('wall')) {
+      return 'wall';
+    } else if (typeName.contains('enemy')) {
+      return 'enemy';
+    }
+
+    return 'solid';
+  }
+
+  Vector2 _calculateContactNormal(
+      Set<Vector2> intersectionPoints, PositionComponent other,) {
+    // Simple normal calculation - can be enhanced
+    if (intersectionPoints.isEmpty) return Vector2(0, -1);
+
+    final contactPoint = intersectionPoints.first;
+    final otherCenter = other.position + (other.size / 2);
+    final thisCenter =
+        (parent as PositionComponent?)?.position ?? Vector2.zero();
+
+    final direction = (thisCenter - otherCenter).normalized();
+    return direction;
   }
 }

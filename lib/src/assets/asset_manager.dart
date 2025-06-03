@@ -48,7 +48,8 @@ class AssetManager {
   final Map<String, DateTime> _assetAccessTimes = <String, DateTime>{};
 
   // Event streams
-  final StreamController<AssetLoadingEvent> _loadingEventController = StreamController<AssetLoadingEvent>.broadcast();
+  final StreamController<AssetLoadingEvent> _loadingEventController =
+      StreamController<AssetLoadingEvent>.broadcast();
 
   /// Stream of asset loading events
   Stream<AssetLoadingEvent> get loadingEvents => _loadingEventController.stream;
@@ -316,10 +317,12 @@ class AssetManager {
   void optimizeCache() {
     if (_currentCacheSize <= maxCacheSize) return;
 
-    final List<MapEntry<String, DateTime>> sortedAssets = _assetAccessTimes.entries.toList()
-      ..sort(
-        (MapEntry<String, DateTime> a, MapEntry<String, DateTime> b) => a.value.compareTo(b.value),
-      );
+    final List<MapEntry<String, DateTime>> sortedAssets =
+        _assetAccessTimes.entries.toList()
+          ..sort(
+            (MapEntry<String, DateTime> a, MapEntry<String, DateTime> b) =>
+                a.value.compareTo(b.value),
+          );
 
     int sizeToFree = _currentCacheSize - (maxCacheSize * 0.8).round();
 
@@ -357,13 +360,17 @@ class AssetManager {
   /// Load the main asset manifest
   Future<void> _loadAssetManifest() async {
     try {
-      final String manifestString = await flutter_services.rootBundle.loadString('assets/asset_manifest.json');
+      final String manifestString = await flutter_services.rootBundle
+          .loadString('assets/asset_manifest.json');
       _assetManifest = json.decode(manifestString) as Map<String, dynamic>;
 
       // Parse asset registry
-      final Map<String, dynamic> assets = _assetManifest!['assets'] as Map<String, dynamic>? ?? <String, dynamic>{};
+      final Map<String, dynamic> assets =
+          _assetManifest!['assets'] as Map<String, dynamic>? ??
+              <String, dynamic>{};
       for (final MapEntry<String, dynamic> entry in assets.entries) {
-        final Map<String, dynamic> assetData = entry.value as Map<String, dynamic>;
+        final Map<String, dynamic> assetData =
+            entry.value as Map<String, dynamic>;
         _assetRegistry[entry.key] = AssetInfo.fromJson(entry.key, assetData);
       }
 
@@ -427,19 +434,23 @@ class AssetManager {
     final Map<String, dynamic>? levelData = await loadLevelData(levelName);
     if (levelData == null) return <String>[];
 
-    final List<String> assets = <String>[]; // Extract asset references from level data
+    final List<String> assets =
+        <String>[]; // Extract asset references from level data
     if (levelData.containsKey('sprites')) {
-      final List<dynamic> sprites = levelData['sprites'] as List<dynamic>? ?? <dynamic>[];
+      final List<dynamic> sprites =
+          levelData['sprites'] as List<dynamic>? ?? <dynamic>[];
       assets.addAll(sprites.cast<String>());
     }
 
     if (levelData.containsKey('animations')) {
-      final List<dynamic> animations = levelData['animations'] as List<dynamic>? ?? <dynamic>[];
+      final List<dynamic> animations =
+          levelData['animations'] as List<dynamic>? ?? <dynamic>[];
       assets.addAll(animations.cast<String>());
     }
 
     if (levelData.containsKey('audio')) {
-      final List<dynamic> audio = levelData['audio'] as List<dynamic>? ?? <dynamic>[];
+      final List<dynamic> audio =
+          levelData['audio'] as List<dynamic>? ?? <dynamic>[];
       assets.addAll(audio.cast<String>());
     }
 
@@ -472,7 +483,8 @@ class AssetManager {
   String get currentLoadingAsset => _currentLoadingAsset;
   int get currentCacheSize => _currentCacheSize;
   int get assetCount => _assetRegistry.length;
-  double get cacheUsagePercentage => maxCacheSize > 0 ? _currentCacheSize / maxCacheSize : 0.0;
+  double get cacheUsagePercentage =>
+      maxCacheSize > 0 ? _currentCacheSize / maxCacheSize : 0.0;
 }
 
 /// Asset information structure
@@ -499,8 +511,10 @@ class AssetInfo {
       estimatedSize: json['estimatedSize'] as int? ?? 0,
       isCritical: json['isCritical'] as bool? ?? false,
       tags: (json['tags'] as List<dynamic>?)?.cast<String>() ?? <String>[],
-      dependencies: (json['dependencies'] as List<dynamic>?)?.cast<String>() ?? <String>[],
-      metadata: json['metadata'] as Map<String, dynamic>? ?? <String, dynamic>{},
+      dependencies: (json['dependencies'] as List<dynamic>?)?.cast<String>() ??
+          <String>[],
+      metadata:
+          json['metadata'] as Map<String, dynamic>? ?? <String, dynamic>{},
     );
   }
 

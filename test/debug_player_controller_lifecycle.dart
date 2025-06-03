@@ -20,11 +20,12 @@ class LifecycleTestGame extends FlameGame {
       position: Vector2(100, 100),
       size: Vector2(32, 48),
     );
-    
+
     directController = PlayerController(player);
     add(directController); // Add directly to game, bypass Player entity
-    
-    developer.log('LifecycleTestGame.onLoad() completed', name: 'LifecycleTestGame');
+
+    developer.log('LifecycleTestGame.onLoad() completed',
+        name: 'LifecycleTestGame',);
   }
 }
 
@@ -35,23 +36,23 @@ void main() {
       () => LifecycleTestGame(),
       (game) async {
         print('=== DIRECT CONTROLLER TEST ===');
-        
+
         // Let a few update cycles pass
         for (int i = 0; i < 3; i++) {
           print('Update cycle ${i + 1}');
           game.update(0.016);
         }
-        
+
         // Test input action
         print('Testing handleInputAction...');
         game.directController.handleInputAction('move_right', true);
-        
+
         // More update cycles
         for (int i = 0; i < 3; i++) {
           print('Update cycle after input ${i + 1}');
           game.update(0.016);
         }
-        
+
         print('=== TEST COMPLETED ===');
         expect(game.directController, isNotNull);
       },

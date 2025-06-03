@@ -105,7 +105,8 @@ class CustomSpriteComponent extends Component {
   /// Set sprite
   Future<void> setSprite(String spritePath) async {
     _spritePath = spritePath;
-    _sprite = await Sprite.load(spritePath); // Replace existing sprite component
+    _sprite =
+        await Sprite.load(spritePath); // Replace existing sprite component
     if (_spriteComponent != null && _spriteComponent!.isMounted) {
       _spriteComponent!.removeFromParent();
     }

@@ -1,9 +1,20 @@
 import 'package:flame/components.dart';
 import 'package:flame/src/game/notifying_vector2.dart';
 
+import '../utils/logger.dart';
+import 'interfaces/transform_integration.dart';
+
+/// PHY-3.1.2: Enhanced TransformComponent with read-only position access
+///
 /// Component that handles transformation operations for entities
 /// Provides utilities for managing position, scale, rotation, etc.
-class TransformComponent extends Component {
+///
+/// Key enhancements:
+/// - Read-only position access enforcement for non-physics systems
+/// - Position synchronization with physics system state updates
+/// - Position validation procedures preventing unauthorized access
+/// - Proper state tracking for physics synchronization
+class TransformComponent extends Component implements ITransformIntegration {
   TransformComponent({
     Vector2? position,
     Vector2? scale,
@@ -23,6 +34,15 @@ class TransformComponent extends Component {
   // Previous frame state for interpolation
   Vector2 _prevPosition = Vector2.zero();
   final double _prevRotation = 0;
+
+  // PHY-3.1.2: Physics synchronization tracking
+  static const String _authorizedSystem = 'PhysicsSystem';
+  double _lastSyncTime = 0.0;
+  bool _isSynchronized = false;
+  String? _syncError;
+
+  // Logger for access violations
+  static final _logger = GameLogger.getLogger('TransformComponent');
 
   @override
   void onMount() {
@@ -52,22 +72,47 @@ class TransformComponent extends Component {
     }
   }
 
-  /// Set position
+  /// Set position - DEPRECATED: Use syncWithPhysics for position updates
+  /// This method now throws an exception to enforce physics ownership
+  @Deprecated('Position updates must go through PhysicsSystem')
   void setPosition(Vector2 newPosition) {
-    _position = newPosition.clone();
+    _logPositionViolation('setPosition', 'Unknown');
+    throw PositionAccessViolation(
+      message:
+          'Direct position modification not allowed. Use PhysicsSystem for position updates.',
+      violatingSystem: 'Unknown',
+      attemptedOperation: 'setPosition',
+    );
   }
 
-  /// Set x coordinate
+  /// Set x coordinate - DEPRECATED: Use syncWithPhysics for position updates
+  /// This method now throws an exception to enforce physics ownership
+  @Deprecated('Position updates must go through PhysicsSystem')
   void setX(double x) {
-    _position.x = x;
+    _logPositionViolation('setX', 'Unknown');
+    throw PositionAccessViolation(
+      message:
+          'Direct position modification not allowed. Use PhysicsSystem for position updates.',
+      violatingSystem: 'Unknown',
+      attemptedOperation: 'setX',
+    );
   }
 
-  /// Set y coordinate
+  /// Set y coordinate - DEPRECATED: Use syncWithPhysics for position updates
+  /// This method now throws an exception to enforce physics ownership
+  @Deprecated('Position updates must go through PhysicsSystem')
   void setY(double y) {
-    _position.y = y;
+    _logPositionViolation('setY', 'Unknown');
+    throw PositionAccessViolation(
+      message:
+          'Direct position modification not allowed. Use PhysicsSystem for position updates.',
+      violatingSystem: 'Unknown',
+      attemptedOperation: 'setY',
+    );
   }
 
   /// Set scale
+  @override
   void setScale(Vector2 newScale) {
     _scale = newScale.clone();
   }
@@ -78,6 +123,7 @@ class TransformComponent extends Component {
   }
 
   /// Set rotation angle in radians
+  @override
   void setRotation(double angle) {
     _rotation = angle;
   }
@@ -92,11 +138,84 @@ class TransformComponent extends Component {
     _pivot = pivot.clone();
   }
 
-  // Getters
-  Vector2 get position => _position;
+  // Getters - PHY-3.1.2: Position is read-only
+  Vector2 get position =>
+      _position.clone(); // Return clone to prevent external modification
   Vector2 get scale => _scale;
   double get rotation => _rotation;
   Vector2 get pivot => _pivot;
-  Vector2 get prevPosition => _prevPosition;
+  Vector2 get prevPosition =>
+      _prevPosition.clone(); // Return clone to prevent external modification
   double get prevRotation => _prevRotation;
+
+  // ============================================================================
+  // PHY-3.1.2: ITransformIntegration Implementation
+  // ============================================================================
+
+  @override
+  Vector2 getPosition() => _position.clone();
+
+  @override
+  Vector2 getScale() => _scale.clone();
+
+  @override
+  double getRotation() => _rotation;
+
+  @override
+  Vector2 getPreviousPosition() => _prevPosition.clone();
+
+  @override
+  void syncWithPhysics(Vector2 position, {String? callerSystem}) {
+    // Validate caller authorization
+    if (!isAuthorizedCaller(callerSystem ?? '')) {
+      _logPositionViolation('syncWithPhysics', callerSystem ?? 'Unknown');
+      throw PositionAccessViolation(
+        message: 'Unauthorized position synchronization attempt',
+        violatingSystem: callerSystem ?? 'Unknown',
+        attemptedOperation: 'syncWithPhysics',
+      );
+    }
+
+    // Store previous position for interpolation
+    _prevPosition = _position.clone();
+
+    // Update position from physics
+    _position.setFrom(position);
+
+    // Update synchronization state
+    _lastSyncTime = DateTime.now().millisecondsSinceEpoch / 1000.0;
+    _isSynchronized = true;
+    _syncError = null;
+
+    // Sync with parent if available
+    if (parent is PositionComponent) {
+      (parent as PositionComponent).position.setFrom(_position);
+    }
+  }
+
+  @override
+  bool isAuthorizedCaller(String callerSystem) {
+    return callerSystem == _authorizedSystem;
+  }
+
+  @override
+  bool isSynchronized() => _isSynchronized;
+
+  @override
+  double getLastSyncTime() => _lastSyncTime;
+
+  @override
+  String? getSynchronizationError() => _syncError;
+
+  // Private helper to log position access violations
+  void _logPositionViolation(String operation, String violatingSystem) {
+    _logger.warning(
+      'Position access violation: System "$violatingSystem" attempted "$operation". '
+      'Position updates must go through PhysicsSystem.',
+    );
+
+    // Mark as desynchronized
+    _isSynchronized = false;
+    _syncError = 'Access violation by $violatingSystem';
+  }
 }

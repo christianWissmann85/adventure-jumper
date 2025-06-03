@@ -137,7 +137,8 @@ class MusicTrack {
       );
       rethrow;
     } catch (e, stackTrace) {
-      final AudioPlaybackException exception = AudioPlaybackException(filePath, 'play', context: e.toString());
+      final AudioPlaybackException exception =
+          AudioPlaybackException(filePath, 'play', context: e.toString());
       ErrorHandler.logError(
         'Failed to play music track $name',
         error: exception,
@@ -169,7 +170,8 @@ class MusicTrack {
         context: 'MusicTrack.stop',
       );
     } catch (e) {
-      final AudioPlaybackException exception = AudioPlaybackException(filePath, 'stop', context: e.toString());
+      final AudioPlaybackException exception =
+          AudioPlaybackException(filePath, 'stop', context: e.toString());
       ErrorHandler.logWarning(
         'Failed to stop music track $name',
         error: exception,
@@ -255,7 +257,8 @@ class MusicTrack {
 
       onFadeComplete?.call();
     } catch (e) {
-      _logger.warning('Failed to crossfade from $name to ${targetTrack.name}: $e');
+      _logger
+          .warning('Failed to crossfade from $name to ${targetTrack.name}: $e');
     } finally {
       _isCrossfading = false;
     }
@@ -264,13 +267,15 @@ class MusicTrack {
   /// Set up player event listeners
   void _setupPlayerListeners() {
     // Position tracking
-    _positionSubscription = _audioPlayer?.onPositionChanged.listen((Duration position) {
+    _positionSubscription =
+        _audioPlayer?.onPositionChanged.listen((Duration position) {
       _currentPosition = position;
       _checkLoopPoint();
     });
 
     // Player state tracking
-    _playerStateSubscription = _audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
+    _playerStateSubscription =
+        _audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
       if (state == PlayerState.completed && _isLooping) {
         _handleLoopCompletion();
       }
@@ -501,7 +506,8 @@ class DynamicMusicSystem {
     Map<String, double> targetVolumes, {
     Duration duration = const Duration(seconds: 2),
   }) async {
-    final Map<String, double> initialVolumes = Map<String, double>.from(_layerVolumes);
+    final Map<String, double> initialVolumes =
+        Map<String, double>.from(_layerVolumes);
     const int steps = 30;
     final double stepDuration = duration.inMilliseconds / steps;
 
@@ -511,7 +517,8 @@ class DynamicMusicSystem {
       for (final String layerName in targetVolumes.keys) {
         final double initialVolume = initialVolumes[layerName] ?? 0.0;
         final double targetVolume = targetVolumes[layerName] ?? 0.0;
-        final double currentVolume = initialVolume + (targetVolume - initialVolume) * progress;
+        final double currentVolume =
+            initialVolume + (targetVolume - initialVolume) * progress;
 
         setLayerVolume(layerName, currentVolume);
       }

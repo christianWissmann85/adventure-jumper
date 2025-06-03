@@ -52,7 +52,8 @@ class Hazard extends Entity {
     // Setup hazard-specific components
     physics = PhysicsComponent()
       ..isStatic = true
-      ..isSensor = true; // Hazards don't provide solid collision, just trigger damage
+      ..isSensor =
+          true; // Hazards don't provide solid collision, just trigger damage
 
     add(physics!);
 

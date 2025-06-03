@@ -39,7 +39,8 @@ class AssetLoadingException extends GameException {
 }
 
 class AssetNotFoundException extends AssetLoadingException {
-  const AssetNotFoundException(String assetPath, String assetType) : super('Asset not found', assetPath, assetType);
+  const AssetNotFoundException(String assetPath, String assetType)
+      : super('Asset not found', assetPath, assetType);
 }
 
 class AssetCorruptedException extends AssetLoadingException {
@@ -74,7 +75,8 @@ class SaveFileCorruptedException extends SaveDataException {
 }
 
 class SaveFileNotFoundException extends SaveDataException {
-  const SaveFileNotFoundException({String? context}) : super('Save file not found', 'load', context: context);
+  const SaveFileNotFoundException({String? context})
+      : super('Save file not found', 'load', context: context);
 }
 
 class SavePermissionException extends SaveDataException {
@@ -102,7 +104,8 @@ class AudioException extends GameException {
 }
 
 class AudioFileNotFoundException extends AudioException {
-  const AudioFileNotFoundException(String audioFile) : super('Audio file not found', audioFile, 'load');
+  const AudioFileNotFoundException(String audioFile)
+      : super('Audio file not found', audioFile, 'load');
 }
 
 class AudioPlaybackException extends AudioException {
@@ -127,7 +130,8 @@ class LevelException extends GameException {
 }
 
 class LevelNotFoundException extends LevelException {
-  const LevelNotFoundException(String levelId) : super('Level not found', levelId, 'load');
+  const LevelNotFoundException(String levelId)
+      : super('Level not found', levelId, 'load');
 }
 
 class LevelDataCorruptedException extends LevelException {

@@ -25,7 +25,8 @@ class DebugConfig {
   static bool logLevelLoading = true; // Important enough to log in all modes
   static bool logSaveOperations = true; // Important enough to log in all modes
   static bool logInputEvents = kDebugMode && verbose;
-  static bool logNetworkOperations = true; // Important enough to log in all modes
+  static bool logNetworkOperations =
+      true; // Important enough to log in all modes
 
   // Enable development-only features
   static bool enableDevTools = kDebugMode;

@@ -196,7 +196,8 @@ class SpatialAudioManager {
       return 0;
     } else {
       // Inverse square law with rolloff factor
-      final double normalizedDistance = (distance - minDistance) / (maxDistance - minDistance);
+      final double normalizedDistance =
+          (distance - minDistance) / (maxDistance - minDistance);
       return math.pow(1.0 - normalizedDistance, rolloffFactor).toDouble();
     }
   }
@@ -224,13 +225,15 @@ class SpatialAudioManager {
 
     // Calculate relative velocity
     final Vector2 relativeVelocity = spatialSound.velocity - _listenerVelocity;
-    final Vector2 soundDirection = (spatialSound.position - _listenerPosition).normalized();
+    final Vector2 soundDirection =
+        (spatialSound.position - _listenerPosition).normalized();
 
     // Project velocity onto sound direction
     final double radialVelocity = relativeVelocity.dot(soundDirection);
 
     // Apply Doppler formula
-    final double dopplerRatio = (_speedOfSound + radialVelocity) / _speedOfSound;
+    final double dopplerRatio =
+        (_speedOfSound + radialVelocity) / _speedOfSound;
     return spatialSound.basePitch * dopplerRatio * dopplerFactor;
   }
 
@@ -441,7 +444,10 @@ class AudioZone {
     for (int i = 0; i < bounds.length; i++) {
       if (((bounds[i].y > point.y) != (bounds[j].y > point.y)) &&
           (point.x <
-              (bounds[j].x - bounds[i].x) * (point.y - bounds[i].y) / (bounds[j].y - bounds[i].y) + bounds[i].x)) {
+              (bounds[j].x - bounds[i].x) *
+                      (point.y - bounds[i].y) /
+                      (bounds[j].y - bounds[i].y) +
+                  bounds[i].x)) {
         inside = !inside;
       }
       j = i;
@@ -476,7 +482,8 @@ extension Vector2Spatial on Vector2 {
   double spatialDistanceTo(Vector2 other, {double heightDifference = 0.0}) {
     final double horizontalDistance = distanceTo(other);
     return math.sqrt(
-      horizontalDistance * horizontalDistance + heightDifference * heightDifference,
+      horizontalDistance * horizontalDistance +
+          heightDifference * heightDifference,
     );
   }
 

@@ -20,7 +20,8 @@ class DebugConsole {
 
   static bool _isVisible = false;
   static final List<String> _commandHistory = <String>[];
-  static final Map<String, CommandHandler> _commands = <String, CommandHandler>{};
+  static final Map<String, CommandHandler> _commands =
+      <String, CommandHandler>{};
 
   /// Check if console is visible
   static bool get isVisible => _isVisible;
@@ -140,7 +141,8 @@ class DebugConsole {
           }
         } else {
           // Set status
-          final bool enable = args[1].toLowerCase() == 'on' || args[1].toLowerCase() == 'true';
+          final bool enable =
+              args[1].toLowerCase() == 'on' || args[1].toLowerCase() == 'true';
 
           switch (feature) {
             case 'fps':

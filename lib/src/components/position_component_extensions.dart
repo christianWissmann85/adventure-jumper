@@ -16,7 +16,8 @@ extension PositionComponentExtensions on PositionComponent {
         value,
       );
     } else if (this is SpriteAnimationComponent) {
-      final SpriteAnimationComponent animComponent = this as SpriteAnimationComponent;
+      final SpriteAnimationComponent animComponent =
+          this as SpriteAnimationComponent;
       final Color currentColor = animComponent.paint.color;
       animComponent.paint.color = Color.fromRGBO(
         (currentColor.r * 255.0).round() & 0xff,

@@ -273,7 +273,8 @@ class MenuButton extends PositionComponent with TapCallbacks {
 
     // Draw button background
     final Rect rect = Rect.fromLTWH(0, 0, size.x, size.y);
-    final RRect rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
+    final RRect rrect =
+        RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
 
     final Paint paint = Paint()..color = buttonColor;
     canvas.drawRRect(rrect, paint); // Draw button border

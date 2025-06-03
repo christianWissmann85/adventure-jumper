@@ -152,7 +152,8 @@ class SettingsMenu extends PositionComponent with TapCallbacks {
         ),
       ),
     );
-    _settingsPanel.position = Vector2(_settingsPanel.position.x, -_settingsPanel.size.y);
+    _settingsPanel.position =
+        Vector2(_settingsPanel.position.x, -_settingsPanel.size.y);
     _settingsPanel.add(
       MoveToEffect(
         Vector2(_settingsPanel.position.x, 80),
@@ -204,7 +205,8 @@ class SettingsPanel extends PositionComponent {
   void _createBackground() {
     final RectangleComponent background = RectangleComponent(
       size: size,
-      paint: Paint()..color = const Color(0xAA333333), // Dark semi-transparent gray
+      paint: Paint()
+        ..color = const Color(0xAA333333), // Dark semi-transparent gray
     );
 
     add(background);
@@ -520,11 +522,13 @@ class SettingsButton extends PositionComponent with TapCallbacks {
     // Determine button color based on state
     Color color = buttonColor;
     if (_isHovered) {
-      color = color.withAlpha(((color.a * 255.0).round() & 0xff + 40).clamp(0, 255));
+      color = color
+          .withAlpha(((color.a * 255.0).round() & 0xff + 40).clamp(0, 255));
     }
 
     if (_isPressed) {
-      color = color.withAlpha(((color.a * 255.0).round() & 0xff - 40).clamp(0, 255));
+      color = color
+          .withAlpha(((color.a * 255.0).round() & 0xff - 40).clamp(0, 255));
     }
 
     // Draw button background
@@ -758,7 +762,8 @@ class SettingsToggle extends PositionComponent with TapCallbacks {
       const Radius.circular(trackHeight / 2),
     );
 
-    Color trackColor = isEnabled ? const Color(0xFF5A7EB0) : const Color(0xFF555555);
+    Color trackColor =
+        isEnabled ? const Color(0xFF5A7EB0) : const Color(0xFF555555);
     if (_isHovered) {
       trackColor = Color.fromRGBO(
         (trackColor.r * 255.0).round() & 0xff,
@@ -774,7 +779,9 @@ class SettingsToggle extends PositionComponent with TapCallbacks {
     const double knobRadius = trackHeight * 0.8;
     final Paint knobPaint = Paint()..color = Colors.white;
 
-    final double knobX = isEnabled ? size.x - trackWidth / 5 : size.x - trackWidth + trackWidth / 5;
+    final double knobX = isEnabled
+        ? size.x - trackWidth / 5
+        : size.x - trackWidth + trackWidth / 5;
 
     final double knobY = size.y / 2;
 
@@ -822,7 +829,8 @@ class SettingsSelector extends PositionComponent with TapCallbacks {
     final Rect rect = Rect.fromLTWH(0, 0, size.x, size.y);
     final RRect rrect = RRect.fromRectAndRadius(rect, const Radius.circular(5));
 
-    final Color bgColor = _isHovered ? const Color(0xFF444444) : const Color(0xFF333333);
+    final Color bgColor =
+        _isHovered ? const Color(0xFF444444) : const Color(0xFF333333);
     final Paint bgPaint = Paint()..color = bgColor;
     canvas.drawRRect(rrect, bgPaint);
 

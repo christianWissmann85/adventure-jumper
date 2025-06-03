@@ -34,7 +34,8 @@ class DebugUtils {
   static const Color performanceBadColor = Colors.red;
 
   // Performance tracking
-  static final Map<String, PerformanceTracker> _performanceTrackers = <String, PerformanceTracker>{};
+  static final Map<String, PerformanceTracker> _performanceTrackers =
+      <String, PerformanceTracker>{};
   static final List<String> _debugLog = <String>[];
   static const int _maxLogEntries = 1000;
   // Frame rate tracking
@@ -109,7 +110,8 @@ class DebugUtils {
   static void logPerformanceMetrics(String operation, double milliseconds) {
     if (!_logPerformance) return;
 
-    final LogLevel level = milliseconds > 16.6 ? LogLevel.warning : LogLevel.debug;
+    final LogLevel level =
+        milliseconds > 16.6 ? LogLevel.warning : LogLevel.debug;
     log('PERF: $operation took ${milliseconds.toStringAsFixed(2)}ms', level);
   }
 
@@ -182,7 +184,8 @@ class DebugUtils {
   static double getCurrentFPS() {
     if (_frameTimes.isEmpty) return 0;
 
-    final double averageFrameTime = _frameTimes.reduce((double a, double b) => a + b) / _frameTimes.length;
+    final double averageFrameTime =
+        _frameTimes.reduce((double a, double b) => a + b) / _frameTimes.length;
     return 1000.0 / averageFrameTime; // Convert from ms to FPS
   }
 
@@ -329,7 +332,8 @@ class DebugUtils {
     if (_debugLog.isEmpty) return;
 
     try {
-      final String timestamp = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final String timestamp =
+          DateTime.now().toIso8601String().replaceAll(':', '-');
       final String fileName = filename ?? 'debug_log_$timestamp.txt';
 
       // In a real implementation, you'd use proper file I/O
@@ -381,7 +385,8 @@ class DebugUtils {
     if (!_debugMode) return;
 
     if (!condition) {
-      final DebugAssertionException exception = DebugAssertionException(message, context: 'debugAssert');
+      final DebugAssertionException exception =
+          DebugAssertionException(message, context: 'debugAssert');
       logError('ASSERTION FAILED: $message', exception);
 
       if (kDebugMode) {
@@ -417,7 +422,8 @@ class DebugUtils {
       return result;
     } on Error catch (e) {
       stopwatch.stop();
-      final PerformanceTrackingException exception = PerformanceTrackingException(
+      final PerformanceTrackingException exception =
+          PerformanceTrackingException(
         name,
         'Error',
         context: e.toString(),
@@ -426,7 +432,8 @@ class DebugUtils {
       rethrow;
     } catch (e) {
       stopwatch.stop();
-      final PerformanceTrackingException exception = PerformanceTrackingException(
+      final PerformanceTrackingException exception =
+          PerformanceTrackingException(
         name,
         'Exception',
         context: e.toString(),

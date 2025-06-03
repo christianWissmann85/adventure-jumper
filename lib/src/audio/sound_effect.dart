@@ -185,7 +185,8 @@ class SoundEffect {
 
   /// Set up player state listener for completion tracking
   void _setupPlayerStateListener() {
-    _playerStateSubscription = _audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
+    _playerStateSubscription =
+        _audioPlayer?.onPlayerStateChanged.listen((PlayerState state) {
       if (state == PlayerState.completed) {
         if (_isLooping) {
           // Restart for looping

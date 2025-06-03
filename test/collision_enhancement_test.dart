@@ -53,7 +53,7 @@ void main() {
     test('DEBUG: Simple collision test', () {
       // Set up a test-specific logger
       final logger = GameLogger.getLogger('CollisionTest');
-      
+
       // CRITICAL FIX: Add entities to the physics system!
       physicsSystem.clearEntities();
       logger.fine('Cleared entities. Count: ${physicsSystem.entityCount}');

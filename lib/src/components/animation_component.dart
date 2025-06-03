@@ -11,7 +11,9 @@ class AnimationComponent extends Component {
     bool? isPlaying,
   }) {
     if (animations != null) _animations = animations;
-    if (initialAnimation != null && animations != null && animations.containsKey(initialAnimation)) {
+    if (initialAnimation != null &&
+        animations != null &&
+        animations.containsKey(initialAnimation)) {
       _currentAnimationName = initialAnimation;
       _currentAnimation = animations[initialAnimation];
     }

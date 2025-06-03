@@ -1,8 +1,20 @@
 import 'package:flame/components.dart';
 
+import '../systems/interfaces/physics_state.dart';
+import 'interfaces/physics_integration.dart';
+
+/// PHY-3.1.1: Enhanced PhysicsComponent with IPhysicsIntegration
+///
 /// Component that handles physics simulation for entities
 /// Manages velocity, acceleration, gravity, and other physics properties
-class PhysicsComponent extends Component {
+///
+/// Now implements IPhysicsIntegration interface for proper coordination
+/// with PhysicsSystem, including:
+/// - State synchronization with PhysicsSystem
+/// - Accumulation prevention mechanisms
+/// - Component lifecycle management
+/// - Error recovery procedures
+class PhysicsComponent extends Component implements IPhysicsIntegration {
   PhysicsComponent({
     Vector2? velocity,
     Vector2? acceleration,
@@ -42,8 +54,6 @@ class PhysicsComponent extends Component {
   bool _isSensor = false; // Sensor objects don't collide physically
   bool _affectedByGravity = true;
 
-  // Environmental properties
-  final Vector2 _gravity = Vector2(0, 9.8); // Default gravity
   // Ground contact state
   bool _isOnGround = false;
   bool _wasOnGround = false;
@@ -198,5 +208,213 @@ class PhysicsComponent extends Component {
   /// Set gravity scale multiplier
   void setGravityScale(double scale) {
     _gravityScale = scale;
+  }
+
+  /// Clear all forces (equivalent to clearForces)
+  void clearForces() {
+    _acceleration.setZero();
+  }
+
+  // ============================================================================
+  // PHY-3.1.1: IPhysicsIntegration Implementation
+  // ============================================================================
+
+  @override
+  Future<void> updatePhysicsState(PhysicsState state) async {
+    // Synchronize component state with authoritative physics state
+    _velocity.setFrom(state.velocity);
+    _acceleration.setFrom(state.acceleration);
+    _isOnGround = state.isGrounded;
+    _wasOnGround = state.wasGrounded;
+
+    // Update physics properties if they've changed
+    _mass = state.mass;
+    _gravityScale = state.gravityScale;
+    _friction = state.friction;
+    _restitution = state.restitution;
+    _isStatic = state.isStatic;
+    _affectedByGravity = state.affectedByGravity;
+
+    // Notify of state update
+    onPhysicsUpdate(state);
+  }
+
+  @override
+  Future<void> resetPhysicsValues() async {
+    // Reset all physics values to clean defaults
+    _velocity.setZero();
+    _acceleration.setZero();
+    _isOnGround = false;
+    _wasOnGround = false;
+
+    // Reset collision tracking
+    _lastCollisionNormal = null;
+    _lastSeparationVector = null;
+    _lastLandingVelocity = 0.0;
+    _lastLandingPosition = null;
+    _lastPlatformType = null;
+
+    // Reset edge detection
+    _isNearLeftEdge = false;
+    _isNearRightEdge = false;
+    _leftEdgeDistance = double.infinity;
+    _rightEdgeDistance = double.infinity;
+    _leftEdgePosition = null;
+    _rightEdgePosition = null;
+
+    // Reset to default physics properties
+    _mass = 1.0;
+    _gravityScale = 1.0;
+    _friction = 0.1;
+    _restitution = 0.2;
+    _isStatic = false;
+    _affectedByGravity = true;
+  }
+
+  @override
+  Future<void> preventAccumulation() async {
+    // Clear any accumulated forces
+    _acceleration.setZero();
+
+    // Clamp velocity to prevent excessive accumulation
+    if (_velocity.length > 1000.0) {
+      _velocity.normalize();
+      _velocity.scale(1000.0);
+    }
+
+    // Reset collision tracking to prevent contact point accumulation
+    _lastCollisionNormal = null;
+    _lastSeparationVector = null;
+  }
+
+  @override
+  Future<Vector2> getPosition() async {
+    // Position is managed by the Entity, not the component
+    // This method should be overridden by the entity or coordinated through the physics system
+    if (parent is PositionComponent) {
+      return (parent as PositionComponent).position.clone();
+    }
+    return Vector2.zero();
+  }
+
+  @override
+  Future<Vector2> getVelocity() async {
+    return _velocity.clone();
+  }
+
+  @override
+  Future<bool> isGrounded() async {
+    return _isOnGround;
+  }
+
+  @override
+  Future<PhysicsProperties> getPhysicsProperties() async {
+    return PhysicsProperties(
+      mass: _mass,
+      gravityScale: _gravityScale,
+      friction: _friction,
+      restitution: _restitution,
+      isStatic: _isStatic,
+      affectedByGravity: _affectedByGravity,
+      useEdgeDetection: _useEdgeDetection,
+    );
+  }
+
+  @override
+  void onPhysicsUpdate(PhysicsState state) {
+    // Hook for subclasses to respond to physics updates
+    // Can be overridden for specific entity behaviors
+  }
+
+  @override
+  void onCollision(CollisionInfo collision) {
+    // Update collision tracking
+    if (collision.collisionType == 'ground') {
+      _lastCollisionNormal = collision.contactNormal.clone();
+      _lastLandingPosition = collision.contactPoint.clone();
+      _lastLandingVelocity = _velocity.y;
+    }
+  }
+
+  @override
+  void onGroundStateChanged(bool isGrounded) {
+    _wasOnGround = _isOnGround;
+    _isOnGround = isGrounded;
+
+    if (isGrounded && !_wasOnGround) {
+      // Just landed
+      _lastLandingVelocity = _velocity.y;
+      if (parent is PositionComponent) {
+        _lastLandingPosition = (parent as PositionComponent).position.clone();
+      }
+    }
+  }
+  
+  /// Get current physics state for synchronization
+  PhysicsState getPhysicsState() {
+    final position = parent is PositionComponent 
+        ? (parent as PositionComponent).position.clone() 
+        : Vector2.zero();
+    
+    // Use entity id if parent is an Entity, otherwise use hashCode
+    int entityId = 0;
+    if (parent != null) {
+      try {
+        // Check if parent has an id getter (Entity class)
+        final dynamic parentDynamic = parent;
+        if (parentDynamic.id != null) {
+          entityId = parentDynamic.id.hashCode;
+        }
+      } catch (_) {
+        entityId = parent.hashCode;
+      }
+    }
+    
+    return PhysicsState(
+      entityId: entityId,
+      position: position,
+      velocity: _velocity.clone(),
+      acceleration: _acceleration.clone(),
+      isGrounded: _isOnGround,
+      wasGrounded: _wasOnGround,
+      mass: _mass,
+      gravityScale: _gravityScale,
+      friction: _friction,
+      restitution: _restitution,
+      isStatic: _isStatic,
+      affectedByGravity: _affectedByGravity,
+      activeCollisions: [],  // Empty for now
+      accumulatedForces: Vector2.zero(),
+      contactPointCount: 0,
+      updateCount: 0,
+      lastUpdateTime: DateTime.now(),
+    );
+  }
+  
+  /// Get position from parent entity
+  Vector2 get position {
+    if (parent is PositionComponent) {
+      return (parent as PositionComponent).position;
+    }
+    return Vector2.zero();
+  }
+
+  // ============================================================================
+  // Component Lifecycle Management (PHY-3.1.1)
+  // ============================================================================
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    // Initialize component with clean physics state
+    await resetPhysicsValues();
+  }
+
+  @override
+  void onRemove() {
+    // Clean up physics state before removal
+    _velocity.setZero();
+    _acceleration.setZero();
+    super.onRemove();
   }
 }

@@ -32,15 +32,19 @@ class ProgressTracker {
         globalStatistics = globalStatistics ?? _defaultGlobalStatistics(),
         firstCompletions = firstCompletions ?? <String, DateTime>{},
         unlockableContent = unlockableContent ?? <String, dynamic>{},
-        achievementCategories = achievementCategories ?? _defaultAchievementCategories(),
-        achievementProgress = achievementProgress ?? <String, AchievementProgress>{},
+        achievementCategories =
+            achievementCategories ?? _defaultAchievementCategories(),
+        achievementProgress =
+            achievementProgress ?? <String, AchievementProgress>{},
         biomeProgress = biomeProgress ?? <String, BiomeProgress>{},
         allLevelsInBiome = allLevelsInBiome ?? <String, bool>{},
         allSecretsInBiome = allSecretsInBiome ?? <String, bool>{},
-        allAchievementsInCategory = allAchievementsInCategory ?? <String, bool>{},
+        allAchievementsInCategory =
+            allAchievementsInCategory ?? <String, bool>{},
         unlockedFeatures = unlockedFeatures ?? _defaultUnlockedFeatures(),
         unlockedBiomes = unlockedBiomes ?? <String, bool>{'grasslands': true},
-        unlockedCharacters = unlockedCharacters ?? <String, bool>{'default_hero': true},
+        unlockedCharacters =
+            unlockedCharacters ?? <String, bool>{'default_hero': true},
         unlockedAbilities = unlockedAbilities ?? <String, bool>{},
         personalBests = personalBests ?? <String, PlayerRecord>{},
         speedrunRecords = speedrunRecords ?? <String, int>{},
@@ -60,7 +64,8 @@ class ProgressTracker {
             )
           : _defaultGlobalStatistics(),
       firstCompletions: json['firstCompletions'] != null
-          ? (json['firstCompletions'] as Map<String, dynamic>).map<String, DateTime>(
+          ? (json['firstCompletions'] as Map<String, dynamic>)
+              .map<String, DateTime>(
               (String key, value) => MapEntry<String, DateTime>(
                 key,
                 DateTime.parse(value as String),
@@ -73,15 +78,19 @@ class ProgressTracker {
             )
           : <String, dynamic>{},
       achievementCategories: json['achievementCategories'] != null
-          ? (json['achievementCategories'] as Map<String, dynamic>).map<String, List<String>>(
+          ? (json['achievementCategories'] as Map<String, dynamic>)
+              .map<String, List<String>>(
               (String key, value) => MapEntry<String, List<String>>(
                 key,
-                (value as List<dynamic>).map<String>((item) => item as String).toList(),
+                (value as List<dynamic>)
+                    .map<String>((item) => item as String)
+                    .toList(),
               ),
             )
           : _defaultAchievementCategories(),
       achievementProgress: json['achievementProgress'] != null
-          ? (json['achievementProgress'] as Map<String, dynamic>).map<String, AchievementProgress>(
+          ? (json['achievementProgress'] as Map<String, dynamic>)
+              .map<String, AchievementProgress>(
               (String key, value) => MapEntry<String, AchievementProgress>(
                 key,
                 AchievementProgress.fromJson(value as Map<String, dynamic>),
@@ -96,7 +105,8 @@ class ProgressTracker {
       totalSecretsFound: json['totalSecretsFound'] as int? ?? 0,
       totalLevelsCompleted: json['totalLevelsCompleted'] as int? ?? 0,
       biomeProgress: json['biomeProgress'] != null
-          ? (json['biomeProgress'] as Map<String, dynamic>).map<String, BiomeProgress>(
+          ? (json['biomeProgress'] as Map<String, dynamic>)
+              .map<String, BiomeProgress>(
               (String key, value) => MapEntry<String, BiomeProgress>(
                 key,
                 BiomeProgress.fromJson(value as Map<String, dynamic>),
@@ -139,7 +149,8 @@ class ProgressTracker {
             )
           : <String, bool>{},
       personalBests: json['personalBests'] != null
-          ? (json['personalBests'] as Map<String, dynamic>).map<String, PlayerRecord>(
+          ? (json['personalBests'] as Map<String, dynamic>)
+              .map<String, PlayerRecord>(
               (String key, value) => MapEntry<String, PlayerRecord>(
                 key,
                 PlayerRecord.fromJson(value as Map<String, dynamic>),
@@ -267,12 +278,14 @@ class ProgressTracker {
     );
 
     // Update level completion count
-    final Map<String, bool> levelsCompleted = saveData['levelsCompleted'] != null
-        ? Map<String, bool>.from(
-            saveData['levelsCompleted'] as Map<String, dynamic>,
-          )
-        : <String, bool>{};
-    totalLevelsCompleted = math.max(totalLevelsCompleted, levelsCompleted.length);
+    final Map<String, bool> levelsCompleted =
+        saveData['levelsCompleted'] != null
+            ? Map<String, bool>.from(
+                saveData['levelsCompleted'] as Map<String, dynamic>,
+              )
+            : <String, bool>{};
+    totalLevelsCompleted =
+        math.max(totalLevelsCompleted, levelsCompleted.length);
 
     // Update secrets found count
     final Map<String, bool> secretsFound = saveData['secretsFound'] != null
@@ -314,7 +327,8 @@ class ProgressTracker {
   /// Check if category is complete
   void _checkCategoryCompletion(String achievementId) {
     for (final String category in achievementCategories.keys) {
-      final List<String> categoryAchievements = achievementCategories[category]!;
+      final List<String> categoryAchievements =
+          achievementCategories[category]!;
       if (categoryAchievements.contains(achievementId)) {
         final bool allComplete = categoryAchievements.every(
           (String achievement) => globalAchievements[achievement] == true,
@@ -402,16 +416,21 @@ class ProgressTracker {
 
   /// Get completion percentage
   double getCompletionPercentage() {
-    final int totalAchievements =
-        achievementCategories.values.expand((List<String> achievements) => achievements).length;
-    final int unlockedAchievements = globalAchievements.values.where((bool unlocked) => unlocked).length;
+    final int totalAchievements = achievementCategories.values
+        .expand((List<String> achievements) => achievements)
+        .length;
+    final int unlockedAchievements =
+        globalAchievements.values.where((bool unlocked) => unlocked).length;
 
-    return totalAchievements > 0 ? unlockedAchievements / totalAchievements : 0.0;
+    return totalAchievements > 0
+        ? unlockedAchievements / totalAchievements
+        : 0.0;
   }
 
   /// Get achievements by category
   Map<String, bool> getAchievementsByCategory(String category) {
-    final List<String> categoryAchievements = achievementCategories[category] ?? <String>[];
+    final List<String> categoryAchievements =
+        achievementCategories[category] ?? <String>[];
     final Map<String, bool> result = <String, bool>{};
 
     for (final String achievement in categoryAchievements) {
@@ -427,12 +446,15 @@ class ProgressTracker {
       'globalAchievements': globalAchievements,
       'globalStatistics': globalStatistics,
       'firstCompletions': firstCompletions.map<String, String>(
-        (String key, DateTime value) => MapEntry<String, String>(key, value.toIso8601String()),
+        (String key, DateTime value) =>
+            MapEntry<String, String>(key, value.toIso8601String()),
       ),
       'unlockableContent': unlockableContent,
       'achievementCategories': achievementCategories,
-      'achievementProgress': achievementProgress.map<String, Map<String, dynamic>>(
-        (String key, AchievementProgress value) => MapEntry<String, Map<String, dynamic>>(key, value.toJson()),
+      'achievementProgress':
+          achievementProgress.map<String, Map<String, dynamic>>(
+        (String key, AchievementProgress value) =>
+            MapEntry<String, Map<String, dynamic>>(key, value.toJson()),
       ),
       'totalPlaytime': totalPlaytime,
       'totalJumps': totalJumps,
@@ -442,7 +464,8 @@ class ProgressTracker {
       'totalSecretsFound': totalSecretsFound,
       'totalLevelsCompleted': totalLevelsCompleted,
       'biomeProgress': biomeProgress.map<String, Map<String, dynamic>>(
-        (String key, BiomeProgress value) => MapEntry<String, Map<String, dynamic>>(key, value.toJson()),
+        (String key, BiomeProgress value) =>
+            MapEntry<String, Map<String, dynamic>>(key, value.toJson()),
       ),
       'allLevelsInBiome': allLevelsInBiome,
       'allSecretsInBiome': allSecretsInBiome,
@@ -452,7 +475,8 @@ class ProgressTracker {
       'unlockedCharacters': unlockedCharacters,
       'unlockedAbilities': unlockedAbilities,
       'personalBests': personalBests.map<String, Map<String, dynamic>>(
-        (String key, PlayerRecord value) => MapEntry<String, Map<String, dynamic>>(key, value.toJson()),
+        (String key, PlayerRecord value) =>
+            MapEntry<String, Map<String, dynamic>>(key, value.toJson()),
       ),
       'speedrunRecords': speedrunRecords,
       'challengeRecords': challengeRecords,
@@ -477,16 +501,26 @@ class BiomeProgress {
     return BiomeProgress(
       biomeId: json['biomeId'] as String,
       levelsCompleted: json['levelsCompleted'] != null
-          ? (json['levelsCompleted'] as List<dynamic>).map<String>((e) => e as String).toSet()
+          ? (json['levelsCompleted'] as List<dynamic>)
+              .map<String>((e) => e as String)
+              .toSet()
           : null,
       secretsFound: json['secretsFound'] != null
-          ? (json['secretsFound'] as List<dynamic>).map<String>((e) => e as String).toSet()
+          ? (json['secretsFound'] as List<dynamic>)
+              .map<String>((e) => e as String)
+              .toSet()
           : null,
       achievementsUnlocked: json['achievementsUnlocked'] != null
-          ? (json['achievementsUnlocked'] as List<dynamic>).map<String>((e) => e as String).toSet()
+          ? (json['achievementsUnlocked'] as List<dynamic>)
+              .map<String>((e) => e as String)
+              .toSet()
           : null,
-      firstVisit: json['firstVisit'] != null ? DateTime.parse(json['firstVisit'] as String) : null,
-      lastVisit: json['lastVisit'] != null ? DateTime.parse(json['lastVisit'] as String) : null,
+      firstVisit: json['firstVisit'] != null
+          ? DateTime.parse(json['firstVisit'] as String)
+          : null,
+      lastVisit: json['lastVisit'] != null
+          ? DateTime.parse(json['lastVisit'] as String)
+          : null,
     );
   }
   final String biomeId;
@@ -521,7 +555,9 @@ class AchievementProgress {
       achievementId: json['achievementId'] as String,
       currentProgress: json['currentProgress'] as int? ?? 0,
       targetProgress: json['targetProgress'] as int? ?? 1,
-      metadata: json['metadata'] != null ? Map<String, dynamic>.from(json['metadata'] as Map<String, dynamic>) : null,
+      metadata: json['metadata'] != null
+          ? Map<String, dynamic>.from(json['metadata'] as Map<String, dynamic>)
+          : null,
     );
   }
   final String achievementId;
@@ -529,7 +565,8 @@ class AchievementProgress {
   int targetProgress;
   Map<String, dynamic> metadata;
 
-  double get progressPercentage => targetProgress > 0 ? currentProgress / targetProgress : 0.0;
+  double get progressPercentage =>
+      targetProgress > 0 ? currentProgress / targetProgress : 0.0;
   bool get isComplete => currentProgress >= targetProgress;
 
   Map<String, dynamic> toJson() {
@@ -555,8 +592,12 @@ class PlayerRecord {
     return PlayerRecord(
       category: json['category'] as String,
       value: json['value'],
-      achieved: json['achieved'] != null ? DateTime.parse(json['achieved'] as String) : null,
-      context: json['context'] != null ? Map<String, dynamic>.from(json['context'] as Map<String, dynamic>) : null,
+      achieved: json['achieved'] != null
+          ? DateTime.parse(json['achieved'] as String)
+          : null,
+      context: json['context'] != null
+          ? Map<String, dynamic>.from(json['context'] as Map<String, dynamic>)
+          : null,
     );
   }
   final String category;
@@ -570,9 +611,11 @@ class PlayerRecord {
     switch (category) {
       case 'fastest_completion':
       case 'speedrun':
-        return (value as num) < (other.value as num); // Lower is better for time
+        return (value as num) <
+            (other.value as num); // Lower is better for time
       default:
-        return (value as num) > (other.value as num); // Higher is better for scores
+        return (value as num) >
+            (other.value as num); // Higher is better for scores
     }
   }
 

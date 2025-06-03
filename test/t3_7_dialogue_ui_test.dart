@@ -102,8 +102,10 @@ void main() {
 
         // Verify navigation structure
         expect(startNode.choiceNodeIds!['Who are you?'], equals('about_mira'));
-        expect(startNode.choiceNodeIds!['What is this place?'],
-            equals('about_archive'),);
+        expect(
+          startNode.choiceNodeIds!['What is this place?'],
+          equals('about_archive'),
+        );
         expect(startNode.choiceNodeIds!['I must go'], equals('farewell'));
 
         // Verify connected nodes exist
@@ -123,8 +125,10 @@ void main() {
 
         final DialogueNode questNode = tree['teaching_offer']!;
         expect(questNode.entry.text, contains('undertake a task'));
-        expect(questNode.choiceNodeIds!['Yes, I\'m ready'],
-            equals('quest_accept'),);
+        expect(
+          questNode.choiceNodeIds!['Yes, I\'m ready'],
+          equals('quest_accept'),
+        );
       });
     });
 

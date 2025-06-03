@@ -40,7 +40,7 @@ class DebugRectangleComponent extends RectangleComponent {
         '[$debugName] Component onMount() called - isMounted: $isMounted',
       );
       _hasLoggedMount = true;
-      
+
       // Check mounting status in next frame
       Future.delayed(Duration.zero, () {
         DebugConfig.spritePrint(
@@ -56,34 +56,34 @@ class DebugRectangleComponent extends RectangleComponent {
   @override
   void render(Canvas canvas) {
     _renderCallCount++;
-    
+
     // Log first few render calls and then periodically
     if (_renderCallCount <= 5 || _renderCallCount % 60 == 0) {
       DebugConfig.spritePrint(
         '[$debugName] RENDER METHOD CALLED #$_renderCallCount - size: $size, position: $position, mounted: $isMounted',
       );
     }
-    
+
     // Call parent render method
     super.render(canvas);
-    
+
     // Additional debug visualization - draw a border
     final Paint borderPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
-    
+
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.x, size.y),
       borderPaint,
     );
-    
+
     // Draw an X in the center to make it very obvious
     final Paint xPaint = Paint()
       ..color = Colors.red
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.0;
-    
+
     canvas.drawLine(
       Offset(0, 0),
       Offset(size.x, size.y),
@@ -100,7 +100,7 @@ class DebugRectangleComponent extends RectangleComponent {
   void update(double dt) {
     super.update(dt);
     _updateCallCount++;
-    
+
     // Log first few update calls and then periodically
     if (_updateCallCount <= 3 || _updateCallCount % 120 == 0) {
       DebugConfig.spritePrint(

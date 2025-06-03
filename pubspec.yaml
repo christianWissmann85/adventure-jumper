@@ -42,14 +42,16 @@ dependencies:
   shared_preferences: ^2.2.2  # For game state management
   vector_math: ^2.1.4  # Vector mathematics
 
+  meta: any
 dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  mocktail: ^1.0.0
+  mocktail: ^1.0.4
   very_good_analysis: ^7.0.0
 
 # The following section is specific to Flutter.
+  test: any
 flutter:
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

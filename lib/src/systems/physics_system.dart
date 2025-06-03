@@ -35,6 +35,21 @@ enum CollisionLayer {
   }
 }
 
+// PHY-2.4.2: Contact point structure for accumulation prevention
+class ContactPoint {
+  ContactPoint({
+    required this.position,
+    required this.normal,
+    required this.otherEntityId,
+    required this.timestamp,
+  });
+
+  final Vector2 position;
+  final Vector2 normal;
+  final int otherEntityId;
+  final DateTime timestamp;
+}
+
 // T2.4.1: Enhanced collision data structure with separation vectors
 class CollisionData {
   CollisionData({
@@ -100,6 +115,15 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     if (timeScale != null) _timeScale = timeScale;
   }
 
+  // PHY-2.4.2: Maximum value constraints for accumulation prevention
+  static const double MAX_VELOCITY = 1000.0;
+  static const double MAX_ACCELERATION = 500.0;
+  static const double MAX_FRICTION_ACCUMULATION = 10.0;
+  static const int MAX_CONTACT_POINTS = 8;
+  static const double CONTACT_LIFETIME = 0.1; // seconds
+  static const double VELOCITY_THRESHOLD = 0.01; // for micro-movement stopping
+  static const double DRIFT_CORRECTION_FACTOR = 0.98;
+
   // Configuration
   double _timeScale = 1.0;
   Vector2 _gravity = Vector2(0, PhysicsConstants.gravity);
@@ -112,6 +136,10 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
   // Collision processing
   final List<CollisionData> _collisions = <CollisionData>[];
   final Map<String, List<Entity>> _spatialHash = {};
+
+  // PHY-2.4.2: Contact point management for accumulation prevention
+  final Map<int, List<ContactPoint>> _entityContactPoints = {};
+  final Map<int, double> _frictionAccumulators = {};
 
   // PHASE 1 DEBUG: Entity count logging
   int _logCounter = 0;
@@ -167,6 +195,13 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
 
     // T2.6.2: Process edge detection after collision resolution
     processEdgeDetection();
+
+    // PHY-2.4.2: Clean up contact points and reset accumulators periodically
+    if (_logCounter % 60 == 0) {
+      // Every second at 60fps
+      _cleanupContactPoints();
+      _resetFrictionAccumulators();
+    }
   }
 
   @override
@@ -207,9 +242,9 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
       // Initialize physics properties if needed
     }
 
-    logger.info('  Collision component details:');
-    logger.info('    Is active: ${entity.collision.isActive}');
-    logger.info('    Hitbox size: ${entity.collision.hitboxSize}');
+    // logger.info('  Collision component details:');
+    // logger.info('    Is active: ${entity.collision.isActive}');
+    // logger.info('    Hitbox size: ${entity.collision.hitboxSize}');
 
     logger.info('  Entity position: ${entity.position}');
     logger.info('  Entity size: ${entity.size}');
@@ -280,34 +315,65 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
   void integrateVelocity(PhysicsComponent physics, double dt) {
     // Apply acceleration to velocity with delta time integration
     physics.velocity.x += physics.acceleration.x * dt;
-    physics.velocity.y += physics.acceleration.y *
-        dt; // Apply velocity to position with delta time integration
+    physics.velocity.y += physics.acceleration.y * dt;
+
+    // PHY-2.4.1: Use centralized position update method
     // The entity that owns this physics component
     if (physics.parent is Entity) {
       final Entity entity = physics.parent as Entity;
 
-      // DEBUG: Log position changes
-      final Vector2 oldPosition = entity.position.clone();
+      // Calculate the position delta from velocity
+      final Vector2 positionDelta = Vector2(
+        physics.velocity.x * dt,
+        physics.velocity.y * dt,
+      );
 
-      entity.position.x += physics.velocity.x * dt;
-      entity.position.y += physics.velocity.y * dt;
-
-      // CRITICAL FIX: Also update the TransformComponent to prevent it from overriding the position
-      entity.transformComponent.setPosition(entity.position);
-
-      // DEBUG: Only log if position actually changed significantly
-      if ((entity.position - oldPosition).length > 0.1) {
-        print(
-          '[PhysicsSystem] integrateVelocity: ${entity.type} position changed from $oldPosition to ${entity.position} (velocity: ${physics.velocity}, dt: $dt)',
-        );
-        print(
-          '[PhysicsSystem] TransformComponent position updated to: ${entity.transformComponent.position}',
-        );
-      }
+      // Use centralized position update method
+      _updateEntityPosition(entity, positionDelta);
     }
 
     // Reset acceleration after integration
     physics.acceleration.setZero();
+  }
+
+  /// PHY-2.4.1: Centralized position update method
+  /// This is the ONLY method that should update entity positions in the physics system
+  /// All position changes must go through this method to ensure proper state management
+  void _updateEntityPosition(Entity entity, Vector2 positionDelta) {
+    // Validate position delta
+    if (!positionDelta.x.isFinite || !positionDelta.y.isFinite) {
+      logger.warning(
+        'Invalid position delta for entity ${entity.id}: $positionDelta',
+      );
+      return;
+    }
+
+    // Store old position for debugging and validation
+    final Vector2 oldPosition = entity.position.clone();
+
+    // Apply position delta
+    entity.position.x += positionDelta.x;
+    entity.position.y += positionDelta.y;
+
+    // PHY-3.1.2: Synchronize with TransformComponent using proper authorization
+    try {
+      entity.transformComponent.syncWithPhysics(
+        entity.position,
+        callerSystem: 'PhysicsSystem',
+      );
+    } catch (e) {
+      // TransformComponent may not be initialized in tests
+      logger
+          .fine('TransformComponent not available for entity ${entity.id}: $e');
+    }
+
+    // Debug logging for significant position changes
+    if ((entity.position - oldPosition).length > 0.1) {
+      logger.fine(
+        'Position updated for ${entity.type} ${entity.id}: '
+        '$oldPosition -> ${entity.position} (delta: $positionDelta)',
+      );
+    }
   }
 
   /// T2.1.3: Apply terminal velocity constraints for falling
@@ -327,6 +393,96 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
       physics.velocity.x =
           physics.velocity.x.sign * PhysicsConstants.maxHorizontalSpeed;
     }
+
+    // PHY-2.4.2: Apply maximum velocity constraints to prevent accumulation
+    _applyVelocityConstraints(physics);
+  }
+
+  /// PHY-2.4.2: Apply maximum value constraints to prevent accumulation
+  void _applyVelocityConstraints(PhysicsComponent physics) {
+    // Enforce maximum velocity magnitude
+    if (physics.velocity.length > MAX_VELOCITY) {
+      physics.velocity.normalize();
+      physics.velocity.scale(MAX_VELOCITY);
+      logger.warning(
+        'Velocity clamped to MAX_VELOCITY for entity ${physics.parent}',
+      );
+    }
+
+    // Enforce maximum acceleration
+    if (physics.acceleration.length > MAX_ACCELERATION) {
+      physics.acceleration.normalize();
+      physics.acceleration.scale(MAX_ACCELERATION);
+      logger.warning(
+        'Acceleration clamped to MAX_ACCELERATION for entity ${physics.parent}',
+      );
+    }
+
+    // PHY-2.4.2: Stop micro-movements to prevent drift
+    if (physics.velocity.length < VELOCITY_THRESHOLD) {
+      physics.velocity.setZero();
+    }
+  }
+
+  /// PHY-2.4.2: Clean up old contact points to prevent accumulation
+  void _cleanupContactPoints() {
+    final now = DateTime.now();
+
+    _entityContactPoints.forEach((entityId, contactPoints) {
+      contactPoints.removeWhere((contact) {
+        final age = now.difference(contact.timestamp).inMilliseconds / 1000.0;
+        return age > CONTACT_LIFETIME;
+      });
+
+      // Limit maximum contact points per entity
+      if (contactPoints.length > MAX_CONTACT_POINTS) {
+        // Keep only the most recent contact points
+        contactPoints.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        contactPoints.removeRange(MAX_CONTACT_POINTS, contactPoints.length);
+      }
+    });
+
+    // Remove entities with no contact points
+    _entityContactPoints.removeWhere((key, value) => value.isEmpty);
+  }
+
+  /// PHY-2.4.2: Add contact point for collision tracking
+  void _addContactPoint(
+      Entity entity, Vector2 position, Vector2 normal, int otherEntityId,) {
+    final entityId = entity.hashCode;
+
+    _entityContactPoints.putIfAbsent(entityId, () => []);
+
+    final contact = ContactPoint(
+      position: position.clone(),
+      normal: normal.clone(),
+      otherEntityId: otherEntityId,
+      timestamp: DateTime.now(),
+    );
+
+    _entityContactPoints[entityId]!.add(contact);
+  }
+
+  /// PHY-2.4.2: Apply friction accumulation limits
+  void _applyFrictionLimits(Entity entity, double frictionForce) {
+    final entityId = entity.hashCode;
+
+    // Track friction accumulation
+    _frictionAccumulators[entityId] =
+        (_frictionAccumulators[entityId] ?? 0.0) + frictionForce.abs();
+
+    // Limit friction accumulation
+    if (_frictionAccumulators[entityId]! > MAX_FRICTION_ACCUMULATION) {
+      _frictionAccumulators[entityId] = MAX_FRICTION_ACCUMULATION;
+      logger.warning(
+        'Friction accumulation limited for entity ${entity.id}',
+      );
+    }
+  }
+
+  /// PHY-2.4.2: Reset friction accumulators periodically
+  void _resetFrictionAccumulators() {
+    _frictionAccumulators.clear();
   }
 
   /// T2.1.4: Apply horizontal friction and air resistance - T2.13.4: Enhanced for smoother movement
@@ -657,14 +813,18 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
       if (normal.y < 0 && physics.velocity.y > 0) {
         // Valid landing on one-way platform from above
         print('  ONE-WAY PLATFORM: Landing from above detected');
-        // Apply position correction to prevent sinking
-        movableEntity.position += separation;
+        // PHY-2.4.1: Apply position correction through centralized method
+        _updateEntityPosition(movableEntity, separation);
         print('  Position after separation: ${movableEntity.position}');
 
         // Update physics state
         physics.setOnGround(true);
         physics.velocity.y = 0; // Stop downward motion
         print('  Set onGround=true, velocity.y=0');
+
+        // PHY-2.4.2: Track contact point
+        _addContactPoint(movableEntity, collision.contactPoint, normal,
+            staticEntity.hashCode,);
 
         // End early - we handled this collision
         return;
@@ -680,9 +840,9 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     // Standard collision resolution (for solid obstacles)
     print('  SOLID COLLISION: Applying standard resolution');
 
-    // Apply position correction to prevent sinking
+    // PHY-2.4.1: Apply position correction through centralized method
     print('  Applying separation: ${movableEntity.position} += $separation');
-    movableEntity.position += separation;
+    _updateEntityPosition(movableEntity, separation);
     print('  Position after separation: ${movableEntity.position}');
 
     // Handle ground detection
@@ -693,6 +853,10 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     } else {
       print('  NO GROUND: normal.y=${normal.y} (not < -0.5)');
     }
+
+    // PHY-2.4.2: Track contact point for all collisions
+    _addContactPoint(
+        movableEntity, collision.contactPoint, normal, staticEntity.hashCode,);
 
     // Reflect velocity based on collision normal for bouncy objects
     if (physics.bounciness > 0) {
@@ -1263,6 +1427,7 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
       return;
     }
 
+    // PHY-2.4.3: Comprehensive physics state reset
     // Reset all physics state to clean defaults
     physics.velocity.setZero();
     physics.acceleration.setZero();
@@ -1272,6 +1437,18 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     // Use default constants or reasonable default values
     physics.setGravityScale(1.0);
     physics.bounciness = 0.2; // Default restitution/bounciness
+
+    // PHY-2.4.3: Clear all accumulation tracking
+    _entityContactPoints.remove(entityId);
+    _frictionAccumulators.remove(entityId);
+
+    // Note: friction is a read-only property in PhysicsComponent
+    // It's set during construction, not modifiable afterwards
+
+    // Clear acceleration (equivalent to clearForces)
+    physics.acceleration.setZero();
+
+    logger.info('Reset physics state for entity $entityId');
   }
 
   @override
@@ -1286,8 +1463,17 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
       return;
     }
 
-    // Clear any accumulated forces that might cause physics degradation
+    // PHY-2.4.2: Clear any accumulated forces that might cause physics degradation
     physics.acceleration.setZero();
+    physics.velocity.scale(DRIFT_CORRECTION_FACTOR); // Apply drift correction
+
+    // Clear contact points for this entity
+    _entityContactPoints.remove(entityId);
+
+    // Clear friction accumulator
+    _frictionAccumulators.remove(entityId);
+
+    logger.fine('Cleared accumulated forces for entity $entityId');
   }
 
   @override
@@ -1302,11 +1488,25 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
       return;
     }
 
+    // PHY-2.4.1: This is the ONLY exception to centralized position updates
+    // Used exclusively for respawn/teleport operations where physics state is reset
     // Override position directly (for respawn/teleport only)
     entity.position.setFrom(position);
 
+    // Synchronize with TransformComponent if available
+    try {
+      entity.transformComponent.setPosition(entity.position);
+    } catch (e) {
+      // TransformComponent may not be initialized in tests
+      logger.fine('TransformComponent not available for entity $entityId');
+    }
+
     // Clear physics state to prevent inconsistencies
     await clearAccumulatedForces(entityId);
+
+    logger.info(
+      'Position override for entity $entityId: $position (respawn/teleport)',
+    );
   }
 
   @override
@@ -1328,16 +1528,26 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
         !physics.velocity.y.isFinite ||
         !physics.acceleration.x.isFinite ||
         !physics.acceleration.y.isFinite) {
+      logger.warning('Entity $entityId has non-finite physics values');
+      return false;
+    }
+
+    // PHY-2.4.3: Check against maximum constraints
+    if (physics.velocity.length > MAX_VELOCITY) {
+      logger.warning('Entity $entityId velocity exceeds MAX_VELOCITY');
+      return false;
+    }
+
+    if (physics.acceleration.length > MAX_ACCELERATION) {
+      logger.warning('Entity $entityId acceleration exceeds MAX_ACCELERATION');
       return false;
     }
 
     // Check for reasonable bounds (prevent extreme values)
     const double maxPosition = 100000.0;
-    const double maxVelocity = 10000.0;
 
-    if (entity.position.length > maxPosition ||
-        physics.velocity.length > maxVelocity ||
-        physics.acceleration.length > maxVelocity) {
+    if (entity.position.length > maxPosition) {
+      logger.warning('Entity $entityId position exceeds bounds');
       return false;
     }
 
@@ -1349,6 +1559,22 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
         physics.restitution < 0 ||
         physics.restitution > 1 ||
         !physics.restitution.isFinite) {
+      logger.warning('Entity $entityId has invalid physics properties');
+      return false;
+    }
+
+    // PHY-2.4.3: Check for accumulation issues
+    final contactCount = _entityContactPoints[entityId]?.length ?? 0;
+    if (contactCount > MAX_CONTACT_POINTS) {
+      logger.warning(
+          'Entity $entityId has excessive contact points: $contactCount',);
+      return false;
+    }
+
+    final frictionAccumulation = _frictionAccumulators[entityId] ?? 0.0;
+    if (frictionAccumulation > MAX_FRICTION_ACCUMULATION) {
+      logger.warning(
+          'Entity $entityId has excessive friction accumulation: $frictionAccumulation',);
       return false;
     }
 
@@ -1361,6 +1587,11 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     _collisions.clear();
     _spatialHash.clear();
     _frameTimes.clear();
+
+    // PHY-2.4.3: Clear accumulation tracking
+    _entityContactPoints.clear();
+    _frictionAccumulators.clear();
+
     super.dispose();
   }
 }

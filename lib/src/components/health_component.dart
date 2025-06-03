@@ -25,7 +25,8 @@ class HealthComponent extends Component {
   // Invulnerability (for damage immunity frames)
   bool _isInvulnerable = false;
   double _invulnerabilityTime = 1;
-  double _invulnerabilityTimer = 0; // Events - explicit void return type to avoid inference issues
+  double _invulnerabilityTimer =
+      0; // Events - explicit void return type to avoid inference issues
   void Function(double damage)? onTakeDamage;
   void Function(double amount)? onHeal;
   void Function()? onDeath;
@@ -54,7 +55,9 @@ class HealthComponent extends Component {
     }
 
     // Apply health regeneration
-    if (_regenerationRate > 0 && _currentHealth > 0 && _currentHealth < _maxHealth) {
+    if (_regenerationRate > 0 &&
+        _currentHealth > 0 &&
+        _currentHealth < _maxHealth) {
       heal(_regenerationRate * dt);
     }
   }

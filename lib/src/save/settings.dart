@@ -105,7 +105,8 @@ class Settings {
           : _defaultGamepadBindings(),
       mouseSensitivity: (json['mouseSensitivity'] as num? ?? 1.0).toDouble(),
       invertMouseY: json['invertMouseY'] as bool? ?? false,
-      gamepadSensitivity: (json['gamepadSensitivity'] as num? ?? 1.0).toDouble(),
+      gamepadSensitivity:
+          (json['gamepadSensitivity'] as num? ?? 1.0).toDouble(),
       gamepadVibration: json['gamepadVibration'] as bool? ?? true,
       gamepadDeadzone: (json['gamepadDeadzone'] as num? ?? 0.2).toDouble(),
       difficulty: json['difficulty'] as String? ?? 'normal',
@@ -473,13 +474,15 @@ class Settings {
       if (!<String>['low', 'medium', 'high'].contains(audioQuality)) {
         return false;
       }
-      if (!<String>['low', 'medium', 'high', 'ultra'].contains(graphicsQuality)) {
+      if (!<String>['low', 'medium', 'high', 'ultra']
+          .contains(graphicsQuality)) {
         return false;
       }
       if (!<String>['easy', 'normal', 'hard', 'expert'].contains(difficulty)) {
         return false;
       }
-      if (!<String>['none', 'protanopia', 'deuteranopia', 'tritanopia'].contains(colorBlindType)) {
+      if (!<String>['none', 'protanopia', 'deuteranopia', 'tritanopia']
+          .contains(colorBlindType)) {
         return false;
       }
 

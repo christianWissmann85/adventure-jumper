@@ -150,9 +150,12 @@ class AIComponent extends Component {
 
         if (_waitTimer >= _waitTime) {
           // Move to next patrol point
-          _currentPatrolIndex = (_currentPatrolIndex + 1) % _patrolPoints.length;
+          _currentPatrolIndex =
+              (_currentPatrolIndex + 1) % _patrolPoints.length;
           _waitTimer = 0;
-          _waitTime = 1.0 + _random.nextDouble() * 2.0; // Random wait time between 1-3 seconds
+          _waitTime = 1.0 +
+              _random.nextDouble() *
+                  2.0; // Random wait time between 1-3 seconds
         }
       } else {
         // Move towards patrol point

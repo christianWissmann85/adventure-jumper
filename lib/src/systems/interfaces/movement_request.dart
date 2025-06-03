@@ -133,7 +133,7 @@ class MovementRequest {
       requestId: requestId,
     );
   }
-  
+
   /// Create a movement request.
   ///
   /// Alias for MovementRequest.walk for backward compatibility.
@@ -145,8 +145,8 @@ class MovementRequest {
     String? requestId,
   }) {
     return MovementRequest.walk(
-      entityId: entityId, 
-      direction: direction, 
+      entityId: entityId,
+      direction: direction,
       speed: speed,
       priority: priority,
       requestId: requestId,

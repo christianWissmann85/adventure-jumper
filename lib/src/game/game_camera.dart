@@ -55,12 +55,15 @@ class GameCamera extends Component {
           final Vector2 currentPosition = camera.viewfinder.position.clone();
 
           // Lerp towards target position
-          final Vector2 newPosition = currentPosition + ((_targetPosition - currentPosition) * _followSpeed * dt);
+          final Vector2 newPosition = currentPosition +
+              ((_targetPosition - currentPosition) * _followSpeed * dt);
 
           // Apply camera bounds if set
           if (_bounds != null) {
-            newPosition.x = newPosition.x.clamp(_bounds!.left.toDouble(), _bounds!.right.toDouble());
-            newPosition.y = newPosition.y.clamp(_bounds!.top.toDouble(), _bounds!.bottom.toDouble());
+            newPosition.x = newPosition.x
+                .clamp(_bounds!.left.toDouble(), _bounds!.right.toDouble());
+            newPosition.y = newPosition.y
+                .clamp(_bounds!.top.toDouble(), _bounds!.bottom.toDouble());
           }
 
           // Apply the new camera position

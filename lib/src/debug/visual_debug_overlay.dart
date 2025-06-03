@@ -71,8 +71,13 @@ class VisualDebugOverlay extends PositionComponent with HasGameRef {
   }
 
   /// Render a bounding box around a component for visual debugging
-  void renderBoundingBox(Canvas canvas, Size size, Vector2 position,
-      Vector2 componentSize, Color color,) {
+  void renderBoundingBox(
+    Canvas canvas,
+    Size size,
+    Vector2 position,
+    Vector2 componentSize,
+    Color color,
+  ) {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.stroke

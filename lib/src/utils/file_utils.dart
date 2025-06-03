@@ -20,7 +20,8 @@ class FileUtils {
   static Future<String?> readFileAsString(
     String filePath, {
     Encoding encoding = utf8,
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     return FileExceptionHandler.handleOperation<String?>(
       () async {
@@ -42,7 +43,8 @@ class FileUtils {
     String filePath,
     String content, {
     Encoding encoding = utf8,
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     return await FileExceptionHandler.handleOperation<bool>(
           () async {
@@ -69,7 +71,8 @@ class FileUtils {
   /// Read JSON file and parse with specific exception handling
   static Future<Map<String, dynamic>?> readJsonFile(
     String filePath, {
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     // First read the file
     final String? content = await readFileAsString(
@@ -91,12 +94,14 @@ class FileUtils {
   static Future<bool> writeJsonFile(
     String filePath,
     Map<String, dynamic> data, {
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     return await FileExceptionHandler.handleOperation<bool>(
           () async {
             final String jsonString = json.encode(data);
-            return writeStringToFile(filePath, jsonString, errorHandling: errorHandling);
+            return writeStringToFile(filePath, jsonString,
+                errorHandling: errorHandling,);
           },
           filePath,
           'write_json',
@@ -112,7 +117,8 @@ class FileUtils {
   static Future<bool> copyFile(
     String sourcePath,
     String destinationPath, {
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     return await FileExceptionHandler.handleOperation<bool>(
           () async {
@@ -150,7 +156,8 @@ class FileUtils {
   /// Delete file with specific exception handling
   static Future<bool> deleteFile(
     String filePath, {
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     return await FileExceptionHandler.handleOperation<bool>(
           () async {
@@ -174,7 +181,8 @@ class FileUtils {
   static Future<List<String>> listFiles(
     String directoryPath, {
     List<String>? extensions,
-    ErrorHandlingMode errorHandling = ErrorHandlingMode.suppressAndReturnFallback,
+    ErrorHandlingMode errorHandling =
+        ErrorHandlingMode.suppressAndReturnFallback,
   }) async {
     return FileExceptionHandler.handleOperation<List<String>>(
       () async {
@@ -189,7 +197,8 @@ class FileUtils {
             final String filePath = entity.path;
             if (extensions == null ||
                 extensions.any(
-                  (String ext) => filePath.toLowerCase().endsWith(ext.toLowerCase()),
+                  (String ext) =>
+                      filePath.toLowerCase().endsWith(ext.toLowerCase()),
                 )) {
               files.add(filePath);
             }

@@ -97,39 +97,48 @@ class Debug {
     switch (feature) {
       case DebugFeature.collisionBoxes:
         DebugConfig.showCollisionBoxes = !DebugConfig.showCollisionBoxes;
-        _logger.info('Collision boxes ${DebugConfig.showCollisionBoxes ? "enabled" : "disabled"}');
+        _logger.info(
+            'Collision boxes ${DebugConfig.showCollisionBoxes ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.velocityVectors:
         DebugConfig.showVelocityVectors = !DebugConfig.showVelocityVectors;
-        _logger.info('Velocity vectors ${DebugConfig.showVelocityVectors ? "enabled" : "disabled"}');
+        _logger.info(
+            'Velocity vectors ${DebugConfig.showVelocityVectors ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.fps:
         DebugConfig.showFPS = !DebugConfig.showFPS;
-        _logger.info('FPS display ${DebugConfig.showFPS ? "enabled" : "disabled"}');
+        _logger.info(
+            'FPS display ${DebugConfig.showFPS ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.memoryUsage:
         DebugConfig.showMemoryUsage = !DebugConfig.showMemoryUsage;
-        _logger.info('Memory usage display ${DebugConfig.showMemoryUsage ? "enabled" : "disabled"}');
+        _logger.info(
+            'Memory usage display ${DebugConfig.showMemoryUsage ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.entityCount:
         DebugConfig.showEntityCount = !DebugConfig.showEntityCount;
-        _logger.info('Entity count display ${DebugConfig.showEntityCount ? "enabled" : "disabled"}');
+        _logger.info(
+            'Entity count display ${DebugConfig.showEntityCount ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.performance:
         DebugConfig.trackPerformance = !DebugConfig.trackPerformance;
-        _logger.info('Performance tracking ${DebugConfig.trackPerformance ? "enabled" : "disabled"}');
+        _logger.info(
+            'Performance tracking ${DebugConfig.trackPerformance ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.inspector:
         DebugConfig.enableInspector = !DebugConfig.enableInspector;
-        _logger.info('Inspector ${DebugConfig.enableInspector ? "enabled" : "disabled"}');
+        _logger.info(
+            'Inspector ${DebugConfig.enableInspector ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.entityEditor:
         DebugConfig.enableEntityEditor = !DebugConfig.enableEntityEditor;
-        _logger.info('Entity editor ${DebugConfig.enableEntityEditor ? "enabled" : "disabled"}');
+        _logger.info(
+            'Entity editor ${DebugConfig.enableEntityEditor ? "enabled" : "disabled"}',);
         break;
       case DebugFeature.consoleCommands:
         DebugConfig.enableConsoleCommands = !DebugConfig.enableConsoleCommands;
-        _logger.info('Console commands ${DebugConfig.enableConsoleCommands ? "enabled" : "disabled"}');
+        _logger.info(
+            'Console commands ${DebugConfig.enableConsoleCommands ? "enabled" : "disabled"}',);
         break;
     }
   }
@@ -152,7 +161,8 @@ class Debug {
 
   /// Assert that the debug module is initialized
   static void _assertInitialized() {
-    assert(_isInitialized, 'Debug module not initialized. Call Debug.initialize() first.');
+    assert(_isInitialized,
+        'Debug module not initialized. Call Debug.initialize() first.',);
   }
 }
 
@@ -175,6 +185,7 @@ extension DebugLogExtension on Object {
 
   /// Log an error message
   void error(String message, [Object? error, StackTrace? stackTrace]) {
-    GameLogger.getLogger(runtimeType.toString()).severe(message, error, stackTrace);
+    GameLogger.getLogger(runtimeType.toString())
+        .severe(message, error, stackTrace);
   }
 }

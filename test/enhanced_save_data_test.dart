@@ -216,8 +216,10 @@ void main() {
         saveData.updateDialogueState(dialogueUpdate);
 
         expect(saveData.dialogueStates['player_choice_trust'], isTrue);
-        expect(saveData.dialogueStates['story_flag_chapter1'],
-            equals('completed'),);
+        expect(
+          saveData.dialogueStates['story_flag_chapter1'],
+          equals('completed'),
+        );
         expect(saveData.dialogueStates['npc_mood_friendly'], equals(8));
       });
     });
@@ -467,11 +469,17 @@ void main() {
         expect(saveData.isValid(), isTrue);
         expect(saveData.playerLevel, equals(7));
         expect(
-            saveData.levelsCompleted.values.where((c) => c).length, equals(3),);
-        expect(saveData.achievementsUnlocked.values.where((u) => u).length,
-            equals(3),);
-        expect(saveData.unlockedAbilities.values.where((u) => u).length,
-            equals(3),);
+          saveData.levelsCompleted.values.where((c) => c).length,
+          equals(3),
+        );
+        expect(
+          saveData.achievementsUnlocked.values.where((u) => u).length,
+          equals(3),
+        );
+        expect(
+          saveData.unlockedAbilities.values.where((u) => u).length,
+          equals(3),
+        );
         expect(saveData.npcsInteracted.length, equals(2));
         expect(saveData.dialogueStates.length, equals(3));
 
@@ -483,8 +491,9 @@ void main() {
         expect(reloaded.dialogueStates['sage_trust_level'], equals(5));
         expect(reloaded.levelBestTimes['forest_1'], equals(180.0));
         expect(
-            reloaded.achievementProgress['level_master']!['levels_completed'],
-            equals(3),);
+          reloaded.achievementProgress['level_master']!['levels_completed'],
+          equals(3),
+        );
       });
     });
   });

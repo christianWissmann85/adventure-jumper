@@ -7,7 +7,8 @@ import '../game/adventure_jumper_game.dart';
 import '../utils/debug_config.dart';
 
 /// Debug overlay for displaying performance metrics and debug information during gameplay
-class DebugOverlay extends PositionComponent with TapCallbacks, HasGameReference<AdventureJumperGame> {
+class DebugOverlay extends PositionComponent
+    with TapCallbacks, HasGameReference<AdventureJumperGame> {
   DebugOverlay() : super(priority: 100);
 
   final Logger _logger = Logger('DebugOverlay');
@@ -97,7 +98,8 @@ class DebugOverlay extends PositionComponent with TapCallbacks, HasGameReference
       }
 
       if (DebugConfig.showMemoryUsage) {
-        _memoryText.text = 'Memory: Unknown'; // Placeholder for actual memory usage
+        _memoryText.text =
+            'Memory: Unknown'; // Placeholder for actual memory usage
       }
 
       // Update entity count if enabled

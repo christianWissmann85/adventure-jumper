@@ -42,8 +42,10 @@ class CollisionUtils {
     Vector2 boxSize,
   ) {
     // Find the closest point on the rectangle to the circle
-    final double closestX = MathUtils.clamp(circleCenter.x, boxPos.x, boxPos.x + boxSize.x);
-    final double closestY = MathUtils.clamp(circleCenter.y, boxPos.y, boxPos.y + boxSize.y);
+    final double closestX =
+        MathUtils.clamp(circleCenter.x, boxPos.x, boxPos.x + boxSize.x);
+    final double closestY =
+        MathUtils.clamp(circleCenter.y, boxPos.y, boxPos.y + boxSize.y);
     final Vector2 closest = Vector2(closestX, closestY);
 
     // Calculate distance and check collision
@@ -194,7 +196,8 @@ class CollisionUtils {
     double closestDistance = double.infinity;
 
     for (final CollisionBox box in boxes) {
-      final RaycastHit? hit = raycastAABB(rayStart, rayDir, box.position, box.size);
+      final RaycastHit? hit =
+          raycastAABB(rayStart, rayDir, box.position, box.size);
       if (hit != null && hit.distance < closestDistance) {
         closestHit = hit;
         closestDistance = hit.distance;
@@ -273,8 +276,10 @@ class CollisionUtils {
     bool immovable2 = false,
   }) {
     // Calculate overlap
-    final double overlapX = math.min(pos1.x + size1.x, pos2.x + size2.x) - math.max(pos1.x, pos2.x);
-    final double overlapY = math.min(pos1.y + size1.y, pos2.y + size2.y) - math.max(pos1.y, pos2.y);
+    final double overlapX =
+        math.min(pos1.x + size1.x, pos2.x + size2.x) - math.max(pos1.x, pos2.x);
+    final double overlapY =
+        math.min(pos1.y + size1.y, pos2.y + size2.y) - math.max(pos1.y, pos2.y);
 
     if (overlapX <= 0 || overlapY <= 0) {
       return CollisionResolution(); // No collision
@@ -356,7 +361,8 @@ class CollisionUtils {
     final Vector2 expandedSize = staticSize + movingSize;
 
     // Raycast the center of the moving box against the expanded static box
-    final RaycastHit? hit = raycastAABB(movingPos, velocity, expandedPos, expandedSize);
+    final RaycastHit? hit =
+        raycastAABB(movingPos, velocity, expandedPos, expandedSize);
 
     if (hit != null && hit.distance <= velocity.length) {
       return SweptCollision(
@@ -377,8 +383,10 @@ class CollisionUtils {
     Vector2 size2,
   ) {
     // Calculate overlap on each axis
-    final double overlapX = math.min(pos1.x + size1.x, pos2.x + size2.x) - math.max(pos1.x, pos2.x);
-    final double overlapY = math.min(pos1.y + size1.y, pos2.y + size2.y) - math.max(pos1.y, pos2.y);
+    final double overlapX =
+        math.min(pos1.x + size1.x, pos2.x + size2.x) - math.max(pos1.x, pos2.x);
+    final double overlapY =
+        math.min(pos1.y + size1.y, pos2.y + size2.y) - math.max(pos1.y, pos2.y);
 
     // No overlap means no collision
     if (overlapX <= 0 || overlapY <= 0) return null;

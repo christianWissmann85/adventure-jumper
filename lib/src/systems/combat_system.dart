@@ -36,9 +36,9 @@ import 'base_system.dart';
 /// ```dart
 /// // Process damage between entities
 /// combatSystem.processDamage(
-///   attacker, 
-///   target, 
-///   10.0, 
+///   attacker,
+///   target,
+///   10.0,
 ///   damageType: 'fire',
 /// );
 ///

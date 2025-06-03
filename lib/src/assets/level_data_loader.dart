@@ -32,10 +32,12 @@ class LevelDataLoader {
     }
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/levels/$levelId.json');
+      final String jsonString =
+          await rootBundle.loadString('assets/levels/$levelId.json');
 
       try {
-        final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        final Map<String, dynamic> jsonData =
+            json.decode(jsonString) as Map<String, dynamic>;
 
         final LevelData levelData = LevelData.fromJson(jsonData);
         _levelCache[levelId] = levelData;
@@ -71,10 +73,12 @@ class LevelDataLoader {
     }
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/biomes/$biomeId.json');
+      final String jsonString =
+          await rootBundle.loadString('assets/biomes/$biomeId.json');
 
       try {
-        final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        final Map<String, dynamic> jsonData =
+            json.decode(jsonString) as Map<String, dynamic>;
 
         final BiomeData biomeData = BiomeData.fromJson(jsonData);
         _biomeCache[biomeId] = biomeData;
@@ -115,10 +119,12 @@ class LevelDataLoader {
     }
 
     try {
-      final String jsonString = await rootBundle.loadString('assets/tilesets/$tilesetId.json');
+      final String jsonString =
+          await rootBundle.loadString('assets/tilesets/$tilesetId.json');
 
       try {
-        final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        final Map<String, dynamic> jsonData =
+            json.decode(jsonString) as Map<String, dynamic>;
 
         final TilesetData tilesetData = TilesetData.fromJson(jsonData);
         _tilesetCache[tilesetId] = tilesetData;
@@ -158,10 +164,12 @@ class LevelDataLoader {
   /// Load complete world data including all levels and biomes
   Future<WorldData> loadWorld(String worldId) async {
     try {
-      final String jsonString = await rootBundle.loadString('assets/worlds/$worldId.json');
+      final String jsonString =
+          await rootBundle.loadString('assets/worlds/$worldId.json');
 
       try {
-        final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        final Map<String, dynamic> jsonData =
+            json.decode(jsonString) as Map<String, dynamic>;
 
         final WorldData worldData = WorldData.fromJson(jsonData);
 
@@ -365,7 +373,8 @@ class LevelDataLoader {
       final String jsonString = await rootBundle.loadString(filePath);
 
       try {
-        final Map<String, dynamic> jsonData = json.decode(jsonString) as Map<String, dynamic>;
+        final Map<String, dynamic> jsonData =
+            json.decode(jsonString) as Map<String, dynamic>;
 
         return LevelIndex.fromJson(jsonData);
       } on FormatException catch (e) {
@@ -649,7 +658,8 @@ class LevelData {
       foregroundTiles: List<int>.from(
         json['foregroundTiles'] as List<dynamic>? ?? <dynamic>[],
       ),
-      spawnPoint: SpawnPoint.fromJson(json['spawnPoint'] as Map<String, dynamic>),
+      spawnPoint:
+          SpawnPoint.fromJson(json['spawnPoint'] as Map<String, dynamic>),
       exitPoints: (json['exitPoints'] as List<dynamic>?)
               ?.map<ExitPoint>(
                 (e) => ExitPoint.fromJson(e as Map<String, dynamic>),
@@ -658,7 +668,8 @@ class LevelData {
           <ExitPoint>[],
       biomeId: json['biomeId'] as String,
       tilesetId: json['tilesetId'] as String,
-      metadata: json['metadata'] as Map<String, dynamic>? ?? <String, dynamic>{},
+      metadata:
+          json['metadata'] as Map<String, dynamic>? ?? <String, dynamic>{},
     );
   }
   final String id;
@@ -691,8 +702,10 @@ class BiomeData {
     return BiomeData(
       id: json['id'] as String,
       name: json['name'] as String,
-      textures: Map<String, String>.from(json['textures'] as Map<dynamic, dynamic>),
-      properties: Map<String, double>.from(json['properties'] as Map<dynamic, dynamic>),
+      textures:
+          Map<String, String>.from(json['textures'] as Map<dynamic, dynamic>),
+      properties:
+          Map<String, double>.from(json['properties'] as Map<dynamic, dynamic>),
       musicTracks: List<String>.from(
         json['musicTracks'] as List<dynamic>? ?? <dynamic>[],
       ),
@@ -723,12 +736,14 @@ class TilesetData {
   });
 
   factory TilesetData.fromJson(Map<String, dynamic> json) {
-    final Map<String, dynamic> propertiesJson = json['tileProperties'] as Map<String, dynamic>? ?? <String, dynamic>{};
+    final Map<String, dynamic> propertiesJson =
+        json['tileProperties'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final Map<int, TileProperties> tileProperties = <int, TileProperties>{};
 
     for (final MapEntry<String, dynamic> entry in propertiesJson.entries) {
       final int tileId = int.parse(entry.key);
-      tileProperties[tileId] = TileProperties.fromJson(entry.value as Map<String, dynamic>);
+      tileProperties[tileId] =
+          TileProperties.fromJson(entry.value as Map<String, dynamic>);
     }
 
     return TilesetData(
@@ -768,7 +783,8 @@ class TileProperties {
       platform: json['platform'] as bool? ?? false,
       hazard: json['hazard'] as bool? ?? false,
       animationFrames: json['animationFrames'] as String?,
-      customProperties: json['customProperties'] as Map<String, dynamic>? ?? <String, dynamic>{},
+      customProperties: json['customProperties'] as Map<String, dynamic>? ??
+          <String, dynamic>{},
     );
   }
   final bool solid;
@@ -798,7 +814,8 @@ class WorldData {
           )
           .toList(),
       biomeIds: List<String>.from(json['biomes'] as List<dynamic>),
-      globalProperties: json['globalProperties'] as Map<String, dynamic>? ?? <String, dynamic>{},
+      globalProperties: json['globalProperties'] as Map<String, dynamic>? ??
+          <String, dynamic>{},
     );
   }
   final String id;
@@ -847,7 +864,8 @@ class EnemySpawnData {
       enemyType: json['enemyType'] as String,
       x: (json['x'] as num).toDouble(),
       y: (json['y'] as num).toDouble(),
-      properties: json['properties'] as Map<String, dynamic>? ?? <String, dynamic>{},
+      properties:
+          json['properties'] as Map<String, dynamic>? ?? <String, dynamic>{},
     );
   }
   final String enemyType;

@@ -33,7 +33,8 @@ class AudioManager {
   bool _isMuted = false;
 
   // Audio pools for performance
-  final Map<String, List<SoundEffect>> _soundPools = <String, List<SoundEffect>>{};
+  final Map<String, List<SoundEffect>> _soundPools =
+      <String, List<SoundEffect>>{};
 
   /// Initialize the audio manager and all subsystems
   Future<void> initialize() async {
@@ -140,7 +141,8 @@ class AudioManager {
       }
 
       // Load and play new music
-      final MusicTrack? musicTrack = await _audioCache.loadMusicTrack(musicName);
+      final MusicTrack? musicTrack =
+          await _audioCache.loadMusicTrack(musicName);
       if (musicTrack == null) return;
 
       final double effectiveVolume = volume * musicVolume * masterVolume;
