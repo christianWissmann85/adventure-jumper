@@ -349,27 +349,29 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
       }
     }
   }
-  
+
   /// Get current physics state for synchronization
   PhysicsState getPhysicsState() {
-    final position = parent is PositionComponent 
-        ? (parent as PositionComponent).position.clone() 
+    final position = parent is PositionComponent
+        ? (parent as PositionComponent).position.clone()
         : Vector2.zero();
-    
     // Use entity id if parent is an Entity, otherwise use hashCode
     int entityId = 0;
     if (parent != null) {
       try {
         // Check if parent has an id getter (Entity class)
         final dynamic parentDynamic = parent;
-        if (parentDynamic.id != null) {
-          entityId = parentDynamic.id.hashCode;
+        final id = parentDynamic.id;
+        if (id != null && id is String && id.isNotEmpty) {
+          entityId = id.hashCode;
+        } else {
+          entityId = parent.hashCode;
         }
       } catch (_) {
         entityId = parent.hashCode;
       }
     }
-    
+
     return PhysicsState(
       entityId: entityId,
       position: position,
@@ -383,14 +385,14 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
       restitution: _restitution,
       isStatic: _isStatic,
       affectedByGravity: _affectedByGravity,
-      activeCollisions: [],  // Empty for now
+      activeCollisions: [], // Empty for now
       accumulatedForces: Vector2.zero(),
       contactPointCount: 0,
       updateCount: 0,
       lastUpdateTime: DateTime.now(),
     );
   }
-  
+
   /// Get position from parent entity
   Vector2 get position {
     if (parent is PositionComponent) {

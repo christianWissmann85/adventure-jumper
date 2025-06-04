@@ -1,4 +1,4 @@
-import 'package:adventure_jumper/src/player/player_controller_refactored.dart';
+import 'package:adventure_jumper/src/player/player_controller.dart';
 import 'package:adventure_jumper/src/player/player.dart';
 import 'package:adventure_jumper/src/systems/interfaces/movement_coordinator.dart';
 import 'package:adventure_jumper/src/systems/interfaces/movement_request.dart';
@@ -33,7 +33,7 @@ void main() {
   
   group('PlayerController Refactor Tests - PHY-3.2.1', () {
     late Player player;
-    late PlayerControllerRefactored controller;
+    late PlayerController controller;
     late MockMovementCoordinator mockMovementCoordinator;
     late MockPhysicsCoordinator mockPhysicsCoordinator;
 
@@ -59,7 +59,7 @@ void main() {
             isGrounded: true,
           ),);
       
-      controller = PlayerControllerRefactored(
+      controller = PlayerController(
         player,
         movementCoordinator: mockMovementCoordinator,
         physicsCoordinator: mockPhysicsCoordinator,
@@ -256,7 +256,7 @@ void main() {
       skip: 'Test isolation issue - passes when run individually', (game) async {
       // Create a new player instance without existing controller  
       final testPlayer = Player(position: Vector2(100, 100));
-      final controllerNoCoords = PlayerControllerRefactored(testPlayer);
+      final controllerNoCoords = PlayerController(testPlayer);
       
       await game.add(testPlayer);
       
@@ -286,7 +286,7 @@ void main() {
     });
 
     test('Controller can have coordinators injected after creation', () {
-      final controllerNoCoords = PlayerControllerRefactored(player);
+      final controllerNoCoords = PlayerController(player);
       
       // Initially no coordinators
       expect(controllerNoCoords.isMovingLeft, false);

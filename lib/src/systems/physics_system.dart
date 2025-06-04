@@ -249,6 +249,21 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     logger.info('  Entity position: ${entity.position}');
     logger.info('  Entity size: ${entity.size}');
     logger.info('  Current entities count after add: ${entities.length}');
+
+    // PHY-3.3.1: Inject physics coordinator for Player entities
+    if (entity.type == 'player') {
+      try {
+        // Cast to Player to access setPhysicsCoordinator method
+        final player = entity as dynamic;
+        if (player.setPhysicsCoordinator != null) {
+          player.setPhysicsCoordinator(this);
+          logger.info('  Physics coordinator injected into Player entity');
+        }
+      } catch (e) {
+        logger
+            .warning('  Failed to inject physics coordinator into Player: $e');
+      }
+    }
   }
 
   @override
@@ -448,7 +463,11 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
 
   /// PHY-2.4.2: Add contact point for collision tracking
   void _addContactPoint(
-      Entity entity, Vector2 position, Vector2 normal, int otherEntityId,) {
+    Entity entity,
+    Vector2 position,
+    Vector2 normal,
+    int otherEntityId,
+  ) {
     final entityId = entity.hashCode;
 
     _entityContactPoints.putIfAbsent(entityId, () => []);
@@ -823,8 +842,12 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
         print('  Set onGround=true, velocity.y=0');
 
         // PHY-2.4.2: Track contact point
-        _addContactPoint(movableEntity, collision.contactPoint, normal,
-            staticEntity.hashCode,);
+        _addContactPoint(
+          movableEntity,
+          collision.contactPoint,
+          normal,
+          staticEntity.hashCode,
+        );
 
         // End early - we handled this collision
         return;
@@ -856,7 +879,11 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
 
     // PHY-2.4.2: Track contact point for all collisions
     _addContactPoint(
-        movableEntity, collision.contactPoint, normal, staticEntity.hashCode,);
+      movableEntity,
+      collision.contactPoint,
+      normal,
+      staticEntity.hashCode,
+    );
 
     // Reflect velocity based on collision normal for bouncy objects
     if (physics.bounciness > 0) {
@@ -1567,14 +1594,16 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     final contactCount = _entityContactPoints[entityId]?.length ?? 0;
     if (contactCount > MAX_CONTACT_POINTS) {
       logger.warning(
-          'Entity $entityId has excessive contact points: $contactCount',);
+        'Entity $entityId has excessive contact points: $contactCount',
+      );
       return false;
     }
 
     final frictionAccumulation = _frictionAccumulators[entityId] ?? 0.0;
     if (frictionAccumulation > MAX_FRICTION_ACCUMULATION) {
       logger.warning(
-          'Entity $entityId has excessive friction accumulation: $frictionAccumulation',);
+        'Entity $entityId has excessive friction accumulation: $frictionAccumulation',
+      );
       return false;
     }
 

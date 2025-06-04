@@ -22,9 +22,9 @@ void main() {
       await player.loaded;
 
       developer.log('=== PLAYER CONTROLLER INTEGRATION TEST ===');
-      developer.log('Player children count: ${player.children.length}');
-
-      // Find the PlayerController
+      developer.log(
+        'Player children count: ${player.children.length}',
+      ); // Find the PlayerController
       PlayerController? controller;
       for (final child in player.children) {
         if (child is PlayerController) {

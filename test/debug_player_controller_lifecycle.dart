@@ -24,8 +24,10 @@ class LifecycleTestGame extends FlameGame {
     directController = PlayerController(player);
     add(directController); // Add directly to game, bypass Player entity
 
-    developer.log('LifecycleTestGame.onLoad() completed',
-        name: 'LifecycleTestGame',);
+    developer.log(
+      'LifecycleTestGame.onLoad() completed',
+      name: 'LifecycleTestGame',
+    );
   }
 }
 

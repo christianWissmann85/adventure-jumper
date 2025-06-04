@@ -19,9 +19,7 @@ void main() {
 
       // Initialize physics component
       physics = PhysicsComponent();
-      player.physics = physics;
-
-      // Initialize controller component
+      player.physics = physics; // Initialize controller component
       controller = PlayerController(player);
       player.controller = controller;
 

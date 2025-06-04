@@ -86,10 +86,11 @@ void main() {
 
       // Simulate landing by setting up physics state
       player.physics!.velocity.y = 200; // Falling downward
-      player.physics!.setOnGround(false);
-
-      // Update to falling state
+      player.physics!.setOnGround(false); // Update to falling state
       controller.update(0.016);
+
+      // Wait for microtasks to complete
+      await Future.delayed(Duration.zero);
 
       // Clear any events from setup
       capturedEvents.clear();
@@ -102,10 +103,12 @@ void main() {
         landingPosition: Vector2(100, 150),
         platformType: 'solid_platform',
       );
-      player.physics!.setOnGround(true);
-
-      // Update to trigger landing state transition
+      player.physics!
+          .setOnGround(true); // Update to trigger landing state transition
       controller.update(0.016);
+
+      // Wait for microtasks to complete
+      await Future.delayed(Duration.zero);
 
       // Verify landing event was fired
       expect(capturedEvents.length, greaterThan(0));
@@ -118,7 +121,6 @@ void main() {
       expect(landingEvent.groundNormal, equals(Vector2(0, -1)));
       expect(landingEvent.platformType, equals('solid_platform'));
     });
-
     test('T2.5.4: Coyote time allows jumping after leaving ground', () async {
       final player = Player(position: Vector2(100, 100));
       await player.onLoad();
@@ -136,18 +138,20 @@ void main() {
       player.physics!.velocity.y = 50; // Slightly falling
 
       // Clear events
-      capturedEvents.clear();
+      capturedEvents.clear(); // Update to enter falling state with coyote time
+      controller
+          .update(0.016); // Should still be able to jump within coyote time
 
-      // Update to enter falling state with coyote time
-      controller.update(0.016);
+      // Wait for microtasks to complete
+      await Future.delayed(Duration.zero);
 
-      // Should still be able to jump within coyote time
-      expect(controller.canPerformJump(), isTrue);
-      expect(controller.coyoteTimeRemaining, greaterThan(0));
-
-      // Attempt jump
-      final jumpSuccessful = controller.attemptJump();
+      expect(await controller.canPerformJump(), isTrue);
+      expect(controller.coyoteTimeRemaining, greaterThan(0)); // Attempt jump
+      final jumpSuccessful = await controller.attemptJump();
       expect(jumpSuccessful, isTrue);
+
+      // Wait for microtasks to complete (for event firing)
+      await Future.delayed(Duration.zero);
 
       // Verify jump event with coyote flag
       final jumpEvents = capturedEvents.whereType<PlayerJumpedEvent>();

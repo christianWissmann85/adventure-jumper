@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:adventure_jumper/src/game/game_config.dart';
 import 'package:adventure_jumper/src/player/player.dart';
@@ -8,7 +7,6 @@ import 'package:adventure_jumper/src/systems/interfaces/movement_response.dart';
 import 'package:adventure_jumper/src/systems/interfaces/physics_coordinator.dart';
 import 'package:adventure_jumper/src/systems/interfaces/physics_state.dart';
 import 'package:adventure_jumper/src/systems/interfaces/player_movement_request.dart';
-import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -33,7 +31,7 @@ void main() {
       entityId: 0,
       direction: Vector2.zero(),
       speed: 0,
-    ));
+    ),);
   });
 
   group('PHY-3.2.4: Simplified Player Responsiveness Tests', () {
@@ -88,7 +86,7 @@ void main() {
         contactPointCount: 0,
         updateCount: 0,
         lastUpdateTime: DateTime.now(),
-      ));
+      ),);
     });
 
     tearDown(() {
@@ -107,7 +105,7 @@ void main() {
             actualVelocity: Vector2(200, 0),
             actualPosition: Vector2(100, 100),
             isGrounded: true,
-          ));
+          ),);
 
       final stopwatch = Stopwatch()..start();
       
@@ -121,7 +119,7 @@ void main() {
       
       // Verify movement was requested within 4 frames (67ms)
       expect(stopwatch.elapsedMilliseconds, lessThan(67),
-          reason: 'Input response must be <4 frames (67ms) at 60fps');
+          reason: 'Input response must be <4 frames (67ms) at 60fps',);
       
       // Verify movement request was made
       verify(() => mockMovementCoordinator.handleMovementInput(any(), Vector2(1, 0), any())).called(1);
@@ -139,7 +137,7 @@ void main() {
             actualVelocity: (invocation.positionalArguments[1] as Vector2) * 200,
             actualPosition: Vector2(100, 100),
             isGrounded: true,
-          ));
+          ),);
 
       final responseTimes = <int>[];
       
@@ -161,7 +159,7 @@ void main() {
       // All inputs should maintain responsiveness
       for (final time in responseTimes) {
         expect(time, lessThan(67),
-            reason: 'Every input must maintain <4 frame response time');
+            reason: 'Every input must maintain <4 frame response time',);
       }
     });
 
@@ -176,7 +174,7 @@ void main() {
             actualVelocity: Vector2(0, -300),
             actualPosition: Vector2(100, 100),
             isGrounded: false,
-          ));
+          ),);
 
       final stopwatch = Stopwatch()..start();
       
@@ -233,7 +231,7 @@ void main() {
       for (int i = 1; i < velocities.length; i++) {
         final delta = velocities[i] - velocities[i - 1];
         expect(delta, greaterThanOrEqualTo(0),
-            reason: 'Velocity should increase smoothly');
+            reason: 'Velocity should increase smoothly',);
       }
     });
 
@@ -282,7 +280,7 @@ void main() {
       
       final successRate = successCount / totalCount;
       expect(successRate, greaterThan(0.98),
-          reason: 'Must maintain >99% control responsiveness');
+          reason: 'Must maintain >99% control responsiveness',);
     });
   });
 }

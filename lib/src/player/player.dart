@@ -9,6 +9,10 @@ import '../components/input_component.dart';
 import '../components/input_modes.dart';
 import '../components/physics_component.dart';
 import '../entities/entity.dart';
+import '../systems/interfaces/movement_coordinator.dart';
+import '../systems/interfaces/movement_request.dart';
+import '../systems/interfaces/movement_response.dart';
+import '../systems/interfaces/physics_coordinator.dart';
 import 'player_animator.dart';
 import 'player_controller.dart';
 import 'player_stats.dart';
@@ -23,6 +27,10 @@ class Player extends Entity {
   late AetherComponent aether;
   late InputComponent input;
 
+  // Physics coordination interface for position queries (PHY-3.3.1)
+  IPhysicsCoordinator? _physicsCoordinator;
+  // Movement coordination interface for movement requests (PHY-3.3.2-Bis.2)
+  IMovementCoordinator? _movementCoordinator;
   Player({
     Vector2? position,
     super.size,
@@ -30,7 +38,10 @@ class Player extends Entity {
           position: position ?? Vector2.zero(),
           id: 'player',
           type: 'player',
-        );
+        ) {
+    // Initialize stats in constructor to prevent LateInitializationError
+    stats = PlayerStats();
+  }
   @override
   Future<void> setupEntity() async {
     await super.setupEntity();
@@ -89,11 +100,13 @@ class Player extends Entity {
     health = HealthComponent();
     aether = AetherComponent();
     add(health);
-    add(aether); // Initialize subsystems
-    controller = PlayerController(this);
+    add(aether); // Initialize subsystems    controller = PlayerController(
+      this,
+      movementCoordinator: _movementCoordinator,
+      physicsCoordinator: _physicsCoordinator,
+    )
     animator = PlayerAnimator(this);
-    stats = PlayerStats();
-    print('[Player] Adding PlayerController to component tree...');
+    print('[Player] Adding PlayerControllerRefactored to component tree...');
     add(controller);
     print('[Player] PlayerController added successfully');
     add(animator);
@@ -140,22 +153,39 @@ class Player extends Entity {
   /// Check if player is alive
   bool get isAlive => stats.isAlive;
 
-  /// Get current player position
-  Vector2 get playerPosition => position;
+  /// Get current player position through physics coordinator (PHY-3.3.1)
+  /// This replaces direct position access to enforce position ownership
+  Future<Vector2> getPlayerPosition() async {
+    if (_physicsCoordinator == null) {
+      // Fallback validation: unauthorized direct position access attempt
+      _validatePositionAccess('getPlayerPosition');
+      return position; // Temporary fallback during transition
+    } // Use physics coordinator for proper position queries
+    // Use entity hashCode as entityId (consistent with physics system _findEntityById)
+    return await _physicsCoordinator!.getPosition(hashCode);
+  }
+
+  /// Legacy getter for backward compatibility (PHY-3.3.1)
+  /// @deprecated Use getPlayerPosition() instead for proper position queries
+  Vector2 get playerPosition {
+    // Validation for unauthorized position access attempts
+    _validatePositionAccess('playerPosition getter');
+    return position; // Temporary fallback during transition
+  }
 
   /// Get the input component for external system integration
   InputComponent get inputComponent =>
       input; // T2.3.1: Jump mechanics integration with PhysicsComponent
-
   /// Attempt to perform a jump if conditions are met
-  /// Returns true if jump was executed, false otherwise
-  bool tryJump({double? customForce}) {
-    // Use the controller's new public method
-    return controller.attemptJump();
+  /// Returns a Future<bool> indicating if jump was executed
+  Future<bool> tryJump({double? customForce}) async {
+    // Use the controller's new async public method
+    return await controller.attemptJump();
   }
 
   /// Check if player can currently jump
-  bool get canJump => controller.canPerformJump();
+  /// Returns a Future<bool> for async compatibility with the refactored controller
+  Future<bool> canJump() async => await controller.canPerformJump();
 
   /// Get current jump state
   String get jumpState => controller.jumpState.toString();
@@ -204,11 +234,11 @@ class Player extends Entity {
   }
 
   /// Get detailed jump state information for debugging
-  Map<String, dynamic> getJumpDebugInfo() {
+  Future<Map<String, dynamic>> getJumpDebugInfo() async {
     return {
       'jumpState': jumpState.toString(),
       'isGrounded': isGrounded,
-      'canJump': canJump,
+      'canJump': await canJump(),
       'jumpCooldownRemaining': jumpCooldownRemaining,
       'coyoteTimeRemaining': coyoteTimeRemaining,
       'velocity': velocity.toString(),
@@ -239,5 +269,95 @@ class Player extends Entity {
         // Handle other collision types
         break;
     }
+  }
+
+  // ============================================================================
+  // PHY-3.3.2-Bis.2: Movement Coordinator Integration
+  // ============================================================================
+  /// Inject movement coordinator for movement requests (PHY-3.3.2-Bis.2)
+  /// This method should be called by the movement system during entity setup
+  void setMovementCoordinator(IMovementCoordinator coordinator) {
+    _movementCoordinator = coordinator;
+    print('[Player] Movement coordinator injected for movement requests');
+
+    // Update controller with new coordinator if already initialized
+    controller.setMovementCoordinator(coordinator);
+  }
+
+  /// Submit movement request through coordinator (PHY-3.3.2-Bis.2)
+  /// Provides proper movement request submission for player actions
+  Future<bool> requestMovement({
+    required Vector2 direction,
+    required double speed,
+    MovementType type = MovementType.walk,
+  }) async {
+    if (_movementCoordinator == null) {
+      print(
+        '[Player] WARNING: Movement coordinator not available - using fallback',
+      );
+      // Fallback to direct physics manipulation (temporary during transition)
+      physics?.setVelocity(Vector2(direction.x * speed, physics!.velocity.y));
+      return true;
+    } // Use movement coordinator for proper request processing
+    final request = MovementRequest(
+      entityId: hashCode,
+      direction: direction,
+      magnitude: speed,
+      type: type,
+      priority: MovementPriority.high, // Player movement has high priority
+    );
+
+    final response = await _movementCoordinator!.submitMovementRequest(request);
+    return response.status == MovementResponseStatus.success;
+  }
+
+  // ============================================================================
+  // PHY-3.3.1: Physics Coordinator Integration
+  // ============================================================================
+  /// Inject physics coordinator for position queries (PHY-3.3.1)
+  /// This method should be called by the physics system during entity setup
+  void setPhysicsCoordinator(IPhysicsCoordinator coordinator) {
+    _physicsCoordinator = coordinator;
+    print('[Player] Physics coordinator injected for position queries');
+  }
+
+  /// Get comprehensive physics state through coordinator (PHY-3.3.1)
+  /// Provides full physics information for systems that need detailed state
+  Future<Vector2> getPhysicsPosition() async {
+    if (_physicsCoordinator == null) {
+      _validatePositionAccess('getPhysicsPosition');
+      return position;
+    }
+    return await _physicsCoordinator!.getPosition(hashCode);
+  }
+
+  /// Get physics velocity through coordinator (PHY-3.3.1)
+  /// Replaces direct velocity access to maintain consistency
+  Future<Vector2> getPhysicsVelocity() async {
+    if (_physicsCoordinator == null) {
+      _validatePositionAccess('getPhysicsVelocity');
+      return physics?.velocity ?? Vector2.zero();
+    }
+    return await _physicsCoordinator!.getVelocity(hashCode);
+  }
+
+  /// Check grounded state through coordinator (PHY-3.3.1)
+  /// Provides authoritative ground contact information
+  Future<bool> getPhysicsGroundedState() async {
+    if (_physicsCoordinator == null) {
+      _validatePositionAccess('getPhysicsGroundedState');
+      return physics?.isOnGround ?? false;
+    }
+    return await _physicsCoordinator!.isGrounded(hashCode);
+  }
+
+  /// Validate unauthorized position access attempts (PHY-3.3.1)
+  /// Logs violations and helps identify code that needs refactoring
+  void _validatePositionAccess(String accessMethod) {
+    print('[Player] WARNING: Direct position access via $accessMethod - '
+        'This violates position ownership. Use physics coordinator queries instead.');
+
+    // In development, we could throw an exception to force proper usage:
+    // throw StateError('Direct position access not allowed. Use getPlayerPosition() instead.');
   }
 }

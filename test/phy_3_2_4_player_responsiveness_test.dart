@@ -1,4 +1,3 @@
-import 'dart:async';
 
 import 'package:adventure_jumper/src/components/input_component.dart';
 import 'package:adventure_jumper/src/components/physics_component.dart';
@@ -10,7 +9,6 @@ import 'package:adventure_jumper/src/systems/interfaces/movement_response.dart';
 import 'package:adventure_jumper/src/systems/interfaces/physics_coordinator.dart';
 import 'package:adventure_jumper/src/systems/interfaces/physics_state.dart';
 import 'package:adventure_jumper/src/systems/interfaces/player_movement_request.dart';
-import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -38,7 +36,7 @@ void main() {
       entityId: 0,
       direction: Vector2.zero(),
       speed: 0,
-    ));
+    ),);
     registerFallbackValue(PhysicsState(
       entityId: 0,
       position: Vector2.zero(),
@@ -57,7 +55,7 @@ void main() {
       contactPointCount: 0,
       updateCount: 0,
       lastUpdateTime: DateTime.now(),
-    ));
+    ),);
   });
 
   group('PHY-3.2.4: Player Responsiveness Validation', () {
@@ -122,7 +120,7 @@ void main() {
         contactPointCount: 0,
         updateCount: 0,
         lastUpdateTime: DateTime.now(),
-      ));
+      ),);
     });
 
     tearDown(() {
@@ -144,7 +142,7 @@ void main() {
               actualPosition: Vector2(100, 100),
               isGrounded: true,
               debugInfo: {'responseTime': '2ms'},
-            ));
+            ),);
 
         // Measure time from input to movement request
         final stopwatch = Stopwatch()..start();
@@ -160,7 +158,7 @@ void main() {
         
         // Verify movement was requested within 4 frames (67ms)
         expect(stopwatch.elapsedMilliseconds, lessThan(67),
-            reason: 'Input response must be <4 frames (67ms) at 60fps');
+            reason: 'Input response must be <4 frames (67ms) at 60fps',);
         
         // Verify movement request was made
         verify(() => mockMovementCoordinator.handleMovementInput(any(), Vector2(1, 0), any())).called(1);
@@ -178,7 +176,7 @@ void main() {
               actualVelocity: Vector2(200, 0),
               actualPosition: Vector2(100, 100),
               isGrounded: true,
-            ));
+            ),);
 
         final responseTimes = <int>[];
         
@@ -201,13 +199,13 @@ void main() {
         // All inputs should maintain <67ms response time
         for (final time in responseTimes) {
           expect(time, lessThan(67),
-              reason: 'Every input must maintain <4 frame response time');
+              reason: 'Every input must maintain <4 frame response time',);
         }
         
         // Average should be well below threshold
         final avgResponseTime = responseTimes.reduce((a, b) => a + b) / responseTimes.length;
         expect(avgResponseTime, lessThan(40),
-            reason: 'Average response time should be well below 67ms threshold');
+            reason: 'Average response time should be well below 67ms threshold',);
       });
 
       test('should handle simultaneous inputs without latency increase', () async {
@@ -222,7 +220,7 @@ void main() {
               actualVelocity: Vector2(200, -300),
               actualPosition: Vector2(100, 100),
               isGrounded: false,
-            ));
+            ),);
         when(() => mockMovementCoordinator.handleJumpInput(any(), any()))
             .thenAnswer((invocation) async => MovementResponse.success(
               request: PlayerMovementRequest.playerJump(
@@ -232,7 +230,7 @@ void main() {
               actualVelocity: Vector2(200, -300),
               actualPosition: Vector2(100, 100),
               isGrounded: false,
-            ));
+            ),);
 
         final stopwatch = Stopwatch()..start();
         
@@ -296,9 +294,9 @@ void main() {
         for (int i = 1; i < velocities.length; i++) {
           final delta = velocities[i] - velocities[i - 1];
           expect(delta, greaterThanOrEqualTo(0),
-              reason: 'Velocity should increase smoothly');
+              reason: 'Velocity should increase smoothly',);
           expect(delta, lessThan(GameConfig.playerAcceleration * 0.02),
-              reason: 'Acceleration should not have sudden jumps');
+              reason: 'Acceleration should not have sudden jumps',);
         }
         
         // Should approach max speed smoothly
@@ -353,9 +351,9 @@ void main() {
         
         // Direction change should be responsive
         expect(frameCount, lessThan(30),
-            reason: 'Direction change should occur within 0.5 seconds');
+            reason: 'Direction change should occur within 0.5 seconds',);
         expect(stopwatch.elapsedMilliseconds, lessThan(500),
-            reason: 'Direction change should be responsive');
+            reason: 'Direction change should be responsive',);
       });
     });
 
@@ -406,9 +404,9 @@ void main() {
         
         // Verify variable jump heights
         expect(jumpHeights[0], lessThan(jumpHeights[1]),
-            reason: 'Longer hold should result in higher jump');
+            reason: 'Longer hold should result in higher jump',);
         expect(jumpHeights[1], lessThan(jumpHeights[2]),
-            reason: 'Even longer hold should result in even higher jump');
+            reason: 'Even longer hold should result in even higher jump',);
       });
 
       test('should maintain coyote time functionality', () async {
@@ -444,7 +442,7 @@ void main() {
         
         // Jump should still work within coyote time
         expect(jumpSuccessful, isTrue,
-            reason: 'Jump should work within coyote time after leaving ground');
+            reason: 'Jump should work within coyote time after leaving ground',);
       });
 
       test('should maintain jump buffer timing', () async {
@@ -483,7 +481,7 @@ void main() {
         
         // Buffered jump should execute
         expect(jumpExecuted, isTrue,
-            reason: 'Buffered jump should execute upon landing');
+            reason: 'Buffered jump should execute upon landing',);
       });
     });
 
@@ -500,7 +498,7 @@ void main() {
               actualVelocity: Vector2(200, 0),
               actualPosition: Vector2(100, 100),
               isGrounded: true,
-            ));
+            ),);
 
         final measurements = <int>[];
         
@@ -521,15 +519,15 @@ void main() {
         
         // Performance requirements
         expect(avgLatency, lessThan(2000), // <2ms average
-            reason: 'Average latency must be <2ms');
+            reason: 'Average latency must be <2ms',);
         expect(maxLatency, lessThan(4000), // <4ms max
-            reason: 'Maximum latency must be <4ms');
+            reason: 'Maximum latency must be <4ms',);
         
         // 99th percentile should be excellent
         measurements.sort();
         final p99 = measurements[(measurements.length * 0.99).floor()];
         expect(p99, lessThan(3000), // <3ms for 99th percentile
-            reason: '99% of inputs must respond within 3ms');
+            reason: '99% of inputs must respond within 3ms',);
       });
 
       test('should maintain movement smoothness during state transitions', () async {
@@ -595,7 +593,7 @@ void main() {
         for (int i = 1; i < velocityChanges.length; i++) {
           final change = (velocityChanges[i] - velocityChanges[i - 1]).abs();
           expect(change, lessThan(50),
-              reason: 'Velocity changes should be smooth during state transitions');
+              reason: 'Velocity changes should be smooth during state transitions',);
         }
       });
 
@@ -650,7 +648,7 @@ void main() {
         final successRate = successfulResponses / totalAttempts;
         
         expect(successRate, greaterThan(0.99),
-            reason: 'Must maintain >99% control responsiveness');
+            reason: 'Must maintain >99% control responsiveness',);
         
         // Verify retry mechanism is working
         verify(() => mockMovementCoordinator.handleMovementInput(any(), any(), any()))

@@ -25,9 +25,7 @@ void main() {
       player.sprite = AdvSpriteComponent(
         size: player.size,
         opacity: 1.0,
-      );
-
-      // Initialize controller component
+      ); // Initialize controller component
       controller = PlayerController(player);
       player.controller = controller;
 
@@ -196,9 +194,8 @@ void main() {
       final fallbackPlayer =
           Player(position: Vector2(0, 0), size: Vector2(32, 64));
       final fallbackPhysics = PhysicsComponent();
-      fallbackPlayer.physics = fallbackPhysics;
-
-      // Create a minimal controller (required by constructor but not fully configured)
+      fallbackPlayer.physics =
+          fallbackPhysics; // Create a minimal controller (required by constructor but not fully configured)
       final fallbackController = PlayerController(fallbackPlayer);
       fallbackPlayer.controller = fallbackController;
 

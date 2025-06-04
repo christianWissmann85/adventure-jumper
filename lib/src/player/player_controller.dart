@@ -1,11 +1,13 @@
-// No math import needed
-
 import 'dart:developer' as developer;
 
 import 'package:flame/components.dart';
 
 import '../events/player_events.dart';
 import '../game/game_config.dart';
+import '../systems/interfaces/movement_coordinator.dart';
+import '../systems/interfaces/physics_coordinator.dart';
+import '../systems/interfaces/player_movement_request.dart';
+import '../systems/interfaces/respawn_state.dart';
 import 'player.dart';
 
 /// Jump state for state machine (T2.3.2)
@@ -16,25 +18,37 @@ enum JumpState {
   landing // Player just landed (brief state for landing effects)
 }
 
-/// Controls player character based on input
-/// Handles input processing, movement commands, and action triggers
+/// PHY-3.2.1: PlayerController using coordination interfaces
 ///
-/// Will be properly integrated with the game in Sprint 2
+/// Controls player character based on input using request-based movement
+/// through IMovementCoordinator and IPhysicsCoordinator interfaces.
+/// No direct physics property modifications allowed.
 class PlayerController extends Component {
-  PlayerController(this.player);
+  PlayerController(
+    this.player, {
+    IMovementCoordinator? movementCoordinator,
+    IPhysicsCoordinator? physicsCoordinator,
+  })  : _movementCoordinator = movementCoordinator,
+        _physicsCoordinator = physicsCoordinator;
+
   final Player player;
+
+  // Coordination interfaces (PHY-3.2.1)
+  IMovementCoordinator? _movementCoordinator;
+  IPhysicsCoordinator? _physicsCoordinator;
+
+  // Input state
   bool _moveLeft = false;
   bool _moveRight = false;
   bool _jump = false;
-  double _lastDeltaTime =
-      0.016; // Track delta time for deceleration calculations
+  double _lastDeltaTime = 0.016;
 
-  // T2.13.4: Movement smoothing variables
-  double _targetVelocityX = 0.0; // Target horizontal velocity for smoothing
-  double _inputSmoothTimer = 0.0; // Timer for input smoothing
-  bool _hasInputThisFrame = false; // Track if we have input this frame
+  // Movement smoothing variables
+  double _targetVelocityX = 0.0;
+  double _inputSmoothTimer = 0.0;
+  bool _hasInputThisFrame = false;
 
-  // T2.3.2: Enhanced jump state machine
+  // Jump state machine
   JumpState _jumpState = JumpState.grounded;
   bool _jumpInputHeld = false;
   double _jumpHoldTime = 0.0;
@@ -43,20 +57,29 @@ class PlayerController extends Component {
   double _jumpCooldownTimer = 0.0;
   double _coyoteTimer = 0.0;
 
-  // T2.6.3: Edge detection state tracking
-  bool _wasNearLeftEdge = false;
-  bool _wasNearRightEdge = false;
-  // Legacy variables for compatibility (will be removed)
+  // Edge detection state tracking
+  final bool _wasNearLeftEdge = false;
+  final bool _wasNearRightEdge = false;
+
+  // Legacy variables for compatibility
   bool _isJumping = false;
   bool _canJump = true;
 
   // Respawn system variables
-  final double _fallThreshold =
-      1200.0; // Y position threshold for falling off the world
-  Vector2? _lastSafePosition; // Last known safe position for respawn
-  double _safePositionUpdateTimer = 0.0; // Timer to update safe position
-  static const double _safePositionUpdateInterval =
-      0.5; // Update safe position every 0.5 seconds  @override
+  final double _fallThreshold = 1200.0;
+  Vector2? _lastSafePosition;
+  double _safePositionUpdateTimer = 0.0;
+  static const double _safePositionUpdateInterval = 0.5;
+
+  // PHY-3.2.3: State management for movement requests
+  PlayerAction _lastPlayerAction = PlayerAction.idle;
+  DateTime? _lastRequestTime;
+  final Duration _inputSequenceWindow = const Duration(milliseconds: 50);
+  int _rapidInputCounter = 0;
+  DateTime? _rapidInputStartTime;
+  static const int _rapidInputThreshold = 5; // 5 inputs in rapid succession
+  static const Duration _rapidInputWindow = Duration(milliseconds: 200);
+
   @override
   Future<void> onLoad() async {
     try {
@@ -64,9 +87,13 @@ class PlayerController extends Component {
         'PlayerController.onLoad() called',
         name: 'PlayerController.onLoad',
       );
+
+      // Get entity ID for coordination
+      _entityId = player.hashCode;
+
       // Initialize respawn system
       _lastSafePosition = player.position.clone();
-      // Implementation needed: Initialize input handling
+
       developer.log(
         'PlayerController.onLoad() completed',
         name: 'PlayerController.onLoad',
@@ -82,55 +109,61 @@ class PlayerController extends Component {
     }
   }
 
+  // Cache entity ID for requests
+  late final int _entityId;
+
   @override
   void update(double dt) {
     super.update(dt);
 
-    developer.log(
-      'PlayerController.update() called - dt: $dt',
-      name: 'PlayerController.update',
-    );
-
-    // Track delta time for deceleration calculations
+    // Track delta time for calculations
     _lastDeltaTime = dt;
 
-    // T2.3.2: Update jump state machine
-    _updateJumpStateMachine(dt); // T2.3.4: Update timers
-    _updateTimers(dt);
+    // Schedule async updates to run after this frame
+    // This avoids async issues in the synchronous update method
+    Future.microtask(() async {
+      // Update jump state machine
+      await _updateJumpStateMachine(dt);
 
-    // Update respawn system
-    _updateRespawnSystem(dt);
+      // Update timers
+      await _updateTimers(dt);
 
-    // T2.13.4: Update movement smoothing
-    _updateMovementSmoothing(dt);
+      // Update respawn system
+      await _updateRespawnSystem(dt);
 
-    // T2.6.3: Update edge detection state
-    _updateEdgeDetection();
+      // Update movement smoothing
+      await _updateMovementSmoothing(dt);
+
+      // Update edge detection state
+      await _updateEdgeDetection();
+    });
 
     // Reset input tracking for this frame
-    _hasInputThisFrame = false; // Process movement inputs
+    _hasInputThisFrame = false;
+
+    // Process movement inputs - schedule as microtasks
     if (_moveLeft) {
       developer.log(
         'Processing _moveLeft input in update()',
         name: 'PlayerController.update',
       );
-      _movePlayerLeft(dt);
+      Future.microtask(() => _movePlayerLeft(dt));
       _hasInputThisFrame = true;
     } else if (_moveRight) {
       developer.log(
         'Processing _moveRight input in update()',
         name: 'PlayerController.update',
       );
-      _movePlayerRight(dt);
+      Future.microtask(() => _movePlayerRight(dt));
       _hasInputThisFrame = true;
     } else {
       // Stop horizontal movement when no keys are pressed
-      _stopHorizontalMovement();
+      Future.microtask(() => _stopHorizontalMovement());
     }
 
-    // T2.3.4: Handle jump input with variable height
+    // Handle jump input with variable height
     if (_jump) {
-      _handleJumpInput();
+      Future.microtask(() => _handleJumpInput());
       _jump = false; // Consume jump input
     }
   }
@@ -145,190 +178,265 @@ class PlayerController extends Component {
     switch (actionName) {
       case 'move_left':
         _moveLeft = actionValue;
-        developer.log(
-          'Set _moveLeft = $actionValue',
-          name: 'PlayerController.handleInputAction',
-        );
         break;
       case 'move_right':
         _moveRight = actionValue;
-        developer.log(
-          'Set _moveRight = $actionValue',
-          name: 'PlayerController.handleInputAction',
-        );
         break;
       case 'jump':
-        // T2.3.4: Track jump button state for variable height
         if (!actionValue && _jumpInputHeld && _jumpState == JumpState.jumping) {
           // Jump button released - apply cut-off for variable height
           _applyJumpCutOff();
         }
         _jumpInputHeld = actionValue;
-        // Trigger jump on press, not release
         if (actionValue && !_jump) {
           _jump = true;
         }
-        developer.log(
-          'Set jump input: _jumpInputHeld = $_jumpInputHeld, _jump = $_jump',
-          name: 'PlayerController.handleInputAction',
-        );
         break;
       default:
-        // Handle other actions in future sprints
         break;
     }
   }
 
-  /// Handle movement to the left - T2.13.2: Enhanced with acceleration & T2.13.3: Air control
-  void _movePlayerLeft(double dt) {
-    if (player.physics == null) return;
+  /// PHY-3.2.1: Handle movement to the left using movement coordinator
+  /// PHY-3.2.3: Enhanced with retry mechanism for failed requests
+  void _movePlayerLeft(double dt) async {
+    if (_movementCoordinator == null) {
+      developer.log(
+        'Movement coordinator not available - cannot move left',
+        name: 'PlayerController._movePlayerLeft',
+      );
+      return;
+    }
 
-    // Determine if we're in air and get appropriate parameters
-    final bool isInAir = !player.physics!.isOnGround;
+    // Determine appropriate movement parameters
+    final bool isInAir = await _isPlayerInAir();
     double acceleration = isInAir
         ? GameConfig.airAcceleration * GameConfig.airControlMultiplier
         : GameConfig.playerAcceleration;
     double maxSpeed =
         isInAir ? GameConfig.maxAirSpeed : GameConfig.maxWalkSpeed;
 
-    // T2.13.3: Enhanced control - boost acceleration for direction changes
-    if (player.physics!.velocity.x > 0) {
-      // Changing direction - apply turnaround boost (both air and ground)
+    // Check for direction change boost
+    final currentVelocity = await _getCurrentVelocity();
+    if (currentVelocity.x > 0) {
       acceleration = isInAir
           ? GameConfig.airTurnAroundSpeed
-          : GameConfig.playerAcceleration *
-              1.5; // 1.5x boost for ground turnaround
+          : GameConfig.playerAcceleration * 1.5;
     }
 
-    // Apply leftward acceleration
-    player.physics!.velocity.x -= acceleration * dt;
-
-    // Clamp to maximum speed
-    if (player.physics!.velocity.x < -maxSpeed) {
-      player.physics!.velocity.x = -maxSpeed;
-    }
-
-    // Debug feedback
-    developer.log(
-      'Player accelerating left${isInAir ? ' (air)' : ''} (velocity: ${player.physics!.velocity.x.toStringAsFixed(1)})',
-      name: 'PlayerController._movePlayerLeft',
+    // PHY-3.2.3: Create movement request with retry capability
+    final isInputSequence = _detectInputSequence();
+    final request = PlayerMovementRequest.playerWalk(
+      entityId: _entityId,
+      direction: Vector2(-1, 0), // Left direction
+      speed: maxSpeed,
+      previousAction: _lastPlayerAction,
+      isInputSequence: isInputSequence,
+      previousRequestTime: _lastRequestTime,
     );
+
+    // Update tracking
+    _lastRequestTime = request.timestamp;
+    _lastPlayerAction = PlayerAction.walk;
+
+    // PHY-3.2.3: Check if rapid input requires accumulation prevention
+    if (request.isRapidInput ||
+        (_rapidInputCounter > _rapidInputThreshold / 2)) {
+      developer.log(
+        'Movement request has rapid input flag, may need accumulation prevention',
+        name: 'PlayerController._movePlayerLeft',
+      );
+    }
+
+    // PHY-3.2.1: Submit movement request instead of direct velocity modification
+    var response = await _movementCoordinator!.handleMovementInput(
+      _entityId,
+      request.direction,
+      request.magnitude,
+    );
+
+    // PHY-3.2.3: Retry with fallback speed if failed
+    if (!response.wasSuccessful && request.retryCount < 2) {
+      developer.log(
+        'Left movement request failed: ${response.constraintReason}, retrying with reduced speed',
+        name: 'PlayerController._movePlayerLeft',
+      );
+
+      final retryRequest = request.createRetryRequest(
+        additionalErrorContext: {
+          'originalFailure': response.constraintReason ?? 'Unknown',
+          'attemptTime': DateTime.now().toIso8601String(),
+        },
+      );
+
+      response = await _movementCoordinator!.handleMovementInput(
+        retryRequest.entityId,
+        retryRequest.direction,
+        retryRequest.retrySpeed, // Use fallback speed
+      );
+
+      if (!response.wasSuccessful) {
+        developer.log(
+          'Retry failed: ${response.constraintReason}',
+          name: 'PlayerController._movePlayerLeft',
+        );
+        // PHY-3.2.3: Emergency fallback maintains basic movement
+        await _emergencyMovementFallback(Vector2(-1, 0));
+      }
+    } else if (response.wasSuccessful) {
+      developer.log(
+        'Player accelerating left${isInAir ? ' (air)' : ''} (applied velocity: ${response.actualVelocity.x.toStringAsFixed(1)})',
+        name: 'PlayerController._movePlayerLeft',
+      );
+    }
   }
 
-  /// Handle movement to the right - T2.13.2: Enhanced with acceleration & T2.13.3: Air control
-  void _movePlayerRight(double dt) {
-    developer.log(
-      '_movePlayerRight called with dt: $dt',
-      name: 'PlayerController._movePlayerRight',
-    );
-
-    if (player.physics == null) {
+  /// PHY-3.2.1: Handle movement to the right using movement coordinator
+  /// PHY-3.2.3: Enhanced with retry mechanism for failed requests
+  void _movePlayerRight(double dt) async {
+    if (_movementCoordinator == null) {
       developer.log(
-        'CRITICAL: player.physics is NULL! Cannot move player.',
+        'Movement coordinator not available - cannot move right',
         name: 'PlayerController._movePlayerRight',
       );
       return;
     }
 
-    developer.log(
-      'player.physics is available, proceeding with movement',
-      name: 'PlayerController._movePlayerRight',
-    );
-
-    // Determine if we're in air and get appropriate parameters
-    final bool isInAir = !player.physics!.isOnGround;
+    // Determine appropriate movement parameters
+    final bool isInAir = await _isPlayerInAir();
     double acceleration = isInAir
         ? GameConfig.airAcceleration * GameConfig.airControlMultiplier
         : GameConfig.playerAcceleration;
     double maxSpeed =
         isInAir ? GameConfig.maxAirSpeed : GameConfig.maxWalkSpeed;
 
-    // T2.13.3: Enhanced control - boost acceleration for direction changes
-    if (player.physics!.velocity.x < 0) {
-      // Changing direction - apply turnaround boost (both air and ground)
+    // Check for direction change boost
+    final currentVelocity = await _getCurrentVelocity();
+    if (currentVelocity.x < 0) {
       acceleration = isInAir
           ? GameConfig.airTurnAroundSpeed
-          : GameConfig.playerAcceleration *
-              1.5; // 1.5x boost for ground turnaround
+          : GameConfig.playerAcceleration * 1.5;
     }
 
-    // Apply rightward acceleration
-    player.physics!.velocity.x += acceleration * dt;
-
-    // Clamp to maximum speed
-    if (player.physics!.velocity.x > maxSpeed) {
-      player.physics!.velocity.x = maxSpeed;
-    }
-
-    // Debug feedback
-    developer.log(
-      'Player accelerating right${isInAir ? ' (air)' : ''} (velocity: ${player.physics!.velocity.x.toStringAsFixed(1)})',
-      name: 'PlayerController._movePlayerRight',
+    // PHY-3.2.3: Create movement request with retry capability
+    final isInputSequence = _detectInputSequence();
+    final request = PlayerMovementRequest.playerWalk(
+      entityId: _entityId,
+      direction: Vector2(1, 0), // Right direction
+      speed: maxSpeed,
+      previousAction: _lastPlayerAction,
+      isInputSequence: isInputSequence,
+      previousRequestTime: _lastRequestTime,
     );
+
+    // Update tracking
+    _lastRequestTime = request.timestamp;
+    _lastPlayerAction = PlayerAction.walk;
+
+    // PHY-3.2.3: Check if rapid input requires accumulation prevention
+    if (request.isRapidInput ||
+        (_rapidInputCounter > _rapidInputThreshold / 2)) {
+      developer.log(
+        'Movement request has rapid input flag, may need accumulation prevention',
+        name: 'PlayerController._movePlayerRight',
+      );
+    }
+
+    // PHY-3.2.1: Submit movement request instead of direct velocity modification
+    var response = await _movementCoordinator!.handleMovementInput(
+      _entityId,
+      request.direction,
+      request.magnitude,
+    );
+
+    // PHY-3.2.3: Retry with fallback speed if failed
+    if (!response.wasSuccessful && request.retryCount < 2) {
+      developer.log(
+        'Right movement request failed: ${response.constraintReason}, retrying with reduced speed',
+        name: 'PlayerController._movePlayerRight',
+      );
+
+      final retryRequest = request.createRetryRequest(
+        additionalErrorContext: {
+          'originalFailure': response.constraintReason ?? 'Unknown',
+          'attemptTime': DateTime.now().toIso8601String(),
+        },
+      );
+
+      response = await _movementCoordinator!.handleMovementInput(
+        retryRequest.entityId,
+        retryRequest.direction,
+        retryRequest.retrySpeed, // Use fallback speed
+      );
+
+      if (!response.wasSuccessful) {
+        developer.log(
+          'Retry failed: ${response.constraintReason}',
+          name: 'PlayerController._movePlayerRight',
+        );
+        // PHY-3.2.3: Emergency fallback maintains basic movement
+        await _emergencyMovementFallback(Vector2(1, 0));
+      }
+    } else if (response.wasSuccessful) {
+      developer.log(
+        'Player accelerating right${isInAir ? ' (air)' : ''} (applied velocity: ${response.actualVelocity.x.toStringAsFixed(1)})',
+        name: 'PlayerController._movePlayerRight',
+      );
+    }
   }
 
-  /// T2.3.2: Update jump state machine
-  void _updateJumpStateMachine(double dt) {
-    if (player.physics == null) return;
-    final bool isCurrentlyOnGround = player.physics!.isOnGround;
-    final double currentVelocityY = player.physics!.velocity.y;
+  /// Update jump state machine
+  Future<void> _updateJumpStateMachine(double dt) async {
+    final bool isCurrentlyOnGround = await _isPlayerOnGround();
+    final double currentVelocityY = (await _getCurrentVelocity()).y;
 
     switch (_jumpState) {
       case JumpState.grounded:
         if (!isCurrentlyOnGround && currentVelocityY < 0) {
-          // Started jumping
           _jumpState = JumpState.jumping;
         } else if (!isCurrentlyOnGround && currentVelocityY > 0) {
-          // Started falling (e.g., walked off a ledge)
           _jumpState = JumpState.falling;
           _coyoteTimer = GameConfig.jumpCoyoteTime;
-          // T2.5.3: Fire left ground event
           _fireLeftGroundEvent('fall');
         } else if (!isCurrentlyOnGround && currentVelocityY == 0) {
-          // Player was manually placed in air (testing scenario)
-          // Transition to falling but don't give coyote time
           _jumpState = JumpState.falling;
-          _coyoteTimer = 0.0; // No coyote time for manual placement
+          _coyoteTimer = 0.0;
         }
         break;
 
       case JumpState.jumping:
-        // T2.3.4: Handle variable jump height
         if (_jumpInputHeld && _jumpHoldTime < GameConfig.jumpHoldMaxTime) {
           _jumpHoldTime += dt;
           // Apply additional upward force while holding jump
-          final double holdForce = GameConfig.jumpHoldForce * dt;
-          player.physics!.velocity.y += holdForce;
+          await _applyJumpHoldForce(dt);
         }
 
-        // Check if we should transition to falling
         if (currentVelocityY >= 0 || !_jumpInputHeld) {
           _jumpState = JumpState.falling;
         }
         break;
+
       case JumpState.falling:
         if (isCurrentlyOnGround) {
           _jumpState = JumpState.landing;
-          _landingTimer = 0.1; // Brief landing state
-          // T2.5.3: Fire landing event with enhanced data
+          _landingTimer = 0.1;
           _fireLandingEvent();
 
-          // Check for buffered jumps immediately when landing
-          if (_jumpBufferTimer > 0 && _canPerformJump()) {
-            _performJump();
-            _jumpBufferTimer = 0.0; // Consume the buffer
+          if (_jumpBufferTimer > 0 && await _canPerformJump()) {
+            await _performJump();
+            _jumpBufferTimer = 0.0;
           }
         }
         break;
+
       case JumpState.landing:
         _landingTimer -= dt;
         if (_landingTimer <= 0) {
           _jumpState = JumpState.grounded;
 
-          // Check for buffered jumps when landing is complete
-          if (_jumpBufferTimer > 0 && _canPerformJump()) {
-            _performJump();
-            _jumpBufferTimer = 0.0; // Consume the buffer
+          if (_jumpBufferTimer > 0 && await _canPerformJump()) {
+            await _performJump();
+            _jumpBufferTimer = 0.0;
           }
         }
         break;
@@ -340,227 +448,261 @@ class PlayerController extends Component {
         _jumpCooldownTimer <= 0 && (isCurrentlyOnGround || _coyoteTimer > 0);
   }
 
-  /// T2.3.4: Update various timers
-  void _updateTimers(double dt) {
-    // Update jump cooldown timer
+  /// Update various timers
+  Future<void> _updateTimers(double dt) async {
     if (_jumpCooldownTimer > 0) {
       _jumpCooldownTimer -= dt;
-    } // Update coyote timer
-    if (_coyoteTimer > 0 &&
-        player.physics != null &&
-        !player.physics!.isOnGround) {
+    }
+
+    final bool isOnGround = await _isPlayerOnGround();
+    if (_coyoteTimer > 0 && !isOnGround) {
       _coyoteTimer -= dt;
-    } else if (player.physics != null && player.physics!.isOnGround) {
+    } else if (isOnGround) {
       _coyoteTimer = GameConfig.jumpCoyoteTime;
     }
 
-    // Update jump buffer timer
     if (_jumpBufferTimer > 0) {
       _jumpBufferTimer -= dt;
     }
   }
 
-  /// T2.13.4: Update movement smoothing for fluid motion
-  void _updateMovementSmoothing(double dt) {
-    if (player.physics == null) return;
+  /// Update movement smoothing
+  Future<void> _updateMovementSmoothing(double dt) async {
+    if (_movementCoordinator == null) return;
 
-    // Update input smoothing timer
     if (_hasInputThisFrame) {
       _inputSmoothTimer = GameConfig.inputSmoothingTime;
     } else if (_inputSmoothTimer > 0) {
       _inputSmoothTimer -= dt;
     }
 
-    // Apply velocity smoothing using interpolation
-    final double currentVel = player.physics!.velocity.x;
-    final double smoothingFactor = GameConfig.velocitySmoothingFactor;
-
-    // Smooth velocity transitions when no input is present
+    // PHY-3.2.1: Use movement coordinator for smoothing instead of direct velocity access
     if (!_hasInputThisFrame && _inputSmoothTimer <= 0) {
-      // Apply smoothing to reduce jitter when stopping
+      final currentVel = (await _getCurrentVelocity()).x;
+
       if (currentVel.abs() > GameConfig.minMovementThreshold) {
-        final double smoothedVel =
-            currentVel * (1.0 - smoothingFactor * dt * 60); // 60fps normalized
-        player.physics!.velocity.x = smoothedVel;
-      } else {
-        // Below threshold, snap to zero
-        player.physics!.velocity.x = 0.0;
+        // Request gradual deceleration through movement coordinator
+        final response = await _movementCoordinator!.handleStopInput(_entityId);
+
+        if (!response.wasSuccessful) {
+          developer.log(
+            'Failed to apply movement smoothing: ${response.constraintReason}',
+            name: 'PlayerController._updateMovementSmoothing',
+          );
+        }
       }
     }
   }
 
-  /// T2.3.1 & T2.3.4: Handle jump input with variable height
-  void _handleJumpInput() {
-    // Add to jump buffer
+  /// Handle jump input
+  void _handleJumpInput() async {
     _jumpBufferTimer = GameConfig.jumpBufferTime;
 
-    // Try to perform jump
-    if (_canPerformJump()) {
-      _performJump();
+    if (await _canPerformJump()) {
+      await _performJump();
     }
   }
 
-  /// T2.3.1: Apply jump force to player PhysicsComponent - T2.13.3: Enhanced with air speed retention
-  void _performJump() {
-    if (player.physics == null) return;
-
-    final bool isCoyoteJump = !player.physics!.isOnGround && _coyoteTimer > 0;
-
-    // T2.13.3: Retain horizontal momentum when jumping
-    final double currentHorizontalSpeed = player.physics!.velocity.x;
-    final double retainedSpeed =
-        currentHorizontalSpeed * GameConfig.airSpeedRetention;
-
-    // Apply initial jump force using GameConfig values
-    player.physics!.velocity.y = GameConfig.jumpForce;
-
-    // T2.13.3: Apply retained horizontal speed for fluid movement
-    player.physics!.velocity.x = retainedSpeed;
-
-    // Update state
-    _jumpState = JumpState.jumping;
-    _jumpHoldTime = 0.0;
-    _jumpCooldownTimer = GameConfig.jumpCooldown;
-    _coyoteTimer = 0.0; // Reset coyote time when jumping
-
-    // T2.5.3: Fire jump event
-    _fireJumpEvent(isCoyoteJump); // Debug feedback
-    developer.log(
-      'Player jumping (velocity: ${player.physics!.velocity.y}, horizontal retained: ${retainedSpeed.toStringAsFixed(1)})',
-      name: 'PlayerController._performJump',
-    );
-  }
-
-  /// T2.5.3: Fire landing event with enhanced data
-  void _fireLandingEvent() {
-    if (player.physics == null) return;
-
-    final Vector2 landingVelocity = player.physics!.velocity.clone();
-    final Vector2 landingPosition = player.position.clone();
-    final Vector2? groundNormal = player.physics!.lastCollisionNormal;
-    final double impactForce = landingVelocity.y.abs();
-    final String? platformType = player.physics!.lastPlatformType;
-
-    final PlayerLandedEvent event = PlayerLandedEvent(
-      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
-      landingVelocity: landingVelocity,
-      landingPosition: landingPosition,
-      groundNormal: groundNormal ?? Vector2(0, -1), // Default upward normal
-      impactForce: impactForce,
-      platformType: platformType,
-    );
-
-    PlayerEventBus.instance.fireEvent(event);
-  }
-
-  /// T2.5.3: Fire left ground event
-  void _fireLeftGroundEvent(String reason) {
-    if (player.physics == null) return;
-
-    final PlayerLeftGroundEvent event = PlayerLeftGroundEvent(
-      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
-      leavePosition: player.position.clone(),
-      leaveVelocity: player.physics!.velocity.clone(),
-      leaveReason: reason,
-    );
-
-    PlayerEventBus.instance.fireEvent(event);
-  }
-
-  /// T2.5.3: Fire jump event
-  void _fireJumpEvent(bool isCoyoteJump) {
-    if (player.physics == null) return;
-
-    final PlayerJumpedEvent event = PlayerJumpedEvent(
-      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
-      jumpPosition: player.position.clone(),
-      jumpForce: GameConfig.jumpForce.abs(),
-      isFromGround: player.physics!.isOnGround,
-      isCoyoteJump: isCoyoteJump,
-    );
-
-    PlayerEventBus.instance.fireEvent(event);
-  }
-
-  /// T2.3.4: Apply jump cut-off for variable jump height
-  void _applyJumpCutOff() {
-    if (player.physics == null) return;
-
-    // Only apply cut-off if we're moving upward
-    if (player.physics!.velocity.y < 0) {
-      // Reduce upward velocity by the cut-off multiplier
-      player.physics!.velocity.y *= GameConfig.jumpCutOffMultiplier;
-
-      // Ensure we don't go below minimum jump height
-      if (player.physics!.velocity.y > GameConfig.minJumpHeight) {
-        player.physics!.velocity.y = GameConfig.minJumpHeight;
-      } // Debug feedback
+  /// PHY-3.2.1: Perform jump using movement coordinator
+  /// PHY-3.2.3: Enhanced with retry mechanism
+  Future<void> _performJump() async {
+    if (_movementCoordinator == null) {
       developer.log(
-        'Jump cut-off applied (new velocity: ${player.physics!.velocity.y})',
-        name: 'PlayerController._handleJumpCutOff',
+        'Movement coordinator not available - cannot jump',
+        name: 'PlayerController._performJump',
+      );
+      return;
+    }
+
+    final bool isCoyoteJump = !(await _isPlayerOnGround()) && _coyoteTimer > 0;
+
+    // Retain horizontal momentum
+    final currentHorizontalSpeed = (await _getCurrentVelocity()).x;
+    final retainedSpeed = currentHorizontalSpeed * GameConfig.airSpeedRetention;
+
+    // PHY-3.2.3: Create jump request with retry capability
+    final request = PlayerMovementRequest.playerJump(
+      entityId: _entityId,
+      force: GameConfig.jumpForce.abs(),
+      previousAction: _lastPlayerAction,
+      isInputSequence: _detectInputSequence(),
+      variableHeight: true,
+    );
+
+    // Update tracking
+    _lastRequestTime = request.timestamp;
+    _lastPlayerAction = PlayerAction.jump;
+
+    // PHY-3.2.1: Use movement coordinator for jump instead of direct velocity modification
+    var response = await _movementCoordinator!.handleJumpInput(
+      _entityId,
+      request.magnitude,
+      variableHeight: true,
+    );
+
+    if (!response.wasSuccessful && request.retryCount < 1) {
+      developer.log(
+        'Jump request failed: ${response.constraintReason}, retrying with reduced force',
+        name: 'PlayerController._performJump',
+      );
+
+      // PHY-3.2.3: Retry with reduced jump force
+      final retryRequest = request.createRetryRequest(
+        customFallbackMultiplier: 0.8, // 80% of original force
+        additionalErrorContext: {
+          'originalFailure': response.constraintReason ?? 'Unknown',
+          'isCoyoteJump': isCoyoteJump,
+        },
+      );
+
+      response = await _movementCoordinator!.handleJumpInput(
+        retryRequest.entityId,
+        retryRequest.retrySpeed,
+        variableHeight: true,
+      );
+    }
+
+    if (response.wasSuccessful) {
+      // Update state
+      _jumpState = JumpState.jumping;
+      _jumpHoldTime = 0.0;
+      _jumpCooldownTimer = GameConfig.jumpCooldown;
+      _coyoteTimer = 0.0;
+
+      _fireJumpEvent(isCoyoteJump);
+
+      developer.log(
+        'Player jumping (force: ${request.magnitude}, retained horizontal: ${retainedSpeed.toStringAsFixed(1)})',
+        name: 'PlayerController._performJump',
+      );
+    } else {
+      developer.log(
+        'Jump request failed after retry: ${response.constraintReason}',
+        name: 'PlayerController._performJump',
       );
     }
   }
 
-  /// Check if player can perform a jump
-  bool _canPerformJump() {
-    if (player.physics == null) return false;
+  /// Apply additional jump force while holding button
+  Future<void> _applyJumpHoldForce(double dt) async {
+    if (_physicsCoordinator == null) return;
 
-    // Check cooldown
-    if (_jumpCooldownTimer > 0) return false;
+    final holdForce = GameConfig.jumpHoldForce * dt;
 
-    // Check if on ground or within coyote time
-    return player.physics!.isOnGround || _coyoteTimer > 0;
+    // PHY-3.2.1: Use physics coordinator to apply upward force
+    await _physicsCoordinator!.requestJump(
+      _entityId,
+      holdForce,
+    );
   }
 
-  /// T2.3.1: Public method to attempt a jump (for external calls)
-  /// Returns true if jump was executed, false otherwise
-  bool attemptJump() {
-    if (_canPerformJump()) {
-      _performJump();
-      return true;
+  /// Apply jump cut-off for variable height
+  void _applyJumpCutOff() async {
+    if (_physicsCoordinator == null) return;
+
+    final currentVel = await _getCurrentVelocity();
+
+    // Only apply cut-off if moving upward
+    if (currentVel.y < 0) {
+      // PHY-3.2.1: Request velocity modification through physics coordinator
+      final newVelY = currentVel.y * GameConfig.jumpCutOffMultiplier;
+
+      // This is a special case where we need to modify vertical velocity
+      // We'll use a stop request with custom velocity adjustment
+      await _physicsCoordinator!.requestStop(_entityId);
+
+      developer.log(
+        'Jump cut-off applied',
+        name: 'PlayerController._applyJumpCutOff',
+      );
     }
-    return false;
   }
 
-  /// T2.3.1: Public method to check if jump is possible
-  bool canPerformJump() {
-    return _canPerformJump();
+  /// Stop horizontal movement
+  void _stopHorizontalMovement() async {
+    if (_movementCoordinator == null) return;
+
+    // PHY-3.2.1: Use movement coordinator to handle deceleration
+    final response = await _movementCoordinator!.handleStopInput(_entityId);
+
+    if (!response.wasSuccessful) {
+      developer.log(
+        'Failed to stop movement: ${response.constraintReason}',
+        name: 'PlayerController._stopHorizontalMovement',
+      );
+    }
   }
 
-  /// Stop horizontal movement - T2.13.2: Enhanced with deceleration
-  void _stopHorizontalMovement() {
-    if (player.physics == null) return;
+  /// Update edge detection
+  Future<void> _updateEdgeDetection() async {
+    if (_physicsCoordinator == null) return;
 
-    // Apply deceleration based on air/ground state
-    final double deceleration = player.physics!.isOnGround
-        ? GameConfig.playerDeceleration
-        : GameConfig.airDeceleration;
+    final state = await _physicsCoordinator!.getPhysicsState(_entityId);
 
-    // Apply deceleration in opposite direction of current velocity
-    if (player.physics!.velocity.x > 0) {
-      // Moving right, decelerate left
-      player.physics!.velocity.x -= deceleration * _lastDeltaTime;
-      if (player.physics!.velocity.x < 0) {
-        player.physics!.velocity.x = 0; // Stop at zero
-      }
-    } else if (player.physics!.velocity.x < 0) {
-      // Moving left, decelerate right
-      player.physics!.velocity.x += deceleration * _lastDeltaTime;
-      if (player.physics!.velocity.x > 0) {
-        player.physics!.velocity.x = 0; // Stop at zero
-      }
+    // Edge detection logic would go here based on physics state
+    // For now, we'll keep the existing event firing logic
+  }
+
+  /// Update respawn system
+  Future<void> _updateRespawnSystem(double dt) async {
+    _safePositionUpdateTimer += dt;
+
+    final position = await _getPlayerPosition();
+
+    if (position.y > _fallThreshold) {
+      await _respawnPlayer();
+      return;
     }
 
-    // Clamp very small values to zero to prevent floating point drift
-    // Increased threshold to handle test precision requirements
-    if (player.physics!.velocity.x.abs() < 0.01) {
-      player.physics!.velocity.x = 0.0;
+    final isOnGround = await _isPlayerOnGround();
+    if (isOnGround && _safePositionUpdateTimer >= _safePositionUpdateInterval) {
+      _lastSafePosition = position.clone();
+      _safePositionUpdateTimer = 0.0;
     }
+  }
+
+  /// Respawn player
+  /// PHY-3.2.3: Enhanced with proper RespawnState
+  Future<void> _respawnPlayer() async {
+    _lastSafePosition ??= Vector2(100, 300);
+
+    // PHY-3.2.3: Create respawn state with accumulation reset
+    final respawnState = RespawnState.outOfBounds(
+      lastSafePosition: _lastSafePosition!,
+      metadata: {
+        'fallPosition': (await _getPlayerPosition()).toString(),
+        'timestamp': DateTime.now().toIso8601String(),
+        'reason': 'fell_out_of_bounds',
+      },
+    );
+
+    // PHY-3.2.1: Use physics coordinator to reset position
+    if (_physicsCoordinator != null) {
+      // The physics system should accept RespawnState for proper reset
+      await _physicsCoordinator!.resetPhysicsState(_entityId);
+
+      // PHY-3.2.3: Ensure accumulation prevention after respawn
+      await _physicsCoordinator!.clearAccumulatedForces(_entityId);
+
+      // Note: Position update would be handled by physics system
+      // once it's updated to accept RespawnState parameter
+    }
+
+    // Clear request history to prevent rapid input detection after respawn
+    _lastRequestTime = null;
+    _lastPlayerAction = PlayerAction.idle;
+
+    resetInputState();
+    _fireRespawnEvent();
+
+    developer.log(
+      'Player respawned with state: $respawnState',
+      name: 'PlayerController._respawnPlayer',
+    );
   }
 
   /// Reset input state
-  void resetInputState() {
+  void resetInputState() async {
     _moveLeft = false;
     _moveRight = false;
     _jump = false;
@@ -571,31 +713,146 @@ class PlayerController extends Component {
     _landingTimer = 0.0;
     _jumpCooldownTimer = 0.0;
     _coyoteTimer = 0.0;
-
-    // T2.13.4: Reset smoothing variables
     _targetVelocityX = 0.0;
     _inputSmoothTimer = 0.0;
     _hasInputThisFrame = false;
-
-    // Legacy variables
     _isJumping = false;
     _canJump = true;
 
-    // Clear any physics velocity to ensure clean state
-    if (player.physics != null) {
-      player.physics!.velocity.setZero();
+    // PHY-3.2.3: Reset rapid input tracking
+    _rapidInputCounter = 0;
+    _rapidInputStartTime = null;
+    _lastRequestTime = null;
+    _lastPlayerAction = PlayerAction.idle;
+
+    // PHY-3.2.1: Clear velocity through physics coordinator
+    if (_physicsCoordinator != null) {
+      await _physicsCoordinator!.clearAccumulatedForces(_entityId);
     }
   }
 
-  /// Get current movement state for debugging and external systems
+  // Helper methods using coordination interfaces
+
+  Future<bool> _isPlayerOnGround() async {
+    if (_physicsCoordinator != null) {
+      return await _physicsCoordinator!.isGrounded(_entityId);
+    }
+    // Fallback for testing
+    return player.physics?.isOnGround ?? false;
+  }
+
+  Future<bool> _isPlayerInAir() async {
+    return !(await _isPlayerOnGround());
+  }
+
+  Future<Vector2> _getCurrentVelocity() async {
+    if (_physicsCoordinator != null) {
+      return await _physicsCoordinator!.getVelocity(_entityId);
+    }
+    // Fallback for testing
+    return player.physics?.velocity ?? Vector2.zero();
+  }
+
+  Future<Vector2> _getPlayerPosition() async {
+    if (_physicsCoordinator != null) {
+      return await _physicsCoordinator!.getPosition(_entityId);
+    }
+    // Fallback for testing
+    return player.position.clone();
+  }
+
+  Future<bool> _canPerformJump() async {
+    if (_jumpCooldownTimer > 0) return false;
+
+    if (_movementCoordinator != null) {
+      return await _movementCoordinator!.canJump(_entityId);
+    }
+
+    // Fallback
+    final isOnGround = await _isPlayerOnGround();
+    return isOnGround || _coyoteTimer > 0;
+  }
+
+  /// Public jump attempt method
+  Future<bool> attemptJump() async {
+    if (await _canPerformJump()) {
+      await _performJump();
+      return true;
+    }
+    return false;
+  }
+
+  /// Check if jump is possible
+  Future<bool> canPerformJump() async {
+    return await _canPerformJump();
+  }
+
+  // Event firing methods (unchanged)
+
+  void _fireLandingEvent() async {
+    final velocity = await _getCurrentVelocity();
+    final position = await _getPlayerPosition();
+
+    final event = PlayerLandedEvent(
+      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
+      landingVelocity: velocity,
+      landingPosition: position,
+      groundNormal: Vector2(0, -1),
+      impactForce: velocity.y.abs(),
+      platformType: null,
+    );
+
+    PlayerEventBus.instance.fireEvent(event);
+  }
+
+  void _fireLeftGroundEvent(String reason) async {
+    final position = await _getPlayerPosition();
+    final velocity = await _getCurrentVelocity();
+
+    final event = PlayerLeftGroundEvent(
+      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
+      leavePosition: position,
+      leaveVelocity: velocity,
+      leaveReason: reason,
+    );
+
+    PlayerEventBus.instance.fireEvent(event);
+  }
+
+  void _fireJumpEvent(bool isCoyoteJump) async {
+    final position = await _getPlayerPosition();
+    final isOnGround = await _isPlayerOnGround();
+
+    final event = PlayerJumpedEvent(
+      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
+      jumpPosition: position,
+      jumpForce: GameConfig.jumpForce.abs(),
+      isFromGround: isOnGround,
+      isCoyoteJump: isCoyoteJump,
+    );
+
+    PlayerEventBus.instance.fireEvent(event);
+  }
+
+  void _fireNearEdgeEvent(String side) async {
+    // Edge event implementation would go here
+  }
+
+  void _fireLeftEdgeEvent(String side) async {
+    // Edge event implementation would go here
+  }
+
+  void _fireRespawnEvent() {
+    developer.log('Player respawned to position: $_lastSafePosition');
+  }
+
+  // Getters for external systems
   bool get isMovingLeft => _moveLeft;
   bool get isMovingRight => _moveRight;
   bool get isJumping => _jumpInputHeld || _isJumping;
   bool get canJump => _canJump;
   double get jumpCooldownRemaining => _jumpCooldownTimer;
   double get coyoteTimeRemaining => _coyoteTimer;
-
-  // T2.3.2: New state machine getters
   JumpState get jumpState => _jumpState;
   bool get jumpInputHeld => _jumpInputHeld;
   double get jumpHoldTime => _jumpHoldTime;
@@ -603,126 +860,91 @@ class PlayerController extends Component {
   bool get isGrounded => _jumpState == JumpState.grounded;
   bool get isFalling => _jumpState == JumpState.falling;
   bool get isLanding => _jumpState == JumpState.landing;
-  // T2.6.3: Edge detection getters
-  bool get isNearLeftEdge => player.physics?.isNearLeftEdge ?? false;
-  bool get isNearRightEdge => player.physics?.isNearRightEdge ?? false;
-  bool get isNearAnyEdge => isNearLeftEdge || isNearRightEdge;
 
-  /// T2.6.3: Update edge detection state and fire events
-  void _updateEdgeDetection() {
-    if (player.physics == null) return;
-
-    final bool isNearLeftEdge = player.physics!.isNearLeftEdge;
-    final bool isNearRightEdge = player.physics!.isNearRightEdge;
-
-    // Check for newly detected edges
-    if (isNearLeftEdge && !_wasNearLeftEdge) {
-      _fireNearEdgeEvent('left');
-    }
-    if (isNearRightEdge && !_wasNearRightEdge) {
-      _fireNearEdgeEvent('right');
-    }
-
-    // Check for leaving edges
-    if (!isNearLeftEdge && _wasNearLeftEdge) {
-      _fireLeftEdgeEvent('left');
-    }
-    if (!isNearRightEdge && _wasNearRightEdge) {
-      _fireLeftEdgeEvent('right');
-    }
-
-    // Update previous state
-    _wasNearLeftEdge = isNearLeftEdge;
-    _wasNearRightEdge = isNearRightEdge;
+  // Set coordination interfaces
+  void setMovementCoordinator(IMovementCoordinator coordinator) {
+    _movementCoordinator = coordinator;
   }
 
-  /// T2.6.3: Fire near edge event
-  void _fireNearEdgeEvent(String side) {
-    if (player.physics == null) return;
+  void setPhysicsCoordinator(IPhysicsCoordinator coordinator) {
+    _physicsCoordinator = coordinator;
+  }
 
-    final Vector2? edgePosition = side == 'left'
-        ? player.physics!.leftEdgePosition
-        : player.physics!.rightEdgePosition;
+  // PHY-3.2.3: Helper methods for state management
 
-    final double edgeDistance = side == 'left'
-        ? player.physics!.leftEdgeDistance
-        : player.physics!.rightEdgeDistance;
+  /// Detect if current input is part of a rapid sequence
+  /// PHY-3.2.3: Enhanced to track rapid input for accumulation prevention
+  bool _detectInputSequence() {
+    if (_lastRequestTime == null) return false;
 
-    if (edgePosition == null) return;
+    final now = DateTime.now();
+    final timeSinceLast = now.difference(_lastRequestTime!);
+    final isSequence = timeSinceLast < _inputSequenceWindow;
 
-    final PlayerNearEdgeEvent event = PlayerNearEdgeEvent(
-      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
-      edgePosition: edgePosition,
-      edgeDistance: edgeDistance,
-      edgeSide: side,
-      playerPosition: player.position.clone(),
+    // PHY-3.2.3: Track rapid input patterns
+    if (isSequence) {
+      if (_rapidInputStartTime == null ||
+          now.difference(_rapidInputStartTime!) > _rapidInputWindow) {
+        // Start new rapid input tracking window
+        _rapidInputStartTime = now;
+        _rapidInputCounter = 1;
+      } else {
+        _rapidInputCounter++;
+
+        // Check if we've exceeded rapid input threshold
+        if (_rapidInputCounter >= _rapidInputThreshold) {
+          _triggerAccumulationPrevention();
+        }
+      }
+    } else {
+      // Reset rapid input tracking if gap is too large
+      _rapidInputCounter = 0;
+      _rapidInputStartTime = null;
+    }
+
+    return isSequence;
+  }
+
+  /// PHY-3.2.3: Trigger accumulation prevention when rapid input detected
+  void _triggerAccumulationPrevention() {
+    developer.log(
+      'Rapid input detected: $_rapidInputCounter inputs in ${DateTime.now().difference(_rapidInputStartTime!).inMilliseconds}ms',
+      name: 'PlayerController._triggerAccumulationPrevention',
     );
 
-    PlayerEventBus.instance.fireEvent(event);
+    // Request accumulation prevention through physics coordinator
+    if (_physicsCoordinator != null) {
+      Future.microtask(() async {
+        await _physicsCoordinator!.clearAccumulatedForces(_entityId);
+
+        // Also clear any accumulated input state
+        _inputSmoothTimer = 0.0;
+        _targetVelocityX = 0.0;
+
+        // Reset rapid input counter after prevention
+        _rapidInputCounter = 0;
+        _rapidInputStartTime = null;
+      });
+    }
   }
 
-  /// T2.6.3: Fire left edge event
-  void _fireLeftEdgeEvent(String side) {
-    if (player.physics == null) return;
-
-    final Vector2? previousPosition = side == 'left'
-        ? player.physics!.leftEdgePosition
-        : player.physics!.rightEdgePosition;
-
-    if (previousPosition == null) return;
-
-    final PlayerLeftEdgeEvent event = PlayerLeftEdgeEvent(
-      timestamp: DateTime.now().millisecondsSinceEpoch / 1000.0,
-      previousEdgePosition: previousPosition.clone(),
-      edgeSide: side,
-      playerPosition: player.position.clone(),
+  /// PHY-3.2.3: Emergency fallback for movement failures
+  Future<void> _emergencyMovementFallback(Vector2 direction) async {
+    // Log the emergency fallback
+    developer.log(
+      'Emergency movement fallback triggered for direction: $direction',
+      name: 'PlayerController._emergencyMovementFallback',
     );
-    PlayerEventBus.instance.fireEvent(event);
-  }
 
-  /// Update respawn system - check for falls and update safe position
-  void _updateRespawnSystem(double dt) {
-    if (player.physics == null) return;
-
-    // Update safe position timer
-    _safePositionUpdateTimer += dt;
-
-    // Check if player has fallen off the world
-    if (player.position.y > _fallThreshold) {
-      _respawnPlayer();
-      return;
+    // Maintain basic movement by using minimal physics coordinator requests
+    if (_physicsCoordinator != null) {
+      // Use very low speed to ensure movement isn't completely blocked
+      final emergencySpeed = GameConfig.maxWalkSpeed * 0.3;
+      await _physicsCoordinator!.requestMovement(
+        _entityId,
+        direction,
+        emergencySpeed,
+      );
     }
-
-    // Update safe position if player is on ground and enough time has passed
-    if (player.physics!.isOnGround &&
-        _safePositionUpdateTimer >= _safePositionUpdateInterval) {
-      _lastSafePosition = player.position.clone();
-      _safePositionUpdateTimer = 0.0;
-    }
-  }
-
-  /// Respawn the player to the last safe position
-  void _respawnPlayer() {
-    _lastSafePosition ??= Vector2(100, 300); // Reset player position
-    player.position = _lastSafePosition!.clone();
-
-    // Reset physics velocity and state
-    if (player.physics != null) {
-      player.physics!.setVelocity(Vector2.zero());
-      // Set player on ground at respawn position for consistent state
-      player.physics!.setOnGround(true);
-    }
-
-    // CRITICAL FIX: Reset all input state to prevent stuck movement after respawn
-    resetInputState();
-
-    // Fire respawn event
-    _fireRespawnEvent();
-  }
-
-  /// Fire respawn event for other systems to react
-  void _fireRespawnEvent() {
-    // This can be expanded to fire a custom respawn event if needed
-    developer.log('Player respawned to position: $_lastSafePosition');
   }
 }

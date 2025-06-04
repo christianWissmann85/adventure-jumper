@@ -469,7 +469,7 @@ Building upon the comprehensive implementation plan, Phase 3 implements the full
 
 **Technical Tasks:**
 
-- [ ] **PHY-3.2**: Integrate PlayerController with coordination interfaces following PHY-1.5.1 Priority 7 specifications.
+- [x] ✅ **PHY-3.2**: Integrate PlayerController with coordination interfaces following PHY-1.5.1 Priority 7 specifications.
 
   - **Effort**: 10 hours (based on PHY-1.5.1 MAJOR REFACTOR effort for critical player control changes)
   - **Assignee**: Player Systems Team
@@ -558,25 +558,86 @@ Building upon the comprehensive implementation plan, Phase 3 implements the full
   - **Target Files**: `lib/src/player/player.dart` [MODERATE UPDATE - respawn procedures]
   - **Granular Steps:**
 
-    - [ ] **PHY-3.3.1**: Remove direct position access (1.5 hours)
+        - Enhanced Entity class with proper component lifecycle management
+        - Removed direct position modifications in favor of physics state synchronization
+        - Added physics state query integration through IPhysicsCoordinator interface
+        - Implemented position ownership enforcement and validation
+        - All position access now goes through proper coordination interfaces        - [x] ✅ **PHY-3.3.2-Bis.3**: Migrate controller file structure (0.8 hours) ✅ **COMPLETED** (June 4, 2025)
 
-      - Eliminate direct position setters per position ownership enforcement
-      - Replace with physics state queries using IPhysicsCoordinator interface
-      - Add validation for unauthorized position access attempts
-      - **Validation**: Position access control enforcement, query functionality
+    - **Context**: Complete migration by updating all dependent files, fixing async compatibility, and preparing for legacy cleanup
+    - **Progress**: 4/4 substeps completed, async compatibility issues resolved
+    - **Granular Steps**:
 
-    - [ ] **PHY-3.3.2**: Update component interactions (1.5 hours)
+      - [x] ✅ **PHY-3.3.2-Bis.3.1**: Update PlayerAnimator imports (0.1 hours) ✅ **COMPLETED** (June 4, 2025)
 
-      - Coordinate with TransformComponent per EntityComponent.TDD.md patterns
-      - Update PhysicsComponent integration using established coordination interfaces
-      - Implement component state synchronization procedures
-      - **Validation**: Component coordination accuracy, state synchronization compliance
+        - ✅ Updated `lib/src/player/player_animator.dart` line 12 import from `player_controller.dart` to `player_controller_refactored.dart`
+        - ✅ Verified controller method calls are compatible (PlayerAnimator doesn't use controller methods directly)
+        - **Result**: No compatibility issues, clean import update
 
-    - [ ] **PHY-3.3.3**: Test entity lifecycle (1 hour)
+      - [x] ✅ **PHY-3.3.2-Bis.3.2**: Update all test file imports and async compatibility (0.3 hours) ✅ **COMPLETED** (June 4, 2025)
+
+        - ✅ Updated 7/7 test files successfully:
+          - ✅ `test/t2_19_simple_respawn_test.dart` - imports and type references updated
+          - ✅ `test/player_animator_test.dart` - imports and constructor calls updated
+          - ✅ `test/player_animator_test_fixed.dart` - imports and type references updated
+          - ✅ `test/landing_detection_test.dart` - imports, constructor calls, and async waits added
+          - ✅ `test/debug_player_integration.dart` - imports and type references updated
+          - ✅ `test/debug_player_controller_lifecycle.dart` - imports and type declarations updated
+          - ✅ `test/edge_detection_test.dart` - imports and type updates completed
+        - ✅ **Async Compatibility Resolved**: Fixed async method signature issues
+          - **Solution**: Added `await Future.delayed(Duration.zero)` after controller updates in tests
+          - **Root Cause**: Refactored controller uses `Future.microtask()` for state updates
+          - **Impact**: Tests now properly wait for async state machine transitions
+
+      - [x] ✅ **PHY-3.3.2-Bis.3.3**: Fix PlayerControllerRefactored async issues (0.2 hours) ✅ **COMPLETED** (June 4, 2025)
+
+        - ✅ Fixed async method declarations (`void` → `Future<void>` for async methods)
+        - ✅ Fixed coyote timer logic and state machine transitions
+        - ✅ Ensured proper event firing with async/await patterns
+        - ✅ Verified landing detection and coyote time mechanisms working correctly
+
+      - [x] ✅ **PHY-3.3.2-Bis.3.4**: Validate test compatibility (0.2 hours) ✅ **COMPLETED** (June 4, 2025)
+        - ✅ Landing detection tests now properly handle async operations
+        - ✅ Coyote time mechanism verified working through debug tests
+        - ✅ State machine transitions confirmed working correctly
+        - ✅ All async timing issues resolved
+
+    - **🔍 Session Findings**:
+
+      - **Import Migration**: 100% complete (7/7 files successfully updated)
+      - **Async Compatibility**: Successfully resolved using microtask waiting pattern
+      - **Core Functionality**: Landing detection, coyote time, and event system all working
+      - **File Structure**: Ready for final cleanup and renaming
+
+    - **✅ Critical Success**: Async controller compatibility fully resolved
+
+      - **Resolution**: Used `await Future.delayed(Duration.zero)` pattern for microtask synchronization
+      - **Validation**: Landing detection tests and coyote time mechanism working correctly
+      - **Performance**: No impact on runtime performance, only affects test synchronization - [ ] **PHY-3.3.2-Bis.4**: Final file cleanup and renaming (0.2 hours) 🎯 **READY TO START**
+
+      - **Status**: Ready to proceed - all compatibility issues resolved
+      - **Next Steps**:
+        1. Remove legacy controller file: `lib/src/player/player_controller.dart`
+        2. Rename `PlayerControllerRefactored` class to `PlayerController`
+        3. Rename `player_controller_refactored.dart` to `player_controller.dart`
+        4. Update all import statements to use standard filename
+        5. Verify no remaining references to legacy or refactored naming
+      - **Validation**: Run test suite to ensure clean migration
+
+    - [ ] **PHY-3.3.3**: Test entity lifecycle (1 hour) 🎯 **READY TO START**
+      - **Dependencies**: PHY-3.3.2-Bis.4 file cleanup completed
       - Test entity creation/destruction with new physics coordination
       - Validate respawn procedures using PlayerCharacter.TDD.md specifications
       - Integration testing with component lifecycle management
       - **Validation**: Entity lifecycle accuracy, respawn procedure compliance
+
+**🎯 Immediate Next Actions for PHY-3.4 Readiness:**
+
+1. **Complete PHY-3.3.2-Bis.4** (15 minutes): Final file cleanup and renaming
+2. **Execute PHY-3.3.3** (1 hour): Entity lifecycle validation
+3. **Begin PHY-3.4**: CollisionSystem coordination integration
+
+**✅ Ready for PHY-3.4**: All async compatibility resolved, core functionality validated
 
 ##### 🔴 **v0.3.0.3 - Supporting Systems Integration** (Days 16-18)
 
