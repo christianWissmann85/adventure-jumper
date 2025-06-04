@@ -1,5 +1,5 @@
 import 'package:adventure_jumper/src/player/player.dart';
-import 'package:adventure_jumper/src/player/player_controller_refactored.dart';
+import 'package:adventure_jumper/src/player/player_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,7 +8,7 @@ void main() {
     final player = Player(position: Vector2(100, 100));
     await player.onLoad();
 
-    final controller = PlayerControllerRefactored(player);
+    final controller = PlayerController(player);
     player.add(controller);
     await controller.onLoad();
 
@@ -27,7 +27,8 @@ void main() {
     print('  jumpState: ${controller.jumpState}');
     print('  coyoteTimeRemaining: ${controller.coyoteTimeRemaining}');
     print(
-        '  canPerformJump: ${await controller.canPerformJump()}'); // Leave ground (walk off platform)
+      '  canPerformJump: ${await controller.canPerformJump()}',
+    ); // Leave ground (walk off platform)
     player.physics!.setOnGround(false);
     player.physics!.velocity.y = 50; // Slightly falling
 

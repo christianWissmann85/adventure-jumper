@@ -107,7 +107,7 @@ class Player extends Entity {
       physicsCoordinator: _physicsCoordinator,
     );
     animator = PlayerAnimator(this);
-    print('[Player] Adding PlayerControllerRefactored to component tree...');
+    print('[Player] Adding PlayerController to component tree...');
     add(controller);
     print('[Player] PlayerController added successfully');
     add(animator);
