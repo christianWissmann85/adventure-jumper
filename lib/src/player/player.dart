@@ -100,11 +100,12 @@ class Player extends Entity {
     health = HealthComponent();
     aether = AetherComponent();
     add(health);
-    add(aether); // Initialize subsystems    controller = PlayerController(
+    add(aether); // Initialize subsystems
+    controller = PlayerController(
       this,
       movementCoordinator: _movementCoordinator,
       physicsCoordinator: _physicsCoordinator,
-    )
+    );
     animator = PlayerAnimator(this);
     print('[Player] Adding PlayerControllerRefactored to component tree...');
     add(controller);
