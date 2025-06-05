@@ -55,11 +55,21 @@ class SpriteLoader {
 
     // For tests, always return a placeholder sprite to avoid asset loading issues
     if (isInTestEnvironment) {
-      // Create a placeholder sprite for tests - essential for CI environments
-      final sprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
-      _spriteCache[path] = sprite;
-      return sprite;
-    } // Flame Images.load expects paths relative to assets/images/
+      // Try to load the static test placeholder first
+      try {
+        final ui.Image image = await _flameImages.load('test_placeholder.png');
+        final sprite = Sprite(image);
+        _spriteCache[path] = sprite;
+        return sprite;
+      } catch (_) {
+        // If static placeholder fails, create a simple dynamic one
+        final sprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
+        _spriteCache[path] = sprite;
+        return sprite;
+      }
+    }
+
+    // Flame Images.load expects paths relative to assets/images/
     // So if path already starts with 'assets/', we need to remove 'assets/images/'
     String flamePath = path;
     if (path.startsWith('assets/images/')) {
@@ -88,10 +98,18 @@ class SpriteLoader {
         return sprite;
       });
     } catch (e) {
-      // Fall back to placeholder sprite on any error
-      final sprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
-      _spriteCache[path] = sprite;
-      return sprite;
+      // Fall back to static test placeholder first, then dynamic placeholder
+      try {
+        final ui.Image image = await _flameImages.load('test_placeholder.png');
+        final sprite = Sprite(image);
+        _spriteCache[path] = sprite;
+        return sprite;
+      } catch (_) {
+        // If static placeholder also fails, create a simple dynamic one
+        final sprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
+        _spriteCache[path] = sprite;
+        return sprite;
+      }
     }
   }
 

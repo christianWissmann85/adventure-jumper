@@ -141,8 +141,13 @@ void main() {
     group('Input-to-Movement Latency Benchmarks', () {
       test('should achieve <4 frame (67ms) input response at 60fps', () async {
         // Setup successful movement response
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer(
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer(
           (invocation) async => MovementResponse.success(
             request: PlayerMovementRequest.playerWalk(
               entityId: player.hashCode,
@@ -176,15 +181,25 @@ void main() {
         );
 
         // Verify movement request was made
-        verify(() => mockMovementCoordinator.handleMovementInput(
-            any(), Vector2(1, 0), any())).called(1);
+        verify(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            Vector2(1, 0),
+            any(),
+          ),
+        ).called(1);
       });
 
       test('should maintain responsiveness during rapid input sequences',
           () async {
         // Setup movement responses
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer(
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer(
           (invocation) async => MovementResponse.success(
             request: PlayerMovementRequest.playerWalk(
               entityId: player.hashCode,
@@ -237,8 +252,13 @@ void main() {
       test('should handle simultaneous inputs without latency increase',
           () async {
         // Setup movement responses
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer(
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer(
           (invocation) async => MovementResponse.success(
             request: PlayerMovementRequest.playerWalk(
               entityId: player.hashCode,
@@ -277,8 +297,13 @@ void main() {
         expect(stopwatch.elapsedMilliseconds, lessThan(67));
 
         // Both movement and jump should be processed
-        verify(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).called(1);
+        verify(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).called(1);
         verify(() => mockMovementCoordinator.handleJumpInput(any(), any()))
             .called(1);
       });
@@ -290,8 +315,13 @@ void main() {
 
         // Setup movement responses that simulate acceleration
         var currentVelocity = 0.0;
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer((_) async {
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer((_) async {
           // Simulate natural acceleration
           currentVelocity =
               (currentVelocity + GameConfig.playerAcceleration * 0.016)
@@ -349,8 +379,13 @@ void main() {
         when(() => mockPhysicsCoordinator.getVelocity(any()))
             .thenAnswer((_) async => Vector2(currentVelocity, 0));
 
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer((invocation) async {
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer((invocation) async {
           final direction = invocation.positionalArguments[1] as Vector2;
 
           // Simulate direction change with boosted deceleration
@@ -418,7 +453,8 @@ void main() {
           when(() => mockPhysicsCoordinator.getPosition(any()))
               .thenAnswer((_) async => Vector2(100, 100 - currentHeight));
           when(() => mockPhysicsCoordinator.getVelocity(any())).thenAnswer(
-              (_) async => Vector2(0, currentHeight > maxHeight ? 100 : -300));
+            (_) async => Vector2(0, currentHeight > maxHeight ? 100 : -300),
+          );
 
           when(() => mockMovementCoordinator.handleJumpInput(any(), any()))
               .thenAnswer((_) async {
@@ -490,7 +526,8 @@ void main() {
 
         // Try to jump within coyote time window
         await Future.delayed(
-            Duration(milliseconds: (GameConfig.jumpCoyoteTime * 500).round()));
+          Duration(milliseconds: (GameConfig.jumpCoyoteTime * 500).round()),
+        );
 
         controller.handleInputAction('jump', true);
         await Future.microtask(() => controller.update(0.016));
@@ -515,7 +552,8 @@ void main() {
 
         // Land shortly after
         await Future.delayed(
-            Duration(milliseconds: (GameConfig.jumpBufferTime * 500).round()));
+          Duration(milliseconds: (GameConfig.jumpBufferTime * 500).round()),
+        );
 
         when(() => mockPhysicsCoordinator.isGrounded(any()))
             .thenAnswer((_) async => true); // Now grounded
@@ -550,8 +588,13 @@ void main() {
     group('Movement Quality Regression Tests', () {
       test('should not introduce input lag compared to baseline', () async {
         // Baseline: immediate response
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer(
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer(
           (invocation) async => MovementResponse.success(
             request: PlayerMovementRequest.playerWalk(
               entityId: player.hashCode,
@@ -572,7 +615,8 @@ void main() {
           // Simulate input through action name
           controller.handleInputAction('move_right', true);
           await Future.microtask(
-              () => controller.update(0.001)); // Minimal frame time
+            () => controller.update(0.001),
+          ); // Minimal frame time
 
           stopwatch.stop();
           measurements.add(stopwatch.elapsedMicroseconds);
@@ -610,8 +654,13 @@ void main() {
         when(() => mockPhysicsCoordinator.getVelocity(any()))
             .thenAnswer((_) async => currentVelocity);
 
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer((invocation) async {
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer((invocation) async {
           final direction = invocation.positionalArguments[1] as Vector2;
           final speed = invocation.positionalArguments[2] as double;
 
@@ -679,8 +728,13 @@ void main() {
         var successfulResponses = 0;
         var totalAttempts = 0;
 
-        when(() => mockMovementCoordinator.handleMovementInput(
-            any(), any(), any())).thenAnswer((invocation) async {
+        when(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).thenAnswer((invocation) async {
           totalAttempts++;
 
           // Simulate 99% success rate
@@ -732,9 +786,13 @@ void main() {
         );
 
         // Verify retry mechanism is working
-        verify(() => mockMovementCoordinator.handleMovementInput(
-                any(), any(), any()))
-            .called(greaterThan(1000)); // Should have retries
+        verify(
+          () => mockMovementCoordinator.handleMovementInput(
+            any(),
+            any(),
+            any(),
+          ),
+        ).called(greaterThan(1000)); // Should have retries
       });
     });
   });

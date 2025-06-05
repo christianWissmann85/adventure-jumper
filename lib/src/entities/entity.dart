@@ -80,7 +80,6 @@ abstract class Entity extends PositionComponent {
 
   // Logger for entity operations
   static final _logger = GameLogger.getLogger('Entity');
-
   @override
   Future<void> onLoad() async {
     _logger.info('onLoad() called - id: $_id, type: $_type');
@@ -105,6 +104,10 @@ abstract class Entity extends PositionComponent {
       _entityLifecycle = ComponentLifecycleStage.initialized;
       _isInitialized = true;
 
+      // Immediately activate the entity and its components
+      _entityLifecycle = ComponentLifecycleStage.active;
+      _activateAllComponents();
+
       _logger.info(
         'onLoad() completed - id: $_id, type: $_type, components: ${_managedComponents.length}',
       );
@@ -121,6 +124,7 @@ abstract class Entity extends PositionComponent {
     _logger.info('onMount() called - id: $_id, type: $_type');
     super.onMount();
 
+    // If entity was not yet activated (fallback case), activate it now
     if (_isInitialized &&
         _entityLifecycle == ComponentLifecycleStage.initialized) {
       _entityLifecycle = ComponentLifecycleStage.active;

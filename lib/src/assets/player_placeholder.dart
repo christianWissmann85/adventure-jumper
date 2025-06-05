@@ -4,6 +4,10 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Colors;
 
 /// Utility class to create placeholder sprites during runtime
+/// @deprecated This class is being phased out in favor of static placeholder images.
+/// Use SpriteLoader's static test_placeholder.png for test environments instead.
+/// This class should only be kept as an absolute last resort fallback.
+@Deprecated('Use static test_placeholder.png through SpriteLoader instead')
 class PlayerPlaceholder {
   /// Creates a placeholder player sprite with the given dimensions
   static Future<Sprite> createPlaceholderSprite(

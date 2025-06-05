@@ -162,72 +162,50 @@ class PlayerAnimator extends Component {
 
   /// Create placeholder animations for all states
   Future<void> _createPlaceholderAnimations() async {
-    // Create placeholder sprites for each animation state
-    final idleSprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
-    final runSprite = await _createAnimatedPlaceholder(32, 64, 'run');
-    final jumpSprite = await _createAnimatedPlaceholder(32, 64, 'jump');
-    final fallSprite = await _createAnimatedPlaceholder(32, 64, 'fall');
-    final landingSprite = await _createAnimatedPlaceholder(32, 64, 'landing');
-    final attackSprite = await _createAnimatedPlaceholder(32, 64, 'attack');
-    final damagedSprite = await _createAnimatedPlaceholder(32, 64, 'damaged');
-    final deathSprite = await _createAnimatedPlaceholder(32, 64, 'death');
+    // Use SpriteLoader to get placeholder sprites for each animation state
+    // This ensures consistent fallback behavior
+    for (final state in AnimationState.values) {
+      try {
+        // Request a generic placeholder from SpriteLoader - it will handle the fallback
+        _sprites[state] = await _spriteLoader
+            .loadSprite('placeholder/generic_player_state.png');
 
-    // Store sprites for each state
-    _sprites[AnimationState.idle] = idleSprite;
-    _sprites[AnimationState.run] = runSprite;
-    _sprites[AnimationState.jump] = jumpSprite;
-    _sprites[AnimationState.fall] = fallSprite;
-    _sprites[AnimationState.landing] = landingSprite;
-    _sprites[AnimationState.attack] = attackSprite;
-    _sprites[AnimationState.damaged] = damagedSprite;
-    _sprites[AnimationState.death] = deathSprite;
-
-    // Create simple placeholder animations using sprite repetition
-    _animations[AnimationState.idle] =
-        SpriteAnimation.spriteList([idleSprite], stepTime: 0.5);
-    _animations[AnimationState.run] =
-        SpriteAnimation.spriteList([runSprite, idleSprite], stepTime: 0.2);
-    _animations[AnimationState.jump] =
-        SpriteAnimation.spriteList([jumpSprite], stepTime: 0.3, loop: false);
-    _animations[AnimationState.fall] =
-        SpriteAnimation.spriteList([fallSprite], stepTime: 0.2);
-    _animations[AnimationState.landing] = SpriteAnimation.spriteList(
-      [landingSprite],
-      stepTime: 0.15,
-      loop: false,
-    );
-    _animations[AnimationState.attack] = SpriteAnimation.spriteList(
-      [attackSprite, idleSprite],
-      stepTime: 0.1,
-      loop: false,
-    );
-    _animations[AnimationState.damaged] = SpriteAnimation.spriteList(
-      [damagedSprite, idleSprite],
-      stepTime: 0.1,
-      loop: false,
-    );
-    _animations[AnimationState.death] =
-        SpriteAnimation.spriteList([deathSprite], stepTime: 0.2, loop: false);
+        // Create simple animation from the placeholder sprite
+        _animations[state] = SpriteAnimation.spriteList(
+          [_sprites[state]!],
+          stepTime: 0.5,
+          loop: state != AnimationState.jump &&
+              state != AnimationState.landing &&
+              state != AnimationState.attack &&
+              state != AnimationState.damaged &&
+              state != AnimationState.death,
+        );
+      } catch (e) {
+        // This should rarely happen since SpriteLoader has its own fallbacks
+        print(
+            '[PlayerAnimator] Failed to create placeholder for ${state.name}: $e');
+      }
+    }
   }
 
   /// Load actual animations from assets
   Future<void> _loadActualAnimations() async {
-    // List of all sprites we need to load
+    // Define the correct relative paths for each player animation state
     final Map<AnimationState, String> spritePaths = {
-      AnimationState.idle: 'characters/player/player_idle.png',
-      AnimationState.run: 'characters/player/player_run.png',
-      AnimationState.jump: 'characters/player/player_jump.png',
-      AnimationState.fall: 'characters/player/player_fall.png',
-      AnimationState.landing: 'characters/player/player_landing.png',
-      AnimationState.attack: 'characters/player/player_attack.png',
-      AnimationState.damaged: 'characters/player/player_damaged.png',
-      AnimationState.death: 'characters/player/player_death.png',
+      AnimationState.idle: 'player/player_idle.png',
+      AnimationState.run: 'player/player_run.png',
+      AnimationState.jump: 'player/player_jump.png',
+      AnimationState.fall: 'player/player_fall.png',
+      AnimationState.landing: 'player/player_landing.png',
+      AnimationState.attack: 'player/player_attack.png',
+      AnimationState.damaged: 'player/player_damaged.png',
+      AnimationState.death: 'player/player_death.png',
     };
 
     int successCount = 0;
     int failureCount = 0;
 
-    // Try to load each sprite individually
+    // Try to load each sprite individually through SpriteLoader
     for (final entry in spritePaths.entries) {
       final state = entry.key;
       final path = entry.value;
@@ -236,18 +214,35 @@ class PlayerAnimator extends Component {
         _sprites[state] = await _spriteLoader.loadSprite(path);
         successCount++;
         print('[PlayerAnimator] Successfully loaded sprite: $path');
+
+        // Create single-frame animation from the sprite
+        // Note: If your sprites are sprite sheets, you'll need to update this
+        // to use SpriteSheet.createAnimation with proper frame parameters
+        _animations[state] = SpriteAnimation.spriteList(
+          [_sprites[state]!],
+          stepTime: 0.2,
+          loop: state != AnimationState.jump &&
+              state != AnimationState.landing &&
+              state != AnimationState.attack &&
+              state != AnimationState.damaged &&
+              state != AnimationState.death,
+        );
       } catch (e) {
         failureCount++;
         print('[PlayerAnimator] Failed to load sprite: $path - $e');
 
-        // Create a placeholder for this specific sprite
+        // SpriteLoader already handles fallbacks, so if we get here it means
+        // we got a placeholder sprite successfully
         try {
-          _sprites[state] =
-              await _createAnimatedPlaceholder(32, 64, state.name);
-          print('[PlayerAnimator] Created placeholder for: ${state.name}');
+          _sprites[state] = await _spriteLoader.loadSprite(path);
+          _animations[state] = SpriteAnimation.spriteList(
+            [_sprites[state]!],
+            stepTime: 0.2,
+          );
+          print('[PlayerAnimator] Using fallback for: ${state.name}');
         } catch (placeholderError) {
           print(
-            '[PlayerAnimator] Failed to create placeholder for ${state.name}: $placeholderError',
+            '[PlayerAnimator] Failed to get fallback for ${state.name}: $placeholderError',
           );
         }
       }
@@ -257,14 +252,8 @@ class PlayerAnimator extends Component {
       '[PlayerAnimator] Asset loading summary: $successCount succeeded, $failureCount failed',
     );
 
-    // If we failed to load any critical sprites, throw an error to trigger fallback
-    if (failureCount > 0) {
-      throw Exception(
-        'Failed to load $failureCount out of ${spritePaths.length} sprite assets',
-      );
-    }
-
-    // TODO: Load actual sprite animations when asset files are available
+    // Note: We don't throw an error here since SpriteLoader handles fallbacks
+    // The game should continue running even if some assets fail to load
   }
 
   /// Create animated placeholder sprite with visual indicators for different states

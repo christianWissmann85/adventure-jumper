@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 
+import '../assets/sprite_loader.dart';
 import '../player/player.dart';
 import '../player/player_stats.dart';
 import 'collectible.dart';
@@ -64,37 +65,49 @@ class AetherShard extends Collectible {
 
   /// Setup visual components for the AetherShard
   Future<void> _setupVisuals() async {
-    // Create the main shard sprite component
-    // For now, use a placeholder diamond shape until we have actual sprites
-    _spriteComponent = SpriteComponent(
-      size: Vector2.all(_baseSize),
-      anchor: Anchor.center,
-    );
+    try {
+      // Load the actual Aether Shard sprite using SpriteLoader
+      final Sprite shardSprite =
+          await SpriteLoader().loadSprite('items/aether_shard.png');
+      _spriteComponent = SpriteComponent(
+        sprite: shardSprite,
+        size: Vector2.all(_baseSize), // Or actual sprite size
+        anchor: Anchor.center,
+      );
+      add(_spriteComponent!);
+    } catch (e) {
+      // Fallback to placeholder diamond shape (SpriteLoader handles fallbacks,
+      // but this is an extra safety net)
+      _spriteComponent = SpriteComponent(
+        size: Vector2.all(_baseSize),
+        anchor: Anchor.center,
+      );
 
-    // Create a diamond-shaped placeholder sprite using a rotated rectangle
-    final RectangleComponent diamond = RectangleComponent(
-      size: Vector2.all(_baseSize * 0.8),
-      paint: Paint()
-        ..color = _aetherColor
-        ..style = PaintingStyle.fill,
-      anchor: Anchor.center,
-    );
-    diamond.angle = pi / 4; // 45 degrees rotation to make diamond shape
+      // Create a diamond-shaped placeholder sprite using a rotated rectangle
+      final RectangleComponent diamond = RectangleComponent(
+        size: Vector2.all(_baseSize * 0.8),
+        paint: Paint()
+          ..color = _aetherColor
+          ..style = PaintingStyle.fill,
+        anchor: Anchor.center,
+      );
+      diamond.angle = pi / 4; // 45 degrees rotation to make diamond shape
 
-    // Add border to the diamond
-    final RectangleComponent border = RectangleComponent(
-      size: Vector2.all(_baseSize * 0.8),
-      paint: Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.0,
-      anchor: Anchor.center,
-    );
-    border.angle = pi / 4;
+      // Add border to the diamond
+      final RectangleComponent border = RectangleComponent(
+        size: Vector2.all(_baseSize * 0.8),
+        paint: Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0,
+        anchor: Anchor.center,
+      );
+      border.angle = pi / 4;
 
-    _spriteComponent!.add(diamond);
-    _spriteComponent!.add(border);
-    add(_spriteComponent!);
+      _spriteComponent!.add(diamond);
+      _spriteComponent!.add(border);
+      add(_spriteComponent!);
+    }
 
     // Create glow effect
     _glowEffect = CircleComponent(

@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Color;
 
+import '../assets/sprite_loader.dart';
 import '../components/adv_sprite_component.dart';
 import '../components/debug_rectangle_component.dart';
 import '../components/physics_component.dart';
@@ -132,23 +133,32 @@ class Platform extends Entity {
     );
     add(sprite!);
 
-    // For now, create a visible platform using DebugRectangleComponent (same as player fallback)
-    // This ensures platforms are clearly visible while we debug rendering issues
-    final DebugRectangleComponent platformVisual = DebugRectangleComponent(
-      size: size,
-      position: Vector2.zero(), // Relative to this platform
-      color: _getPlatformColor(),
-      debugName: 'Platform_$_platformType',
-      priority: 10, // Higher priority to ensure it renders on top
-    );
-    add(platformVisual);
+    // Load actual platform sprite based on platform type
+    final SpriteLoader spriteLoader = SpriteLoader();
+    final String spritePath = _getPlatformSpritePath();
 
-    print(
-      '[Platform] Added DebugRectangleComponent for platform type: $_platformType, size: $size, position: $position',
-    );
+    try {
+      final Sprite platformSprite = await spriteLoader.loadSprite(spritePath);
+      sprite!.setSprite(platformSprite);
+      print(
+          '[Platform] Loaded actual sprite for platform type: $_platformType, path: $spritePath');
+    } catch (e) {
+      print('[Platform] Failed to load sprite $spritePath, using fallback: $e');
 
-    // TODO: Replace with actual sprite loading in future sprints
-    // Example: await sprite!.setSprite(await Sprite.load('platforms/${_platformType}_platform.png'));
+      // Fallback to colored rectangle if sprite loading fails
+      final DebugRectangleComponent platformVisual = DebugRectangleComponent(
+        size: size,
+        position: Vector2.zero(), // Relative to this platform
+        color: _getPlatformColor(),
+        debugName: 'Platform_$_platformType',
+        priority: 10, // Higher priority to ensure it renders on top
+      );
+      add(platformVisual);
+
+      print(
+        '[Platform] Added fallback DebugRectangleComponent for platform type: $_platformType, size: $size, position: $position',
+      );
+    }
   }
 
   /// Get platform color based on type
@@ -164,6 +174,26 @@ class Platform extends Entity {
         return const Color(0xFF228B22); // Forest green
       default:
         return const Color(0xFF696969); // Dim gray
+    }
+  }
+
+  /// Get platform sprite path based on type
+  String _getPlatformSpritePath() {
+    switch (_platformType) {
+      case 'solid':
+        return 'tilesets/stone_tile.png';
+      case 'ice':
+        return 'tilesets/ice_tile.png';
+      case 'lava':
+        return 'tilesets/lava_tile.png';
+      case 'grass':
+        return 'tilesets/grass_tile.png';
+      case 'dirt':
+        return 'tilesets/dirt_tile.png';
+      case 'crystal':
+        return 'tilesets/crystal_tile.png';
+      default:
+        return 'tilesets/ground_tile.png'; // Default ground tile
     }
   }
 

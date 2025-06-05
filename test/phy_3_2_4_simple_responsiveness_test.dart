@@ -100,9 +100,9 @@ void main() {
 
     test('should respond to movement input within 4 frames (67ms)', () async {
       // Setup successful movement response
-      when(() =>
-              mockMovementCoordinator.handleMovementInput(any(), any(), any()))
-          .thenAnswer(
+      when(
+        () => mockMovementCoordinator.handleMovementInput(any(), any(), any()),
+      ).thenAnswer(
         (invocation) async => MovementResponse.success(
           request: PlayerMovementRequest.playerWalk(
             entityId: player.hashCode,
@@ -133,15 +133,20 @@ void main() {
       );
 
       // Verify movement request was made
-      verify(() => mockMovementCoordinator.handleMovementInput(
-          any(), Vector2(1, 0), any())).called(1);
+      verify(
+        () => mockMovementCoordinator.handleMovementInput(
+          any(),
+          Vector2(1, 0),
+          any(),
+        ),
+      ).called(1);
     });
 
     test('should maintain responsiveness during rapid inputs', () async {
       // Setup movement responses
-      when(() =>
-              mockMovementCoordinator.handleMovementInput(any(), any(), any()))
-          .thenAnswer(
+      when(
+        () => mockMovementCoordinator.handleMovementInput(any(), any(), any()),
+      ).thenAnswer(
         (invocation) async => MovementResponse.success(
           request: PlayerMovementRequest.playerWalk(
             entityId: player.hashCode,
@@ -216,9 +221,9 @@ void main() {
       final velocities = <double>[];
       var currentVelocity = 0.0;
 
-      when(() =>
-              mockMovementCoordinator.handleMovementInput(any(), any(), any()))
-          .thenAnswer((_) async {
+      when(
+        () => mockMovementCoordinator.handleMovementInput(any(), any(), any()),
+      ).thenAnswer((_) async {
         // Simulate natural acceleration
         currentVelocity =
             (currentVelocity + GameConfig.playerAcceleration * 0.016)
@@ -265,9 +270,9 @@ void main() {
       var successCount = 0;
       var totalCount = 0;
 
-      when(() =>
-              mockMovementCoordinator.handleMovementInput(any(), any(), any()))
-          .thenAnswer((_) async {
+      when(
+        () => mockMovementCoordinator.handleMovementInput(any(), any(), any()),
+      ).thenAnswer((_) async {
         totalCount++;
 
         // Simulate 99% success rate

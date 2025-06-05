@@ -10,6 +10,7 @@ import 'package:logging/logging.dart';
 
 import '../debug/debug_config.dart';
 import '../debug/visual_debug_overlay.dart';
+import '../systems/collision_system.dart';
 import '../systems/input_system.dart';
 import '../systems/movement_system.dart';
 import '../systems/physics_system.dart';
@@ -24,9 +25,10 @@ class AdventureJumperGame extends FlameGame
     with TapDetector, HasKeyboardHandlerComponents {
   late GameWorld gameWorld;
   late GameCamera gameCamera;
-  late InputSystem inputSystem;
-  late MovementSystem movementSystem;
-  late PhysicsSystem physicsSystem;
+  late final InputSystem inputSystem;
+  late final MovementSystem movementSystem;
+  late final PhysicsSystem physicsSystem;
+  late final CollisionSystem collisionSystem;
   late GameHUD gameHUD; // Add GameHUD reference
   late VisualDebugOverlay debugOverlay; // Add debug overlay
 
@@ -53,6 +55,10 @@ class AdventureJumperGame extends FlameGame
     physicsSystem = PhysicsSystem();
     add(physicsSystem);
     _logger.fine('Physics system initialized');
+    // Add CollisionSystem
+    collisionSystem = CollisionSystem(physicsCoordinator: physicsSystem);
+    add(collisionSystem);
+    _logger.fine('Collision system initialized');
 
     // Set up keyboard event forwarding to input system
     // The input system will handle keyboard events and distribute to entities    _setupInputHandlers(); // Initialize camera

@@ -33,7 +33,8 @@ void main() {
     registerFallbackValue(MovementType.walk);
     registerFallbackValue(PlayerAction.walk);
     registerFallbackValue(
-        MovementRequest.walk(entityId: 0, direction: Vector2.zero(), speed: 0));
+      MovementRequest.walk(entityId: 0, direction: Vector2.zero(), speed: 0),
+    );
   });
 
   setUp(() {
@@ -62,7 +63,10 @@ void main() {
         ).thenAnswer(
           (_) async => MovementResponse.failed(
             request: MovementRequest.walk(
-                entityId: 123, direction: Vector2(-1, 0), speed: 100),
+              entityId: 123,
+              direction: Vector2(-1, 0),
+              speed: 100,
+            ),
             reason: 'blocked',
             currentPosition: Vector2(100, 200),
           ),
@@ -101,7 +105,10 @@ void main() {
         ).thenAnswer(
           (_) async => MovementResponse.failed(
             request: MovementRequest.walk(
-                entityId: 123, direction: Vector2(1, 0), speed: 100),
+              entityId: 123,
+              direction: Vector2(1, 0),
+              speed: 100,
+            ),
             reason: 'blocked',
             currentPosition: Vector2(100, 200),
           ),
@@ -117,7 +124,10 @@ void main() {
         ).thenAnswer(
           (_) async => MovementResponse.success(
             request: MovementRequest.walk(
-                entityId: 123, direction: Vector2.zero(), speed: 30),
+              entityId: 123,
+              direction: Vector2.zero(),
+              speed: 30,
+            ),
             actualVelocity: Vector2(30, 0),
             actualPosition: Vector2(100, 200),
             isGrounded: true,
@@ -149,7 +159,8 @@ void main() {
       test('should create proper RespawnState on respawn', () async {
         // Mock physics state queries
         when(() => mockPhysicsCoordinator.getPosition(any())).thenAnswer(
-            (_) async => Vector2(100, 1500)); // Below fall threshold
+          (_) async => Vector2(100, 1500),
+        ); // Below fall threshold
         when(() => mockPhysicsCoordinator.isGrounded(any()))
             .thenAnswer((_) async => false);
         when(() => mockPhysicsCoordinator.resetPhysicsState(any()))
@@ -212,7 +223,10 @@ void main() {
         ).thenAnswer(
           (_) async => MovementResponse.success(
             request: MovementRequest.walk(
-                entityId: 123, direction: Vector2(-1, 0), speed: 100),
+              entityId: 123,
+              direction: Vector2(-1, 0),
+              speed: 100,
+            ),
             actualVelocity: Vector2(100, 0),
             actualPosition: Vector2(100, 200),
             isGrounded: true,
@@ -254,7 +268,10 @@ void main() {
         ).thenAnswer(
           (_) async => MovementResponse.success(
             request: MovementRequest.walk(
-                entityId: 123, direction: Vector2(-1, 0), speed: 100),
+              entityId: 123,
+              direction: Vector2(-1, 0),
+              speed: 100,
+            ),
             actualVelocity: Vector2(100, 0),
             actualPosition: Vector2(100, 200),
             isGrounded: true,
@@ -313,7 +330,10 @@ void main() {
           final speed = invocation.positionalArguments[2] as double;
           capturedResponse = MovementResponse.success(
             request: MovementRequest.walk(
-                entityId: 123, direction: direction, speed: speed),
+              entityId: 123,
+              direction: direction,
+              speed: speed,
+            ),
             actualVelocity: direction * speed,
             actualPosition: Vector2(100, 200),
             isGrounded: true,
@@ -355,7 +375,10 @@ void main() {
         ).thenAnswer(
           (_) async => MovementResponse.success(
             request: MovementRequest.walk(
-                entityId: 123, direction: Vector2(1, 0), speed: 100),
+              entityId: 123,
+              direction: Vector2(1, 0),
+              speed: 100,
+            ),
             actualVelocity: Vector2(100, 0),
             actualPosition: Vector2(100, 200),
             isGrounded: true,

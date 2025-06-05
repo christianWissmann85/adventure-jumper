@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 
+import '../assets/sprite_loader.dart';
 import '../components/collision_component.dart';
 import '../entities/entity.dart';
 import '../player/player.dart';
@@ -62,11 +63,34 @@ class Checkpoint extends Entity {
 
   /// Load checkpoint sprite assets
   Future<void> _loadSprites() async {
-    // Sprite loading will be implemented in future sprints
-    // For now we create placeholder sprites
+    // Load actual checkpoint sprites using SpriteLoader
+    final SpriteLoader spriteLoader = SpriteLoader();
 
-    _inactiveSpriteComponent = SpriteComponent()..size = Vector2(32, 32);
-    _activeSpriteComponent = SpriteComponent()..size = Vector2(32, 32);
+    try {
+      // Load inactive checkpoint sprite (small crystal)
+      final Sprite inactiveSprite = await spriteLoader
+          .loadSprite('props/luminara/prop_luminara_small_crystal.png');
+      _inactiveSpriteComponent = SpriteComponent(
+        sprite: inactiveSprite,
+        size: Vector2(32, 32),
+      );
+
+      // Load active checkpoint sprite (star)
+      final Sprite activeSprite =
+          await spriteLoader.loadSprite('ui/icons/star.png');
+      _activeSpriteComponent = SpriteComponent(
+        sprite: activeSprite,
+        size: Vector2(32, 32),
+      );
+
+      print('[Checkpoint] Loaded actual sprites for checkpoint states');
+    } catch (e) {
+      print('[Checkpoint] Failed to load sprites, using fallback: $e');
+
+      // Fallback to basic sprite components if loading fails
+      _inactiveSpriteComponent = SpriteComponent()..size = Vector2(32, 32);
+      _activeSpriteComponent = SpriteComponent()..size = Vector2(32, 32);
+    }
 
     // Add sprites as children
     add(_inactiveSpriteComponent);
