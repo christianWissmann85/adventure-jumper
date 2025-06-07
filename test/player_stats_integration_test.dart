@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('T2.7: PlayerStats Integration Tests - Player Entity Integration', () {
     late Player player;
-    late PlayerStats stats;
+    // late PlayerStats stats; // Unused
     late PlayerEventBus eventBus;
     List<PlayerEvent> capturedEvents = [];
 
@@ -17,7 +17,7 @@ void main() {
       player = Player(position: Vector2.zero());
       await player.onLoad();
 
-      stats = player.stats;
+      // stats = player.stats; // Unused
 
       // Set up event capture for testing event system integration
       eventBus = PlayerEventBus.instance;

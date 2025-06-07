@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flame/components.dart';
-import 'package:flame/src/game/notifying_vector2.dart';
 
 /// Component that handles AI logic for entities
 /// Manages behavior states, pathfinding, and decision-making
@@ -15,9 +14,9 @@ class AIComponent extends Component {
     bool? canPatrol,
     bool? canFollow,
   }) {
-    if (initialState != null) _currentState = initialState;
-    if (detectionRange != null) _detectionRange = detectionRange;
-    if (attackRange != null) _attackRange = attackRange;
+    if (initialState != null) currentState = initialState;
+    if (detectionRange != null) detectionRange = detectionRange;
+    if (attackRange != null) attackRange = attackRange;
     if (difficulty != null) _difficulty = difficulty;
     if (isAggressive != null) _isAggressive = isAggressive;
     if (canPatrol != null) _canPatrol = canPatrol;
@@ -25,7 +24,7 @@ class AIComponent extends Component {
   }
 
   // AI States
-  String _currentState = 'idle';
+  String currentState = 'idle';
   final List<String> _availableStates = <String>[
     'idle',
     'patrol',
@@ -34,9 +33,9 @@ class AIComponent extends Component {
     'flee',
     'stunned',
   ];
-  // AI Properties
-  double _detectionRange = 200;
-  double _attackRange = 50;
+  // AI Parameters
+  double detectionRange = 200;
+  double attackRange = 50;
   // Will be used in Sprint 3 for scaling enemy difficulty
   // ignore: unused_field
   int _difficulty = 1; // 1-5, higher is more difficult
@@ -45,8 +44,8 @@ class AIComponent extends Component {
   bool _canFollow = true;
 
   // Target tracking
-  Vector2? _targetPosition;
-  bool _hasTarget = false;
+  Vector2? targetPosition;
+  bool hasTarget = false;
   final math.Random _random = math.Random();
 
   // Patrol points
@@ -68,9 +67,13 @@ class AIComponent extends Component {
 
     // Initialize patrol points around entity position if none provided
     if (_patrolPoints.isEmpty && parent is PositionComponent) {
-      final NotifyingVector2 pos = (parent as PositionComponent).position;
-      _patrolPoints.add(Vector2(pos.x - 100, pos.y));
-      _patrolPoints.add(Vector2(pos.x + 100, pos.y));
+      // TODO(christian): Kept nullable (pos) due to previous runtime errors related to parent component's state/type. Re-evaluate when AI lifecycle is more stable.
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final Vector2? pos = (parent as PositionComponent).position;
+      if (pos != null) {
+        _patrolPoints.add(Vector2(pos.x - 100, pos.y));
+        _patrolPoints.add(Vector2(pos.x + 100, pos.y));
+      }
     }
   }
 
@@ -82,7 +85,7 @@ class AIComponent extends Component {
     _stateTime += dt;
 
     // Update based on current state
-    switch (_currentState) {
+    switch (currentState) {
       case 'idle':
         _updateIdleState(dt);
         break;
@@ -107,7 +110,7 @@ class AIComponent extends Component {
   /// Set AI state
   void setState(String newState) {
     if (_availableStates.contains(newState)) {
-      _currentState = newState;
+      currentState = newState;
       _stateTime = 0;
     }
   }
@@ -124,7 +127,7 @@ class AIComponent extends Component {
     }
 
     // If target detected and aggressive, switch to chase
-    if (_hasTarget && _isAggressive) {
+    if (hasTarget && _isAggressive) {
       setState('chase');
     }
   }
@@ -141,7 +144,10 @@ class AIComponent extends Component {
 
     // Move towards patrol point
     if (parent is PositionComponent) {
-      final NotifyingVector2 pos = (parent as PositionComponent).position;
+      // TODO(christian): Kept nullable (pos) due to previous runtime errors related to parent component's state/type. Re-evaluate when AI lifecycle is more stable.
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final Vector2? pos = (parent as PositionComponent).position;
+      if (pos == null) return;
       final double distance = pos.distanceTo(targetPoint);
 
       if (distance < 10) {
@@ -164,33 +170,36 @@ class AIComponent extends Component {
     }
 
     // If target detected and aggressive, switch to chase
-    if (_hasTarget && _isAggressive) {
+    if (hasTarget && _isAggressive) {
       setState('chase');
     }
   }
 
   /// Update chase state logic
   void _updateChaseState(double dt) {
-    if (!_hasTarget || !_canFollow || _targetPosition == null) {
+    if (!hasTarget || !_canFollow || targetPosition == null) {
       setState('idle');
       return;
     }
 
     if (parent is PositionComponent) {
-      final NotifyingVector2 pos = (parent as PositionComponent).position;
-      final double distanceToTarget = pos.distanceTo(_targetPosition!);
+      // TODO(christian): Kept nullable (pos) due to previous runtime errors related to parent component's state/type. Re-evaluate when AI lifecycle is more stable.
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final Vector2? pos = (parent as PositionComponent).position;
+      if (pos == null) return;
+      final double distanceToTarget = pos.distanceTo(targetPosition!);
 
       // If within attack range, switch to attack
-      if (distanceToTarget <= _attackRange) {
+      if (distanceToTarget <= attackRange) {
         setState('attack');
         return;
       }
 
       // If target too far, go back to patrol
-      if (distanceToTarget > _detectionRange * 1.5) {
+      if (distanceToTarget > detectionRange * 1.5) {
         setState('patrol');
-        _hasTarget = false;
-        _targetPosition = null;
+        hasTarget = false;
+        targetPosition = null;
         return;
       }
 
@@ -201,17 +210,20 @@ class AIComponent extends Component {
 
   /// Update attack state logic
   void _updateAttackState(double dt) {
-    if (!_hasTarget || _targetPosition == null) {
+    if (!hasTarget || targetPosition == null) {
       setState('idle');
       return;
     }
 
     if (parent is PositionComponent) {
-      final NotifyingVector2 pos = (parent as PositionComponent).position;
-      final double distanceToTarget = pos.distanceTo(_targetPosition!);
+      // TODO(christian): Kept nullable (pos) due to previous runtime errors related to parent component's state/type. Re-evaluate when AI lifecycle is more stable.
+      // ignore: unnecessary_nullable_for_final_variable_declarations
+      final Vector2? pos = (parent as PositionComponent).position;
+      if (pos == null) return;
+      final double distanceToTarget = pos.distanceTo(targetPosition!);
 
       // If target moved out of attack range, chase again
-      if (distanceToTarget > _attackRange) {
+      if (distanceToTarget > attackRange) {
         setState('chase');
         return;
       }
@@ -223,7 +235,7 @@ class AIComponent extends Component {
 
   /// Update flee state logic
   void _updateFleeState(double dt) {
-    if (!_hasTarget || _targetPosition == null) {
+    if (!hasTarget || targetPosition == null) {
       setState('idle');
       return;
     }
@@ -241,9 +253,9 @@ class AIComponent extends Component {
   }
 
   /// Set target position
-  void setTarget(Vector2 target, bool isAwareOfTarget) {
-    _targetPosition = target.clone();
-    _hasTarget = isAwareOfTarget;
+  void setTarget(Vector2 targetValue, bool isAwareOfTarget) {
+    targetPosition = targetValue.clone();
+    hasTarget = isAwareOfTarget;
   }
 
   /// Add patrol point
@@ -264,11 +276,4 @@ class AIComponent extends Component {
   }
 
   // Getters and setters
-  String get currentState => _currentState;
-  double get detectionRange => _detectionRange;
-  set detectionRange(double range) => _detectionRange = range;
-  double get attackRange => _attackRange;
-  set attackRange(double range) => _attackRange = range;
-  bool get hasTarget => _hasTarget;
-  Vector2? get targetPosition => _targetPosition;
 }

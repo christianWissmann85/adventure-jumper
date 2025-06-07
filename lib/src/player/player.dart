@@ -1,6 +1,5 @@
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Color;
-
 import '../components/adv_sprite_component.dart';
 import '../components/aether_component.dart';
 import '../components/debug_rectangle_component.dart';
@@ -19,7 +18,9 @@ import 'player_stats.dart';
 
 /// Main player entity class (Kael)
 /// Handles player representation, component management, and state coordination
-class Player extends Entity {
+import '../game/adventure_jumper_game.dart';
+
+class Player extends Entity with HasGameReference<AdventureJumperGame> {
   late PlayerController controller;
   late PlayerAnimator animator;
   late PlayerStats stats; // Additional components specific to Player
@@ -45,7 +46,6 @@ class Player extends Entity {
   @override
   Future<void> setupEntity() async {
     await super.setupEntity();
-    print('[Player] setupEntity() called - size: $size');
 
     // Set up collision callback to handle interactions with other entities
     onCollision =
@@ -60,20 +60,12 @@ class Player extends Entity {
     collision.addCollisionTag('player');
     collision.addCollisionTag('entity');
 
-    // Debug logging to confirm collision setup
-    print(
-      '[Player] Collision hitbox configured: size=$size, tags=[player, entity]',
-    );
-    print('[Player] Collision component active: ${collision.isActive}');
-
     // Initialize sprite component (inherited from Entity)
     sprite = AdvSpriteComponent(
-      size:
-          size, // Now using PositionComponent's size parameter instead of spriteSize
+      size: size, 
       opacity: 1.0,
     );
     add(sprite!);
-    print('[Player] AdvSpriteComponent added to player');
 
     // Create a temporary fallback visual using DebugRectangleComponent
     // This ensures the player is visible while sprites load and provides extensive debug logging
@@ -101,30 +93,22 @@ class Player extends Entity {
     aether = AetherComponent();
     add(health);
     add(aether); // Initialize subsystems
+    // PHY-3.3.1 & PHY-3.3.2: Assign coordinators from gameRef
+    // gameRef is guaranteed to be available in onLoad/onMount, which calls setupEntity.
+    _physicsCoordinator = game.physicsSystem;
+    _movementCoordinator = game.movementSystem;
+
     controller = PlayerController(
       this,
       movementCoordinator: _movementCoordinator,
       physicsCoordinator: _physicsCoordinator,
     );
     animator = PlayerAnimator(this);
-    print('[Player] Adding PlayerController to component tree...');
     add(controller);
-    print('[Player] PlayerController added successfully');
     add(animator);
     add(stats); // Implementation needed: Load player sprites
     // Implementation needed: Set initial position
     // Implementation needed: Configure physics properties
-
-    print(
-      '[Player] setupEntity() completed - total children: ${children.length}',
-    );
-
-    // Debug: List all children
-    print('[Player] Children list:');
-    for (int i = 0; i < children.length; i++) {
-      final child = children.elementAt(i);
-      print('  Child $i: ${child.runtimeType}');
-    }
   }
 
   /// Handle input action changes from InputComponent
@@ -178,14 +162,14 @@ class Player extends Entity {
   InputComponent get inputComponent =>
       input; // T2.3.1: Jump mechanics integration with PhysicsComponent
   /// Attempt to perform a jump if conditions are met
-  /// Returns a Future<bool> indicating if jump was executed
+  /// Returns a `Future<bool>` indicating if jump was executed
   Future<bool> tryJump({double? customForce}) async {
     // Use the controller's new async public method
     return await controller.attemptJump();
   }
 
   /// Check if player can currently jump
-  /// Returns a Future<bool> for async compatibility with the refactored controller
+  /// Returns a `Future<bool>` for async compatibility with the refactored controller
   Future<bool> canJump() async => await controller.canPerformJump();
 
   /// Get current jump state

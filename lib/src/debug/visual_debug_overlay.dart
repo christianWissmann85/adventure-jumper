@@ -5,7 +5,7 @@ import 'debug_config.dart';
 
 /// Visual debugging overlay that renders debug information directly on screen
 /// This helps us see what's actually being rendered without relying on console logs
-class VisualDebugOverlay extends PositionComponent with HasGameRef {
+class VisualDebugOverlay extends PositionComponent with HasGameReference {
   late TextComponent _debugText;
   String _debugInfo = '';
   @override
@@ -112,7 +112,7 @@ class VisualDebugOverlay extends PositionComponent with HasGameRef {
         lines.length * lineHeight + padding * 2,
       );
 
-      final backgroundPaint = Paint()..color = Colors.black.withOpacity(0.7);
+      final backgroundPaint = Paint()..color = const Color.fromRGBO(0, 0, 0, 0.7);
 
       canvas.drawRect(backgroundRect, backgroundPaint);
     }

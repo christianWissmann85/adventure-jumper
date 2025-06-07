@@ -1,12 +1,16 @@
 import 'package:flame/components.dart';
 
 import '../entities/entity.dart';
+import '../utils/logger.dart'; // Added logger import
 import 'system.dart';
 
 /// A base implementation of System that also extends Flame's Component class
 /// Provides common functionality for systems that need to be Components
 abstract class BaseFlameSystem extends Component implements System {
   BaseFlameSystem();
+
+  // Logger for system operations
+  static final _logger = GameLogger.getLogger('BaseFlameSystem');
 
   /// Entities being processed by this system
   final List<Entity> _entities = <Entity>[];
@@ -34,21 +38,19 @@ abstract class BaseFlameSystem extends Component implements System {
   /// Register an entity with this system if it has the required components
   @override
   void addEntity(Entity entity) {
-    print('PHASE 1 DEBUG: BaseFlameSystem.addEntity() called');
-    print('  Entity type: ${entity.type}');
-    print('  Entity ID: ${entity.id}');
-    print('  Current entities count: ${_entities.length}');
-    print('  canProcessEntity(): ${canProcessEntity(entity)}');
-    print('  Entity already in list: ${_entities.contains(entity)}');
+    _logger.fine('BaseFlameSystem.addEntity() called for ${runtimeType.toString()} with entity: ${entity.id} (${entity.type})');
+    _logger.fine('  Current entities count: ${_entities.length}');
+    _logger.fine('  canProcessEntity(${entity.id}): ${canProcessEntity(entity)}');
+    _logger.fine('  Entity ${entity.id} already in list: ${_entities.contains(entity)}');
 
     if (canProcessEntity(entity) && !_entities.contains(entity)) {
       _entities.add(entity);
-      print('  Entity successfully added. New count: ${_entities.length}');
+      _logger.fine('  Entity ${entity.id} successfully added. New count: ${_entities.length}');
       onEntityAdded(entity);
-      print('  onEntityAdded() callback completed');
+      _logger.fine('  onEntityAdded(${entity.id}) callback completed');
     } else {
-      print(
-        '  Entity NOT added - canProcess: ${canProcessEntity(entity)}, alreadyExists: ${_entities.contains(entity)}',
+      _logger.fine(
+        '  Entity ${entity.id} NOT added - canProcess: ${canProcessEntity(entity)}, alreadyExists: ${_entities.contains(entity)}',
       );
     }
   }
@@ -92,6 +94,20 @@ abstract class BaseFlameSystem extends Component implements System {
   @override
   void initialize() {
     // Default empty implementation
+  }
+
+  @override
+  void onMount() {
+    _logger.fine('BaseFlameSystem.onMount() CALLED for ${runtimeType.toString()}');
+    super.onMount();
+    // Automatically discover and add entities that are children of the same parent (e.g., FlameGame)
+    if (parent != null) {
+      for (final component in parent!.children) {
+        if (component is Entity) {
+          addEntity(component);
+        }
+      }
+    }
   }
 
   @override

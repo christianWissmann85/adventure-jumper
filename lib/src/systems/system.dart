@@ -6,14 +6,10 @@ abstract class System {
   System();
 
   /// Whether this system is currently active
-  bool _isActive = true;
-  bool get isActive => _isActive;
-  set isActive(bool value) => _isActive = value;
+  bool isActive = true;
 
   /// Priority for update order (higher values update first)
-  int _priority = 0;
-  int get priority => _priority;
-  set priority(int value) => _priority = value;
+  int priority = 0;
 
   /// Process system logic for the current frame
   /// [dt] is the delta time in seconds since the last update

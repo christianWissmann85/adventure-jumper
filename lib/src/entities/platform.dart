@@ -5,6 +5,7 @@ import '../assets/sprite_loader.dart';
 import '../components/adv_sprite_component.dart';
 import '../components/debug_rectangle_component.dart';
 import '../components/physics_component.dart';
+import '../systems/interfaces/collision_notifier.dart' as notifier; // Added for SurfaceMaterial
 import 'entity.dart';
 
 /// Base class for platforms in the game
@@ -25,9 +26,11 @@ class Platform extends Entity {
     bool? isBreakable,
     bool? isOneWay,
     bool? needsPlayerWeight,
+    notifier.SurfaceMaterial? surfaceMaterial, // Added for surface material
   }) : super(
           position: position,
           type: 'platform',
+          defaultSurfaceMaterial: surfaceMaterial, // Pass to Entity constructor
         ) {
     if (platformType != null) _platformType = platformType;
     if (isMoving != null) _isMoving = isMoving;
@@ -141,7 +144,8 @@ class Platform extends Entity {
       final Sprite platformSprite = await spriteLoader.loadSprite(spritePath);
       sprite!.setSprite(platformSprite);
       print(
-          '[Platform] Loaded actual sprite for platform type: $_platformType, path: $spritePath');
+        '[Platform] Loaded actual sprite for platform type: $_platformType, path: $spritePath',
+      );
     } catch (e) {
       print('[Platform] Failed to load sprite $spritePath, using fallback: $e');
 

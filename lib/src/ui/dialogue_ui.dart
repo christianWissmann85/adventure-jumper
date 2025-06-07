@@ -418,7 +418,7 @@ class DialogueUI extends PositionComponent with TapCallbacks {
         size: Vector2(boxWidth, dialogueBoxHeight),
         position: Vector2.zero(),
         paint: Paint()
-          ..color = Colors.white.withOpacity(0.3)
+          ..color = Colors.white.withAlpha(77)
           ..style = PaintingStyle.stroke
           ..strokeWidth = borderWidth,
       );
@@ -597,7 +597,7 @@ class DialogueUI extends PositionComponent with TapCallbacks {
 
     // Apply alpha to all UI components
     _dialogueBox.paint = Paint()
-      ..color = Color(0xCC000000).withOpacity(alpha * 0.8)
+      ..color = Color(0xCC000000).withAlpha((204 * alpha * 0.8).round())
       ..style = PaintingStyle.fill;
 
     // Apply scale using Flame's scale property
@@ -612,12 +612,12 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     // Update speaker name opacity
     final TextPaint nameStyle = TextPaint(
       style: font?.copyWith(
-            color: Colors.white.withOpacity(alpha),
+            color: Colors.white.withAlpha((255 * alpha).round()),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ) ??
           TextStyle(
-            color: Colors.white.withOpacity(alpha),
+            color: Colors.white.withAlpha((255 * alpha).round()),
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
@@ -627,11 +627,11 @@ class DialogueUI extends PositionComponent with TapCallbacks {
     // Update dialogue text opacity
     final TextPaint dialogueStyle = TextPaint(
       style: font?.copyWith(
-            color: Colors.white.withOpacity(alpha),
+            color: Colors.white.withAlpha((255 * alpha).round()),
             fontSize: 16,
           ) ??
           TextStyle(
-            color: Colors.white.withOpacity(alpha),
+            color: Colors.white.withAlpha((255 * alpha).round()),
             fontSize: 16,
           ),
     );
@@ -768,7 +768,7 @@ class ChoiceButton extends PositionComponent with TapCallbacks {
     _border = RectangleComponent(
       size: size,
       paint: Paint()
-        ..color = Colors.white.withOpacity(0.2)
+        ..color = Colors.white.withAlpha(51)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.0,
     );
@@ -801,7 +801,7 @@ class ChoiceButton extends PositionComponent with TapCallbacks {
         ..style = PaintingStyle.fill;
 
       _border.paint = Paint()
-        ..color = Colors.white.withOpacity(0.5)
+        ..color = Colors.white.withAlpha(128)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
     } else {
@@ -810,7 +810,7 @@ class ChoiceButton extends PositionComponent with TapCallbacks {
         ..style = PaintingStyle.fill;
 
       _border.paint = Paint()
-        ..color = Colors.white.withOpacity(0.2)
+        ..color = Colors.white.withAlpha(51)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.0;
     }

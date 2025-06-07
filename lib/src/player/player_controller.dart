@@ -41,10 +41,7 @@ class PlayerController extends Component {
   bool _moveLeft = false;
   bool _moveRight = false;
   bool _jump = false;
-  double _lastDeltaTime = 0.016;
 
-  // Movement smoothing variables
-  double _targetVelocityX = 0.0;
   double _inputSmoothTimer = 0.0;
   bool _hasInputThisFrame = false;
 
@@ -58,9 +55,6 @@ class PlayerController extends Component {
   double _coyoteTimer = 0.0;
 
   // Edge detection state tracking
-  final bool _wasNearLeftEdge = false;
-  final bool _wasNearRightEdge = false;
-
   // Legacy variables for compatibility
   bool _isJumping = false;
   bool _canJump = true;
@@ -115,9 +109,6 @@ class PlayerController extends Component {
   @override
   void update(double dt) {
     super.update(dt);
-
-    // Track delta time for calculations
-    _lastDeltaTime = dt;
 
     // Schedule async updates to run after this frame
     // This avoids async issues in the synchronous update method
@@ -210,19 +201,17 @@ class PlayerController extends Component {
 
     // Determine appropriate movement parameters
     final bool isInAir = await _isPlayerInAir();
-    double acceleration = isInAir
-        ? GameConfig.airAcceleration * GameConfig.airControlMultiplier
-        : GameConfig.playerAcceleration;
-    double maxSpeed =
-        isInAir ? GameConfig.maxAirSpeed : GameConfig.maxWalkSpeed;
+    double maxSpeed = isInAir
+        ? GameConfig.maxAirSpeed
+        : GameConfig.maxWalkSpeed;
 
     // Check for direction change boost
-    final currentVelocity = await _getCurrentVelocity();
-    if (currentVelocity.x > 0) {
-      acceleration = isInAir
-          ? GameConfig.airTurnAroundSpeed
-          : GameConfig.playerAcceleration * 1.5;
-    }
+    // final currentVelocity = await _getCurrentVelocity(); // This was only used to set unused 'acceleration'
+    // if (currentVelocity.x > 0) { // This was only used to set unused 'acceleration'
+    //   // acceleration = isInAir // This was only used to set unused 'acceleration'
+    //   //     ? GameConfig.airTurnAroundSpeed // This was only used to set unused 'acceleration'
+    //   //     : GameConfig.playerAcceleration * 1.5; // This was only used to set unused 'acceleration'
+    // } // This was only used to set unused 'acceleration'
 
     // PHY-3.2.3: Create movement request with retry capability
     final isInputSequence = _detectInputSequence();
@@ -304,19 +293,17 @@ class PlayerController extends Component {
 
     // Determine appropriate movement parameters
     final bool isInAir = await _isPlayerInAir();
-    double acceleration = isInAir
-        ? GameConfig.airAcceleration * GameConfig.airControlMultiplier
-        : GameConfig.playerAcceleration;
-    double maxSpeed =
-        isInAir ? GameConfig.maxAirSpeed : GameConfig.maxWalkSpeed;
+    double maxSpeed = isInAir
+        ? GameConfig.maxAirSpeed
+        : GameConfig.maxWalkSpeed;
 
     // Check for direction change boost
-    final currentVelocity = await _getCurrentVelocity();
-    if (currentVelocity.x < 0) {
-      acceleration = isInAir
-          ? GameConfig.airTurnAroundSpeed
-          : GameConfig.playerAcceleration * 1.5;
-    }
+    // final currentVelocity = await _getCurrentVelocity(); // This was only used to set unused 'acceleration'
+    // if (currentVelocity.x < 0) { // This was only used to set unused 'acceleration'
+    //   // acceleration = isInAir // This was only used to set unused 'acceleration'
+    //   //     ? GameConfig.airTurnAroundSpeed // This was only used to set unused 'acceleration'
+    //   //     : GameConfig.playerAcceleration * 1.5; // This was only used to set unused 'acceleration'
+    // } // This was only used to set unused 'acceleration'
 
     // PHY-3.2.3: Create movement request with retry capability
     final isInputSequence = _detectInputSequence();
@@ -605,7 +592,7 @@ class PlayerController extends Component {
     // Only apply cut-off if moving upward
     if (currentVel.y < 0) {
       // PHY-3.2.1: Request velocity modification through physics coordinator
-      final newVelY = currentVel.y * GameConfig.jumpCutOffMultiplier;
+      // final newVelY = currentVel.y * GameConfig.jumpCutOffMultiplier; // Value not used
 
       // This is a special case where we need to modify vertical velocity
       // We'll use a stop request with custom velocity adjustment
@@ -637,7 +624,7 @@ class PlayerController extends Component {
   Future<void> _updateEdgeDetection() async {
     if (_physicsCoordinator == null) return;
 
-    final state = await _physicsCoordinator!.getPhysicsState(_entityId);
+    // final state = await _physicsCoordinator!.getPhysicsState(_entityId); // Value not used
 
     // Edge detection logic would go here based on physics state
     // For now, we'll keep the existing event firing logic
@@ -713,7 +700,6 @@ class PlayerController extends Component {
     _landingTimer = 0.0;
     _jumpCooldownTimer = 0.0;
     _coyoteTimer = 0.0;
-    _targetVelocityX = 0.0;
     _inputSmoothTimer = 0.0;
     _hasInputThisFrame = false;
     _isJumping = false;
@@ -834,14 +820,6 @@ class PlayerController extends Component {
     PlayerEventBus.instance.fireEvent(event);
   }
 
-  void _fireNearEdgeEvent(String side) async {
-    // Edge event implementation would go here
-  }
-
-  void _fireLeftEdgeEvent(String side) async {
-    // Edge event implementation would go here
-  }
-
   void _fireRespawnEvent() {
     developer.log('Player respawned to position: $_lastSafePosition');
   }
@@ -919,7 +897,6 @@ class PlayerController extends Component {
 
         // Also clear any accumulated input state
         _inputSmoothTimer = 0.0;
-        _targetVelocityX = 0.0;
 
         // Reset rapid input counter after prevention
         _rapidInputCounter = 0;

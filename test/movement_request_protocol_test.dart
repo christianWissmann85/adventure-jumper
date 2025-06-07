@@ -204,7 +204,7 @@ void main() {
           MovementType.walk,
         ];
         
-        ValidationResult? lastResult;
+        // ValidationResult? lastResult; // Unused
         for (int i = 0; i < types.length; i++) {
           final request = MovementRequest(
             entityId: entityId,
@@ -213,7 +213,7 @@ void main() {
             magnitude: types[i] == MovementType.walk ? 200.0 : 0.0,
           );
           
-          lastResult = validator.validateMovementRequest(request);
+          validator.validateMovementRequest(request); // Result not used
         }
         
         // The oscillation detection might not trigger with our current implementation
@@ -285,7 +285,7 @@ void main() {
         final tracker = RapidInputTracker();
         
         // We need to simulate rapid succession with custom timestamps
-        final baseTime = DateTime.now();
+        // final baseTime = DateTime.now(); // Unused
         
         // Add requests with decreasing intervals to simulate rapid input
         for (int i = 0; i < 5; i++) {

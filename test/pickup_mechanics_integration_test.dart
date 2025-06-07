@@ -279,8 +279,8 @@ void main() {
 
       test('should prevent double collection of same shard', () {
         // Record initial state
-        final initialAether = player.stats.currentAether;
-        final initialShards = player.stats.aetherShards;
+        // final initialAether = player.stats.currentAether; // Unused
+        // final initialShards = player.stats.aetherShards; // Unused
 
         // Trigger first collection
         aetherShard.onCollision?.call(player);

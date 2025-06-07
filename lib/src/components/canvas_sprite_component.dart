@@ -75,7 +75,7 @@ class CanvasSpriteComponent extends PositionComponent {
 
     // Set up paint with opacity and tint
     final Paint paint = Paint()
-      ..color = _tintColor.withOpacity(currentOpacity)
+      ..color = ui.Color.fromRGBO((_tintColor.r * 255.0).round() & 0xff, (_tintColor.g * 255.0).round() & 0xff, (_tintColor.b * 255.0).round() & 0xff, currentOpacity)
       ..filterQuality = FilterQuality.none; // Pixel-perfect rendering
 
     // Calculate source and destination rectangles

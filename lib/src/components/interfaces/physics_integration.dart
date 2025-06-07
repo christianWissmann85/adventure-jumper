@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 
-import '../../systems/interfaces/physics_state.dart';
+import '../../systems/interfaces/collision_notifier.dart'; // For CollisionInfo
+import '../../systems/interfaces/physics_state.dart' hide CollisionInfo; // Hide its version of CollisionInfo
 
 /// PHY-3.1.1: Interface for physics component integration
 ///

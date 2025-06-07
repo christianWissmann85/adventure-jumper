@@ -12,7 +12,7 @@ class HealthComponent extends Component {
   }) {
     if (maxHealth != null) _maxHealth = maxHealth;
     if (currentHealth != null) _currentHealth = currentHealth;
-    if (regenerationRate != null) _regenerationRate = regenerationRate;
+    if (regenerationRate != null) this.regenerationRate = regenerationRate;
     if (isInvulnerable != null) _isInvulnerable = isInvulnerable;
     if (invulnerabilityTime != null) _invulnerabilityTime = invulnerabilityTime;
   }
@@ -20,7 +20,7 @@ class HealthComponent extends Component {
   // Health properties
   double _maxHealth = 100;
   double _currentHealth = 100;
-  double _regenerationRate = 0;
+  double regenerationRate = 0;
   bool _isDead = false;
   // Invulnerability (for damage immunity frames)
   bool _isInvulnerable = false;
@@ -55,10 +55,10 @@ class HealthComponent extends Component {
     }
 
     // Apply health regeneration
-    if (_regenerationRate > 0 &&
+    if (regenerationRate > 0 &&
         _currentHealth > 0 &&
         _currentHealth < _maxHealth) {
-      heal(_regenerationRate * dt);
+      heal(regenerationRate * dt);
     }
   }
 
@@ -165,6 +165,4 @@ class HealthComponent extends Component {
   double get healthPercentage => _currentHealth / _maxHealth * 100;
   bool get isDead => _isDead;
   bool get isInvulnerable => _isInvulnerable;
-  double get regenerationRate => _regenerationRate;
-  set regenerationRate(double rate) => _regenerationRate = rate;
 }

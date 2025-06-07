@@ -6,6 +6,7 @@ import 'package:adventure_jumper/src/systems/interfaces/movement_request.dart';
 import 'package:adventure_jumper/src/systems/interfaces/movement_response.dart';
 import 'package:adventure_jumper/src/systems/interfaces/physics_coordinator.dart';
 import 'package:adventure_jumper/src/systems/interfaces/physics_state.dart';
+import 'package:adventure_jumper/src/systems/interfaces/collision_notifier.dart'; // Added for SurfaceMaterial
 import 'package:adventure_jumper/src/systems/movement_system.dart';
 import 'package:flame/components.dart';
 import 'package:test/test.dart';
@@ -133,6 +134,12 @@ class MockPhysicsCoordinator implements IPhysicsCoordinator {
         updateCount: 0,
         lastUpdateTime: DateTime.now(),
       );
+
+  @override
+  Future<SurfaceMaterial> getCurrentGroundSurfaceMaterial(int entityId) async {
+    // Mock implementation, can be customized for specific test cases if needed
+    return SurfaceMaterial.stone;
+  }
 
   @override
   Future<bool> hasCollisionBelow(int entityId) async => false;

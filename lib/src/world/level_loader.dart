@@ -48,10 +48,7 @@ class LevelLoader {
       }
       return level;
     } catch (e, stackTrace) {
-      logger.severe('Error loading level $levelId', e);
-      // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
-      print('DEBUG ERROR: $e');
-      print('DEBUG STACK TRACE: $stackTrace');
+      logger.severe('Error loading level $levelId', e, stackTrace);
       // Return a fallback empty level
       return _createEmptyLevel(levelId);
     }

@@ -17,7 +17,7 @@ class AnimationComponent extends Component {
       _currentAnimationName = initialAnimation;
       _currentAnimation = animations[initialAnimation];
     }
-    if (animationSpeed != null) _animationSpeed = animationSpeed;
+    if (animationSpeed != null) speed = animationSpeed;
     if (isPlaying != null) _isPlaying = isPlaying;
     // Note: loop parameter is used for individual animation play calls
   }
@@ -25,7 +25,7 @@ class AnimationComponent extends Component {
   Map<String, SpriteAnimation> _animations = <String, SpriteAnimation>{};
   String _currentAnimationName = 'idle';
   SpriteAnimation? _currentAnimation;
-  double _animationSpeed = 1;
+  double speed = 1;
   bool _isPlaying = true;
 
   // Animation component reference
@@ -92,7 +92,7 @@ class AnimationComponent extends Component {
     _currentAnimation = _animations[animationName];
 
     if (speed != null) {
-      _animationSpeed = speed;
+      this.speed = speed;
     }
 
     _isPlaying = true;
@@ -125,14 +125,6 @@ class AnimationComponent extends Component {
       _animationComponent!.animationTicker!.reset();
     }
   }
-
-  /// Set animation speed
-  set speed(double speed) {
-    _animationSpeed = speed;
-  }
-
-  /// Get animation speed
-  double get speed => _animationSpeed;
 
   /// Get the name of the current animation
   String get currentAnimationName => _currentAnimationName;

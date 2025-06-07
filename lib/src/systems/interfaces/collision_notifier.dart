@@ -754,6 +754,7 @@ enum SurfaceMaterial {
 
 /// Collision type classification for event handling.
 enum CollisionType {
+  none, // No specific collision type / default state
   ground, // Ground contact collision
   wall, // Wall contact collision
   ceiling, // Ceiling contact collision

@@ -9,6 +9,7 @@ import '../utils/collision_utils.dart';
 import '../utils/constants.dart';
 import '../utils/edge_detection_utils.dart';
 import 'base_flame_system.dart';
+import 'interfaces/collision_notifier.dart'; // Added for SurfaceMaterial
 import 'interfaces/movement_request.dart';
 import 'interfaces/movement_response.dart';
 import 'interfaces/physics_coordinator.dart';
@@ -116,13 +117,13 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
   }
 
   // PHY-2.4.2: Maximum value constraints for accumulation prevention
-  static const double MAX_VELOCITY = 1000.0;
-  static const double MAX_ACCELERATION = 500.0;
-  static const double MAX_FRICTION_ACCUMULATION = 10.0;
-  static const int MAX_CONTACT_POINTS = 8;
-  static const double CONTACT_LIFETIME = 0.1; // seconds
-  static const double VELOCITY_THRESHOLD = 0.01; // for micro-movement stopping
-  static const double DRIFT_CORRECTION_FACTOR = 0.98;
+  static const double maxVelocity = 1000.0;
+  static const double maxAcceleration = 500.0;
+  static const double maxFrictionAccumulation = 10.0;
+  static const int maxContactPoints = 8;
+  static const double contactLifetime = 0.1; // seconds
+  static const double velocityThreshold = 0.01; // for micro-movement stopping
+  static const double driftCorrectionFactor = 0.98;
 
   // Configuration
   double _timeScale = 1.0;
@@ -416,25 +417,25 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
   /// PHY-2.4.2: Apply maximum value constraints to prevent accumulation
   void _applyVelocityConstraints(PhysicsComponent physics) {
     // Enforce maximum velocity magnitude
-    if (physics.velocity.length > MAX_VELOCITY) {
+    if (physics.velocity.length > maxVelocity) {
       physics.velocity.normalize();
-      physics.velocity.scale(MAX_VELOCITY);
+      physics.velocity.scale(maxVelocity);
       logger.warning(
-        'Velocity clamped to MAX_VELOCITY for entity ${physics.parent}',
+        'Velocity clamped to maxVelocity for entity ${physics.parent}',
       );
     }
 
     // Enforce maximum acceleration
-    if (physics.acceleration.length > MAX_ACCELERATION) {
+    if (physics.acceleration.length > maxAcceleration) {
       physics.acceleration.normalize();
-      physics.acceleration.scale(MAX_ACCELERATION);
+      physics.acceleration.scale(maxAcceleration);
       logger.warning(
-        'Acceleration clamped to MAX_ACCELERATION for entity ${physics.parent}',
+        'Acceleration clamped to maxAcceleration for entity ${physics.parent}',
       );
     }
 
     // PHY-2.4.2: Stop micro-movements to prevent drift
-    if (physics.velocity.length < VELOCITY_THRESHOLD) {
+    if (physics.velocity.length < velocityThreshold) {
       physics.velocity.setZero();
     }
   }
@@ -446,14 +447,14 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     _entityContactPoints.forEach((entityId, contactPoints) {
       contactPoints.removeWhere((contact) {
         final age = now.difference(contact.timestamp).inMilliseconds / 1000.0;
-        return age > CONTACT_LIFETIME;
+        return age > contactLifetime;
       });
 
       // Limit maximum contact points per entity
-      if (contactPoints.length > MAX_CONTACT_POINTS) {
+      if (contactPoints.length > maxContactPoints) {
         // Keep only the most recent contact points
         contactPoints.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        contactPoints.removeRange(MAX_CONTACT_POINTS, contactPoints.length);
+        contactPoints.removeRange(maxContactPoints, contactPoints.length);
       }
     });
 
@@ -482,22 +483,6 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     _entityContactPoints[entityId]!.add(contact);
   }
 
-  /// PHY-2.4.2: Apply friction accumulation limits
-  void _applyFrictionLimits(Entity entity, double frictionForce) {
-    final entityId = entity.hashCode;
-
-    // Track friction accumulation
-    _frictionAccumulators[entityId] =
-        (_frictionAccumulators[entityId] ?? 0.0) + frictionForce.abs();
-
-    // Limit friction accumulation
-    if (_frictionAccumulators[entityId]! > MAX_FRICTION_ACCUMULATION) {
-      _frictionAccumulators[entityId] = MAX_FRICTION_ACCUMULATION;
-      logger.warning(
-        'Friction accumulation limited for entity ${entity.id}',
-      );
-    }
-  }
 
   /// PHY-2.4.2: Reset friction accumulators periodically
   void _resetFrictionAccumulators() {
@@ -740,7 +725,9 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     if (entityA.physics != null && !entityA.physics!.isStatic) {
       // Handle landing on surfaces
       if (entityA.position.y < entityB.position.y) {
-        entityA.physics!.setOnGround(true);
+        final collisionComp = entityB.collision; // Entity has a direct 'collision' property
+        final groundMaterial = collisionComp.surfaceMaterial;
+        entityA.physics!.setOnGround(true, groundMaterial: groundMaterial);
         entityA.physics!.velocity.y = 0;
       } else {
         // Hitting ceiling
@@ -837,7 +824,9 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
         print('  Position after separation: ${movableEntity.position}');
 
         // Update physics state
-        physics.setOnGround(true);
+        final collisionComp = staticEntity.collision; // staticEntity here is a Platform, which extends Entity
+        final groundMaterial = collisionComp.surfaceMaterial;
+        physics.setOnGround(true, groundMaterial: groundMaterial);
         physics.velocity.y = 0; // Stop downward motion
         print('  Set onGround=true, velocity.y=0');
 
@@ -872,7 +861,9 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     if (normal.y < -0.5) {
       // If normal points mostly upward
       print('  GROUND DETECTED: Setting onGround=true (normal.y=${normal.y})');
-      physics.setOnGround(true);
+      final collisionComp = staticEntity.collision; // staticEntity is an Entity or Platform
+      final groundMaterial = collisionComp.surfaceMaterial;
+      physics.setOnGround(true, groundMaterial: groundMaterial);
     } else {
       print('  NO GROUND: normal.y=${normal.y} (not < -0.5)');
     }
@@ -1374,6 +1365,24 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
   }
 
   @override
+  Future<SurfaceMaterial> getCurrentGroundSurfaceMaterial(int entityId) async {
+    final entity = _findEntityById(entityId);
+    if (entity == null) {
+      logger.warning('Entity with ID $entityId not found for getCurrentGroundSurfaceMaterial.');
+      return SurfaceMaterial.none;
+    }
+
+    final physicsComponent = entity.physics;
+    if (physicsComponent == null) {
+      logger.warning('PhysicsComponent not found for entity $entityId for getCurrentGroundSurfaceMaterial.');
+      return SurfaceMaterial.none;
+    }
+
+    // Retrieve the stored ground surface material from the PhysicsComponent
+    return physicsComponent.currentGroundSurfaceMaterial;
+  }
+
+  @override
   Future<PhysicsState> getPhysicsState(int entityId) async {
     final Entity? entity = _findEntityById(entityId);
     if (entity == null) {
@@ -1492,7 +1501,7 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
 
     // PHY-2.4.2: Clear any accumulated forces that might cause physics degradation
     physics.acceleration.setZero();
-    physics.velocity.scale(DRIFT_CORRECTION_FACTOR); // Apply drift correction
+    physics.velocity.scale(driftCorrectionFactor); // Apply drift correction
 
     // Clear contact points for this entity
     _entityContactPoints.remove(entityId);
@@ -1522,7 +1531,7 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
 
     // Synchronize with TransformComponent if available
     try {
-      entity.transformComponent.setPosition(entity.position);
+      entity.transformComponent.syncWithPhysics(entity.position, callerSystem: 'PhysicsSystem.setPositionOverride');
     } catch (e) {
       // TransformComponent may not be initialized in tests
       logger.fine('TransformComponent not available for entity $entityId');
@@ -1560,13 +1569,13 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     }
 
     // PHY-2.4.3: Check against maximum constraints
-    if (physics.velocity.length > MAX_VELOCITY) {
-      logger.warning('Entity $entityId velocity exceeds MAX_VELOCITY');
+    if (physics.velocity.length > maxVelocity) {
+      logger.warning('Entity $entityId velocity exceeds maxVelocity');
       return false;
     }
 
-    if (physics.acceleration.length > MAX_ACCELERATION) {
-      logger.warning('Entity $entityId acceleration exceeds MAX_ACCELERATION');
+    if (physics.acceleration.length > maxAcceleration) {
+      logger.warning('Entity $entityId acceleration exceeds maxAcceleration');
       return false;
     }
 
@@ -1592,7 +1601,7 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
 
     // PHY-2.4.3: Check for accumulation issues
     final contactCount = _entityContactPoints[entityId]?.length ?? 0;
-    if (contactCount > MAX_CONTACT_POINTS) {
+    if (contactCount > maxContactPoints) {
       logger.warning(
         'Entity $entityId has excessive contact points: $contactCount',
       );
@@ -1600,7 +1609,7 @@ class PhysicsSystem extends BaseFlameSystem implements IPhysicsCoordinator {
     }
 
     final frictionAccumulation = _frictionAccumulators[entityId] ?? 0.0;
-    if (frictionAccumulation > MAX_FRICTION_ACCUMULATION) {
+    if (frictionAccumulation > maxFrictionAccumulation) {
       logger.warning(
         'Entity $entityId has excessive friction accumulation: $frictionAccumulation',
       );

@@ -4,7 +4,6 @@ import 'package:adventure_jumper/src/components/physics_component.dart';
 import 'package:adventure_jumper/src/events/player_events.dart';
 import 'package:adventure_jumper/src/player/player.dart';
 import 'package:adventure_jumper/src/player/player_controller.dart';
-import 'package:adventure_jumper/src/systems/physics_system.dart';
 import 'package:adventure_jumper/src/utils/edge_detection_utils.dart';
 import 'package:flame/components.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,7 +13,6 @@ void main() {
     late PhysicsComponent physics;
     late Player player;
     late PlayerController controller;
-    late PhysicsSystem physicsSystem;
     setUp(() async {
       physics = PhysicsComponent();
       player = Player(
@@ -24,7 +22,6 @@ void main() {
       // Initialize player components
       await player.onLoad();
       controller = PlayerController(player);
-      physicsSystem = PhysicsSystem();
     });
 
     group('T2.6.1: Platform Boundary Detection Logic', () {
@@ -201,8 +198,8 @@ void main() {
         // Mock values for a player near the left edge of a platform
         final playerPosition = Vector2(15, 100);
         final platformPosition = Vector2(0, 150);
-        final Vector2 playerSize = Vector2(32, 48);
-        final platformSize = Vector2(100, 50);
+        // final Vector2 playerSize = Vector2(32, 48); // Unused
+        // final platformSize = Vector2(100, 50); // Unused
         final threshold = 30.0;
 
         // Player's left position is at x=15, platform's left edge is at x=0

@@ -47,13 +47,14 @@ class AdventureJumperGame extends FlameGame
     inputSystem = InputSystem();
     add(inputSystem);
     _logger.fine('Input system initialized'); // Initialize movement system
-    movementSystem = MovementSystem();
-    add(movementSystem);
-    _logger.fine('Movement system initialized');
-
-    // Initialize physics system
+    // Initialize physics system FIRST
     physicsSystem = PhysicsSystem();
     add(physicsSystem);
+    _logger.fine('Physics system initialized');
+
+    // Initialize movement system and PASS the physicsSystem
+    movementSystem = MovementSystem(physicsCoordinator: physicsSystem);
+    add(movementSystem);
     _logger.fine('Physics system initialized');
     // Add CollisionSystem
     collisionSystem = CollisionSystem(physicsCoordinator: physicsSystem);
@@ -181,14 +182,6 @@ class AdventureJumperGame extends FlameGame
   void onTapUp(TapUpInfo info) {
     // Handle tap up events
     super.onTapUp(info);
-  }
-
-  /// Set up input handlers for keyboard and other input devices
-  void _setupInputHandlers() {
-    // Input handling is managed entirely by the InputSystem
-    // The InputSystem will register with entities that have InputComponents
-    // Keyboard events are forwarded via the onKeyEvent method below
-    _logger.fine('Input handlers configured');
   }
 
   @override

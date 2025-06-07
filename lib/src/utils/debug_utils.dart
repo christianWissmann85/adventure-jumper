@@ -17,13 +17,13 @@ class DebugUtils {
   DebugUtils._();
 
   // Debug configuration
-  static bool _debugMode = kDebugMode;
-  static bool _showCollisionBoxes = false;
-  static bool _showVelocityVectors = false;
-  static bool _showFPS = false;
-  static bool _showEntityCount = false;
-  static bool _logPerformance = false;
-  static bool _verboseLogging = false;
+  static bool debugMode = kDebugMode;
+  static bool showCollisionBoxes = false;
+  static bool showVelocityVectors = false;
+  static bool showFPS = false;
+  static bool showEntityCount = false;
+  static bool logPerformance = false;
+  static bool verboseLogging = false;
 
   // Debug colors
   static const Color collisionBoxColor = Colors.red;
@@ -51,19 +51,19 @@ class DebugUtils {
     bool logPerformance = false,
     bool verboseLogging = false,
   }) {
-    _debugMode = debugMode;
-    _showCollisionBoxes = showCollisionBoxes;
-    _showVelocityVectors = showVelocityVectors;
-    _showFPS = showFPS;
-    _logPerformance = logPerformance;
-    _verboseLogging = verboseLogging;
+    debugMode = debugMode;
+    showCollisionBoxes = showCollisionBoxes;
+    showVelocityVectors = showVelocityVectors;
+    showFPS = showFPS;
+    logPerformance = logPerformance;
+    verboseLogging = verboseLogging;
 
     log('Debug utilities initialized', LogLevel.info);
   }
 
   /// Log a message with specified level
   static void log(String message, [LogLevel level = LogLevel.debug]) {
-    if (!_debugMode && level == LogLevel.debug) return;
+    if (!debugMode && level == LogLevel.debug) return;
 
     final String timestamp = DateTime.now().toIso8601String();
     final String levelStr = level.toString().split('.').last.toUpperCase();
@@ -87,7 +87,7 @@ class DebugUtils {
         developer.log(logEntry, level: 800, name: 'AdventureJumper');
         break;
       case LogLevel.debug:
-        if (_verboseLogging) {
+        if (verboseLogging) {
           developer.log(logEntry, level: 700, name: 'AdventureJumper');
         }
         break;
@@ -101,14 +101,14 @@ class DebugUtils {
     StackTrace? stackTrace,
   ]) {
     log('ERROR: $message${error != null ? ' - $error' : ''}', LogLevel.error);
-    if (stackTrace != null && _verboseLogging) {
+    if (stackTrace != null && verboseLogging) {
       log('Stack trace: $stackTrace', LogLevel.error);
     }
   }
 
   /// Log performance metrics
   static void logPerformanceMetrics(String operation, double milliseconds) {
-    if (!_logPerformance) return;
+    if (!logPerformance) return;
 
     final LogLevel level =
         milliseconds > 16.6 ? LogLevel.warning : LogLevel.debug;
@@ -117,7 +117,7 @@ class DebugUtils {
 
   /// Start performance tracking for an operation
   static void startPerformanceTracking(String operation) {
-    if (!_debugMode) return;
+    if (!debugMode) return;
 
     _performanceTrackers[operation] = PerformanceTracker(
       name: operation,
@@ -127,7 +127,7 @@ class DebugUtils {
 
   /// End performance tracking and log results
   static void endPerformanceTracking(String operation) {
-    if (!_debugMode) return;
+    if (!debugMode) return;
 
     final PerformanceTracker? tracker = _performanceTrackers[operation];
     if (tracker != null) {
@@ -138,7 +138,7 @@ class DebugUtils {
       if (tracker.samples.length > 100) {
         tracker.samples.removeAt(0);
       }
-      if (_logPerformance) {
+      if (logPerformance) {
         logPerformanceMetrics(operation, duration.toDouble());
       }
 
@@ -172,7 +172,7 @@ class DebugUtils {
 
   /// Update frame rate tracking
   static void updateFrameRate(double deltaTime) {
-    if (!_debugMode) return;
+    if (!debugMode) return;
 
     _frameTimes.add(deltaTime * 1000); // Convert to milliseconds
     if (_frameTimes.length > _maxFrameSamples) {
@@ -191,13 +191,13 @@ class DebugUtils {
 
   /// Draw debug information on screen
   static void drawDebugInfo(Canvas canvas, Size screenSize, Camera camera) {
-    if (!_debugMode) return;
+    if (!debugMode) return;
 
     double yOffset = 10;
     const double lineHeight = 20;
 
     // Draw FPS
-    if (_showFPS) {
+    if (showFPS) {
       final double fps = getCurrentFPS();
       final Color fpsColor = fps >= 55
           ? performanceGoodColor
@@ -216,7 +216,7 @@ class DebugUtils {
     }
 
     // Draw entity count
-    if (_showEntityCount) {
+    if (showEntityCount) {
       // This would need to be passed in from the game world
       _drawDebugText(canvas, 'Entities: N/A', 10, yOffset, debugTextColor);
       yOffset += lineHeight;
@@ -233,7 +233,7 @@ class DebugUtils {
     yOffset += lineHeight;
 
     // Draw memory usage (simplified)
-    if (_logPerformance) {
+    if (logPerformance) {
       _drawDebugText(
         canvas,
         'Debug Log: ${_debugLog.length} entries',
@@ -252,7 +252,7 @@ class DebugUtils {
     Vector2 size, [
     Color? color,
   ]) {
-    if (!_debugMode || !_showCollisionBoxes) return;
+    if (!debugMode || !showCollisionBoxes) return;
 
     final Paint paint = Paint()
       ..color = color ?? collisionBoxColor
@@ -270,7 +270,7 @@ class DebugUtils {
     Vector2 velocity, [
     Color? color,
   ]) {
-    if (!_debugMode || !_showVelocityVectors) return;
+    if (!debugMode || !showVelocityVectors) return;
 
     if (velocity.length < 0.1) return; // Don't draw very small vectors
 
@@ -382,7 +382,7 @@ class DebugUtils {
 
   /// Assert a condition in debug mode
   static void debugAssert(bool condition, String message) {
-    if (!_debugMode) return;
+    if (!debugMode) return;
 
     if (!condition) {
       final DebugAssertionException exception =
@@ -397,21 +397,21 @@ class DebugUtils {
 
   /// Dump object state for debugging
   static void dumpObject(String name, Object object) {
-    if (!_debugMode || !_verboseLogging) return;
+    if (!debugMode || !verboseLogging) return;
 
     log('DUMP $name: $object');
   }
 
   /// Create a debug checkpoint
   static void checkpoint(String name) {
-    if (!_debugMode) return;
+    if (!debugMode) return;
 
     log('CHECKPOINT: $name');
   }
 
   /// Time a function execution
   static T timeFunction<T>(String name, T Function() function) {
-    if (!_debugMode) return function();
+    if (!debugMode) return function();
 
     final Stopwatch stopwatch = Stopwatch()..start();
 
@@ -443,22 +443,6 @@ class DebugUtils {
     }
   }
 
-  // Getters and setters for debug flags
-  static bool get debugMode => _debugMode;
-  static bool get showCollisionBoxes => _showCollisionBoxes;
-  static bool get showVelocityVectors => _showVelocityVectors;
-  static bool get showFPS => _showFPS;
-  static bool get showEntityCount => _showEntityCount;
-  static bool get logPerformance => _logPerformance;
-  static bool get verboseLogging => _verboseLogging;
-
-  static set debugMode(bool value) => _debugMode = value;
-  static set showCollisionBoxes(bool value) => _showCollisionBoxes = value;
-  static set showVelocityVectors(bool value) => _showVelocityVectors = value;
-  static set showFPS(bool value) => _showFPS = value;
-  static set showEntityCount(bool value) => _showEntityCount = value;
-  static set logPerformance(bool value) => _logPerformance = value;
-  static set verboseLogging(bool value) => _verboseLogging = value;
 }
 
 /// Log levels for debug messages

@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart' show Colors;
 
-import '../assets/player_placeholder.dart';
+import '../game/adventure_jumper_game.dart';
 import '../assets/sprite_loader.dart';
 import '../debug/debug_config.dart';
 import 'player.dart';
@@ -17,7 +17,7 @@ enum AnimationState { idle, run, jump, fall, landing, attack, damaged, death }
 /// Handles animation state transitions, sprite management, and visual effects
 ///
 /// Will be properly integrated with the game in Sprint 2
-class PlayerAnimator extends Component {
+class PlayerAnimator extends Component with HasGameReference<AdventureJumperGame> {
   PlayerAnimator(this.player);
   final Player player;
 
@@ -139,10 +139,7 @@ class PlayerAnimator extends Component {
 
       try {
         // Create minimal fallback sprite as last resort
-        final fallbackSprite = await PlayerPlaceholder.createPlaceholderSprite(
-          player.size.x,
-          player.size.y,
-        );
+        final fallbackSprite = await game.loadSprite('static/test_placeholder.png');
         _sprites[AnimationState.idle] = fallbackSprite;
 
         if (player.sprite != null) {
@@ -183,7 +180,8 @@ class PlayerAnimator extends Component {
       } catch (e) {
         // This should rarely happen since SpriteLoader has its own fallbacks
         print(
-            '[PlayerAnimator] Failed to create placeholder for ${state.name}: $e');
+          '[PlayerAnimator] Failed to create placeholder for ${state.name}: $e',
+        );
       }
     }
   }

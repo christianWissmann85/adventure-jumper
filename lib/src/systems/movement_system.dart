@@ -163,9 +163,9 @@ class MovementSystem extends BaseFlameSystem implements IMovementCoordinator {
   ) {
     final Vector2 newPosition =
         entity.transformComponent.position + (velocity * scaledDt);
-    entity.transformComponent.setPosition(newPosition);
-
     // CRITICAL ISSUE - Direct position update (WILL BE REMOVED)
+    // The call to entity.transformComponent.setPosition(newPosition); was removed here as it's deprecated
+    // and entity.position = newPosition; (below) is expected to handle the transform component update.
     entity.position = newPosition;
 
     // Debug output for direct position changes

@@ -15,7 +15,7 @@ class AetherComponent extends Component {
     if (maxAether != null) _maxAether = maxAether;
     if (currentAether != null) _currentAether = currentAether;
     if (aetherRegenRate != null) _aetherRegenRate = aetherRegenRate;
-    if (isActive != null) _isActive = isActive;
+    if (isActive != null) this.isActive = isActive;
     if (unlockedAbilities != null) _unlockedAbilities = unlockedAbilities;
   }
 
@@ -23,7 +23,7 @@ class AetherComponent extends Component {
   double _maxAether = 100;
   double _currentAether = 100;
   double _aetherRegenRate = 5; // Aether points per second
-  bool _isActive = true;
+  bool isActive = true;
 
   // Event system integration for T2.8.4
   final PlayerEventBus _eventBus = PlayerEventBus.instance;
@@ -91,7 +91,7 @@ class AetherComponent extends Component {
   void update(double dt) {
     super.update(dt);
 
-    if (!_isActive) return;
+    if (!isActive) return;
 
     // Regenerate Aether over time
     if (_currentAether < _maxAether) {
@@ -362,12 +362,9 @@ class AetherComponent extends Component {
   double get currentAether => _currentAether;
   double get aetherRegenRate => _aetherRegenRate;
   double get aetherPercentage => _currentAether / _maxAether * 100;
-  bool get isActive => _isActive;
   List<String> get unlockedAbilities =>
       List<String>.unmodifiable(_unlockedAbilities);
   Map<String, bool> get abilityStates =>
       Map<String, bool>.unmodifiable(_abilityActive);
 
-  /// Set whether aether regeneration is active
-  set isActive(bool value) => _isActive = value;
 }

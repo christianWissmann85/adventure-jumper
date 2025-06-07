@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flame/src/game/notifying_vector2.dart';
 
 import '../utils/logger.dart';
 import 'interfaces/transform_integration.dart';
@@ -50,7 +49,7 @@ class TransformComponent extends Component implements ITransformIntegration {
 
     // Initialize with parent's position if available
     if (parent is PositionComponent) {
-      final NotifyingVector2 parentPos = (parent as PositionComponent).position;
+      final Vector2 parentPos = (parent as PositionComponent).position;
       _position = parentPos.clone();
       _prevPosition = parentPos.clone();
     }

@@ -79,7 +79,6 @@ class InputComponent extends Component implements IInputIntegration {
       MovementCapabilities.defaultPlayer();
   final Map<String, double> _lastInputTime = <String, double>{};
   final Map<String, int> _inputFrequency = <String, int>{};
-  double _timeSinceLastInput = 0.0;
   bool _isGrounded = false;
 
   // Input frequency limits (actions per second)
@@ -116,8 +115,11 @@ class InputComponent extends Component implements IInputIntegration {
 
     if (!_isActive) return;
 
-    // Update time tracking
-    _timeSinceLastInput += dt;
+    // Update time tracking for individual actions
+    final actionsToUpdate = _lastInputTime.keys.toList();
+    for (final action in actionsToUpdate) {
+      _lastInputTime[action] = (_lastInputTime[action] ?? 0.0) + dt;
+    }
 
     // Update input buffer timers and clear expired ones
     if (_enableInputBuffering) {
@@ -224,7 +226,6 @@ class InputComponent extends Component implements IInputIntegration {
       if (state) {
         _lastInputTime[action] = 0.0;
         _inputFrequency[action] = (_inputFrequency[action] ?? 0) + 1;
-        _timeSinceLastInput = 0.0;
       }
 
       // Trigger callback
@@ -478,7 +479,6 @@ class InputComponent extends Component implements IInputIntegration {
     _inputBuffer.clear();
     _lastInputTime.clear();
     _inputFrequency.clear();
-    _timeSinceLastInput = 0.0;
   }
 
   @override

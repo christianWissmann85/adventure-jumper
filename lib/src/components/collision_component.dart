@@ -26,12 +26,14 @@ class CollisionComponent extends Component
     bool? isOneWay,
     List<String>? collisionTags,
     bool createTestHitbox = true,
+    notifier.SurfaceMaterial? surfaceMaterial, // Added for surface material
   }) {
     if (hitboxSize != null) _hitboxSize = hitboxSize;
     if (hitboxOffset != null) _hitboxOffset = hitboxOffset;
     if (isActive != null) _isActive = isActive;
-    if (isOneWay != null) _isOneWay = isOneWay;
+    if (isOneWay != null) this.isOneWay = isOneWay;
     if (collisionTags != null) _collisionTags = collisionTags;
+    this.surfaceMaterial = surfaceMaterial ?? notifier.SurfaceMaterial.none; // Initialize surfaceMaterial
 
     // Create a hitbox immediately for testing if needed
     if (createTestHitbox &&
@@ -40,7 +42,7 @@ class CollisionComponent extends Component
       _hitbox = RectangleHitbox(
         size: _hitboxSize,
         position: _hitboxOffset,
-        isSolid: !_isOneWay,
+        isSolid: !this.isOneWay,
       );
     }
   }
@@ -49,8 +51,9 @@ class CollisionComponent extends Component
   Vector2 _hitboxSize = Vector2.zero();
   Vector2 _hitboxOffset = Vector2.zero();
   bool _isActive = true;
-  bool _isOneWay = false;
+  bool isOneWay = false;
   List<String> _collisionTags = <String>['default'];
+  late final notifier.SurfaceMaterial surfaceMaterial; // Added for surface material
   // Hitbox components
   ShapeHitbox? _hitbox;
 
@@ -58,10 +61,12 @@ class CollisionComponent extends Component
   final List<CollisionInfo> _activeCollisions = [];
   notifier.GroundInfo? _groundInfo;
   bool _isColliding = false;
-  double _lastPhysicsSync = 0.0;
 
   // Logger for collision events
   static final _logger = GameLogger.getLogger('CollisionComponent');
+
+  // Coyote time configuration
+  static const Duration _kCoyoteTimeDuration = Duration(milliseconds: 150);
 
   @override
   Future<void> onLoad() async {
@@ -80,7 +85,7 @@ class CollisionComponent extends Component
       _hitbox = RectangleHitbox(
         size: _hitboxSize,
         position: _hitboxOffset,
-        isSolid: !_isOneWay,
+        isSolid: !isOneWay,
       );
 
       // Add hitbox to parent
@@ -147,9 +152,7 @@ class CollisionComponent extends Component
   Vector2 get hitboxSize => _hitboxSize;
   Vector2 get hitboxOffset => _hitboxOffset;
   bool get isActive => _isActive;
-  set isOneWay(bool value) => _isOneWay = value;
-  bool get isOneWay => _isOneWay;
-  List<String> get collisionTags => _collisionTags;
+  List<String> get collisionTags => List.unmodifiable(_collisionTags);
   ShapeHitbox get hitbox {
     if (_hitbox == null) {
       // Create a test hitbox if not initialized yet (for tests)
@@ -157,7 +160,7 @@ class CollisionComponent extends Component
         _hitbox = RectangleHitbox(
           size: _hitboxSize,
           position: _hitboxOffset,
-          isSolid: !_isOneWay,
+          isSolid: !isOneWay,
         );
       } else {
         throw StateError('Hitbox accessed before initialization. '
@@ -252,6 +255,29 @@ class CollisionComponent extends Component
     return _groundInfo;
   }
 
+  /// Returns true if the entity is currently on the ground or within the coyote time window.
+  Future<bool> isEffectivelyGrounded() async {
+    final groundInfo = _groundInfo; // groundInfo is of type notifier.GroundInfo?
+
+    if (groundInfo?.isGrounded ?? false) { // Handles case where groundInfo is null or isGrounded is false
+      return true;
+    }
+
+    // At this point, either groundInfo is null, or groundInfo.isGrounded is false.
+    // We only care about coyote time if groundInfo is not null and isGrounded was false.
+    if (groundInfo != null) {
+      // Now we know groundInfo is not null.
+      // groundInfo.lastGroundedTime is non-nullable DateTime, so lastTimeGrounded is also non-nullable.
+      final lastTimeGrounded = groundInfo.lastGroundedTime;
+      final timeSinceLeftGround = DateTime.now().difference(lastTimeGrounded);
+      if (timeSinceLeftGround <= _kCoyoteTimeDuration) {
+        _logger.finer('Coyote time active: ${timeSinceLeftGround.inMilliseconds}ms since left ground.');
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   Future<List<CollisionInfo>> predictCollisions(Vector2 movement) async {
     // This would typically query the collision system for potential collisions
@@ -264,11 +290,17 @@ class CollisionComponent extends Component
   Future<bool> isMovementBlocked(Vector2 direction) async {
     // Check active collisions for blocking in the given direction
     for (final collision in _activeCollisions) {
-      // Check if collision normal opposes movement direction
-      final dotProduct = collision.contactNormal.dot(direction.normalized());
-      if (dotProduct < -0.7) {
-        // Threshold for opposing directions
-        return true;
+      // Consider only collisions that are inherently blocking (like walls or ceilings)
+      final isBlockingType = collision.collisionType == notifier.CollisionType.wall.name ||
+                             collision.collisionType == notifier.CollisionType.ceiling.name;
+
+      if (isBlockingType) {
+        // Check if collision normal opposes movement direction
+        final dotProduct = collision.contactNormal.dot(direction.normalized());
+        if (dotProduct < -0.7) { // Threshold for opposing directions
+          _logger.finer('Movement blocked by ${collision.collisionType} (normal: ${collision.contactNormal}, direction: $direction)');
+          return true;
+        }
       }
     }
     return false;
@@ -301,7 +333,6 @@ class CollisionComponent extends Component
   @override
   Future<void> syncWithPhysics(PhysicsState physicsState) async {
     // Sync collision state with physics state
-    _lastPhysicsSync = DateTime.now().millisecondsSinceEpoch / 1000.0;
 
     // Update ground state from physics
     if (physicsState.isGrounded != (_groundInfo?.isGrounded ?? false)) {
@@ -338,7 +369,6 @@ class CollisionComponent extends Component
     _activeCollisions.clear();
     _groundInfo = null;
     _isColliding = false;
-    _lastPhysicsSync = 0.0;
 
     _logger.fine('Collision state cleared');
   }
@@ -412,7 +442,6 @@ class CollisionComponent extends Component
     // Simple normal calculation - can be enhanced
     if (intersectionPoints.isEmpty) return Vector2(0, -1);
 
-    final contactPoint = intersectionPoints.first;
     final otherCenter = other.position + (other.size / 2);
     final thisCenter =
         (parent as PositionComponent?)?.position ?? Vector2.zero();

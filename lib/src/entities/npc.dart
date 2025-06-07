@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flame/components.dart';
+import 'package:logging/logging.dart';
 
 import '../components/ai_component.dart';
 import 'entity.dart';
@@ -15,6 +16,7 @@ enum NPCInteractionState {
 /// Non-player character base class
 /// Handles interaction, dialogue, and quest-related behaviors
 class NPC extends Entity {
+  static final _logger = Logger('NPC');
   NPC({
     required super.position,
     super.size,
@@ -28,8 +30,8 @@ class NPC extends Entity {
     bool? hasQuest,
     String? dialogueId,
     String? questId,
-    double? interactionRange,
-    double? visualFeedbackRange,
+    this.interactionRange = 100.0,
+    this.visualFeedbackRange = 150.0,
   }) : super(
           type: 'npc',
         ) {
@@ -39,8 +41,6 @@ class NPC extends Entity {
     if (hasQuest != null) _hasQuest = hasQuest;
     if (dialogueId != null) _dialogueId = dialogueId;
     if (questId != null) _questId = questId;
-    if (interactionRange != null) _interactionRange = interactionRange;
-    if (visualFeedbackRange != null) _visualFeedbackRange = visualFeedbackRange;
   } // NPC-specific components
   late AIComponent ai;
 
@@ -52,9 +52,6 @@ class NPC extends Entity {
   String _dialogueId = '';
   String _questId = '';
 
-  // T3.4.1: Interaction range detection
-  double _interactionRange = 100.0;
-  double _visualFeedbackRange = 150.0;
 
   // T3.4.2: Interaction state management
   NPCInteractionState _interactionState = NPCInteractionState.idle;
@@ -167,16 +164,14 @@ class NPC extends Entity {
   void startDialogue() {
     // T3.4.3: Enhanced dialogue trigger system
     // This will integrate with DialogueSystem in future implementations
-    // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
-    print('$_name: Starting dialogue with ID: $_dialogueId');
+    _logger.info('$_name: Starting dialogue with ID: $_dialogueId');
   }
 
   /// Offer quest to the player
   void offerQuest() {
     // T3.4.3: Enhanced quest trigger system
     // This will integrate with QuestSystem in future implementations
-    // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
-    print('$_name: Offering quest with ID: $_questId');
+    _logger.info('$_name: Offering quest with ID: $_questId');
   }
 
   /// T3.4.2: Set NPC interaction state
@@ -203,7 +198,7 @@ class NPC extends Entity {
     Vector2 playerPosition, {
     double? customRange,
   }) {
-    final double range = customRange ?? _interactionRange;
+    final double range = customRange ?? interactionRange;
     final double distance = position.distanceTo(playerPosition);
     return distance <= range;
   }
@@ -211,7 +206,7 @@ class NPC extends Entity {
   /// T3.4.1: Check if player is within visual feedback range
   bool isInVisualFeedbackRange(Vector2 playerPosition) {
     final double distance = position.distanceTo(playerPosition);
-    return distance <= _visualFeedbackRange;
+    return distance <= visualFeedbackRange;
   }
 
   /// T3.4.1: Get exact distance to player for proximity-based behaviors
@@ -244,11 +239,10 @@ class NPC extends Entity {
   String get dialogueId => _dialogueId;
   String get questId => _questId;
 
-  // T3.4.1: Interaction range getters and setters
-  double get interactionRange => _interactionRange;
-  set interactionRange(double range) => _interactionRange = range;
-  double get visualFeedbackRange => _visualFeedbackRange;
-  set visualFeedbackRange(double range) => _visualFeedbackRange = range;
+  // T3.4.1: Interaction range
+  double interactionRange;
+  // T3.4.1: Visual feedback range
+  double visualFeedbackRange;
 
   // T3.4.2: Interaction state getters
   NPCInteractionState get interactionState => _interactionState;

@@ -203,7 +203,7 @@ class SpriteRectangleComponent extends RectangleComponent {
       if (_isFlashing && _flashVisible) {
         canvas.drawRect(
           destRect,
-          Paint()..color = Colors.white.withOpacity(0.5),
+          Paint()..color = Color.fromRGBO(255, 255, 255, 0.5),
         );
       }
     } catch (e) {

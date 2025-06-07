@@ -54,14 +54,10 @@ class GameLogger {
             stackTrace: record.stackTrace,
           );
         } else {
-          // Standard logging for info and below - use debugPrint for better Flutter integration
-          if (kDebugMode) {
-            // Use debugPrint in debug mode for all levels
-            debugPrint('[${record.level.name}] $formattedMessage');
-          } else if (record.level >= Level.INFO) {
-            // In release mode, only print INFO and above
-            debugPrint('[${record.level.name}] $formattedMessage');
-          }
+          // For levels below WARNING (e.g., INFO, FINE, FINER, FINEST),
+          // always print to console if enableConsoleOutput is true.
+          // This ensures diagnostic logs appear during testing, regardless of kDebugMode.
+          debugPrint('[${record.level.name}] $formattedMessage');
         }
       }
 

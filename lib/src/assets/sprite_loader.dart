@@ -4,10 +4,10 @@ import 'dart:ui' as ui;
 
 import 'package:flame/cache.dart';
 import 'package:flame/components.dart';
+import 'dart:developer' as developer;
 
 import '../utils/error_handler.dart';
 import '../utils/exceptions.dart';
-import 'player_placeholder.dart';
 
 /// Handles loading and management of sprite assets for the game
 class SpriteLoader {
@@ -63,7 +63,7 @@ class SpriteLoader {
         return sprite;
       } catch (_) {
         // If static placeholder fails, create a simple dynamic one
-        final sprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
+        final sprite = await _createDynamicPlaceholderSprite(32, 64);
         _spriteCache[path] = sprite;
         return sprite;
       }
@@ -106,7 +106,7 @@ class SpriteLoader {
         return sprite;
       } catch (_) {
         // If static placeholder also fails, create a simple dynamic one
-        final sprite = await PlayerPlaceholder.createPlaceholderSprite(32, 64);
+        final sprite = await _createDynamicPlaceholderSprite(32, 64);
         _spriteCache[path] = sprite;
         return sprite;
       }
@@ -306,6 +306,25 @@ class SpriteLoader {
     } catch (e) {
       // Silently handle errors during preload - will fallback to placeholders when needed
     }
+  }
+
+  /// Creates a dynamic placeholder sprite (e.g., a magenta rectangle).
+  Future<Sprite> _createDynamicPlaceholderSprite(double width, double height) async {
+    developer.log(
+      'Creating dynamic placeholder sprite ($width x $height) as test_placeholder.png failed to load or was not available.',
+      name: 'SpriteLoader',
+      level: 800, // Warning level for logging
+    );
+    final recorder = ui.PictureRecorder();
+    final canvas = ui.Canvas(recorder);
+    final paint = ui.Paint()..color = const ui.Color(0xFFFF00FF); // Magenta
+    canvas.drawRect(ui.Rect.fromLTWH(0, 0, width, height), paint);
+    final picture = recorder.endRecording();
+    // Ensure width and height are positive for toImage
+    final imgWidth = width.toInt().clamp(1, 4096); // Clamp to reasonable values
+    final imgHeight = height.toInt().clamp(1, 4096);
+    final image = await picture.toImage(imgWidth, imgHeight);
+    return Sprite(image);
   }
 }
 

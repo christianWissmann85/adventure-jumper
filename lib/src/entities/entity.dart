@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 
 import '../components/adv_sprite_component.dart';
 import '../components/collision_component.dart';
@@ -10,6 +10,8 @@ import '../components/interfaces/physics_integration.dart';
 import '../components/interfaces/transform_integration.dart';
 import '../components/physics_component.dart';
 import '../components/transform_component.dart';
+import '../systems/interfaces/collision_notifier.dart'
+    as notifier; // Added for SurfaceMaterial
 import '../utils/logger.dart';
 
 enum ComponentLifecycleStage {
@@ -50,10 +52,16 @@ abstract class Entity extends PositionComponent {
     super.priority,
     String? id,
     String? type,
+    notifier.SurfaceMaterial?
+    defaultSurfaceMaterial, // Added for default surface material
   }) {
+    _defaultSurfaceMaterialForCollision = defaultSurfaceMaterial; // Store it
     if (id != null) _id = id;
     if (type != null) _type = type;
   }
+
+  // Default surface material for collision component
+  notifier.SurfaceMaterial? _defaultSurfaceMaterialForCollision;
 
   // Component lifecycle management
   final Map<Type, ComponentLifecycleStage> _componentLifecycle = {};
@@ -74,6 +82,7 @@ abstract class Entity extends PositionComponent {
   String _type = 'entity';
   bool _isInitialized = false;
   ComponentLifecycleStage _entityLifecycle = ComponentLifecycleStage.created;
+  bool publicOnLoadCalled = false;
 
   // Collision callback - this is assignable from external code
   Function(Entity)? onCollision;
@@ -82,24 +91,57 @@ abstract class Entity extends PositionComponent {
   static final _logger = GameLogger.getLogger('Entity');
   @override
   Future<void> onLoad() async {
+    debugPrint(
+      "--- Entity.onLoad ENTERED for ${runtimeType.toString()} (id: $_id) ---",
+    );
+    _logger.fine("Entity '$_id' (${runtimeType.toString()}) onLoad START");
     _logger.info('onLoad() called - id: $_id, type: $_type');
     _entityLifecycle = ComponentLifecycleStage.initializing;
 
     try {
+      debugPrint("--- Entity.onLoad ($_id): CALLING super.onLoad() ---");
       await super.onLoad();
+      debugPrint("--- Entity.onLoad ($_id): super.onLoad() COMPLETE ---");
 
       // Create and add required components with lifecycle tracking
       transformComponent = TransformComponent();
-      collision = CollisionComponent();
-
+      _logger.fine(
+        "Entity '$_id' (${runtimeType.toString()}) Initializing collision component...",
+      );
+      collision = CollisionComponent(
+        surfaceMaterial: _defaultSurfaceMaterialForCollision,
+      ); // Pass stored material
+      _logger.fine(
+        "Entity '$_id' (${runtimeType.toString()}) Collision component INSTANTIATED.",
+      );
+      debugPrint(
+        "--- Entity.onLoad ($_id): CALLING initializeComponent(transformComponent) ---",
+      );
       await initializeComponent(transformComponent);
+      debugPrint(
+        "--- Entity.onLoad ($_id): initializeComponent(transformComponent) COMPLETE ---",
+      );
+      debugPrint(
+        "--- Entity.onLoad ($_id): CALLING initializeComponent(collision) ---",
+      );
       await initializeComponent(collision);
+      debugPrint(
+        "--- Entity.onLoad ($_id): initializeComponent(collision) COMPLETE ---",
+      );
 
       // Setup entity-specific components after required components are initialized
+      debugPrint("--- Entity.onLoad ($_id): CALLING setupEntity() ---");
       await setupEntity();
+      debugPrint("--- Entity.onLoad ($_id): setupEntity() COMPLETE ---");
 
       // Validate all components are properly initialized
+      debugPrint(
+        "--- Entity.onLoad ($_id): CALLING _validateComponentInitialization() ---",
+      );
       await _validateComponentInitialization();
+      debugPrint(
+        "--- Entity.onLoad ($_id): _validateComponentInitialization() COMPLETE ---",
+      );
 
       _entityLifecycle = ComponentLifecycleStage.initialized;
       _isInitialized = true;
@@ -108,10 +150,13 @@ abstract class Entity extends PositionComponent {
       _entityLifecycle = ComponentLifecycleStage.active;
       _activateAllComponents();
 
+      publicOnLoadCalled = true; // Set flag here
       _logger.info(
         'onLoad() completed - id: $_id, type: $_type, components: ${_managedComponents.length}',
       );
+      debugPrint("--- Entity.onLoad ($_id): TRY BLOCK COMPLETE ---");
     } catch (e, stack) {
+      debugPrint("--- Entity.onLoad ($_id): CAUGHT ERROR: $e ---");
       _entityLifecycle = ComponentLifecycleStage.error;
       _logger.severe('Entity initialization failed: $e', e, stack);
       await _handleEntityError(e, stack);
@@ -138,9 +183,7 @@ abstract class Entity extends PositionComponent {
 
   @override
   void onGameResize(Vector2 size) {
-    _logger.info(
-      'onGameResize() called - id: $_id, type: $_type, size: $size',
-    );
+    _logger.info('onGameResize() called - id: $_id, type: $_type, size: $size');
     super.onGameResize(size);
   }
 
@@ -496,8 +539,9 @@ abstract class Entity extends PositionComponent {
         : 0.0;
 
     _logger.info(
-        'Component coordination accuracy: ${(accuracy * 100.0).toStringAsFixed(2)}% '
-        '($successfulCoordinations/$totalCoordinations)');
+      'Component coordination accuracy: ${(accuracy * 100.0).toStringAsFixed(2)}% '
+      '($successfulCoordinations/$totalCoordinations)',
+    );
 
     return accuracy;
   }
@@ -553,12 +597,14 @@ abstract class Entity extends PositionComponent {
         _logger.severe('PhysicsComponent synchronization check failed: $e');
       }
     }
-    final compliance =
-        totalComponents > 0 ? (synchronizedComponents / totalComponents) : 0.0;
+    final compliance = totalComponents > 0
+        ? (synchronizedComponents / totalComponents)
+        : 0.0;
 
     _logger.info(
-        'State synchronization compliance: ${(compliance * 100.0).toStringAsFixed(2)}% '
-        '($synchronizedComponents/$totalComponents)');
+      'State synchronization compliance: ${(compliance * 100.0).toStringAsFixed(2)}% '
+      '($synchronizedComponents/$totalComponents)',
+    );
 
     return compliance;
   }

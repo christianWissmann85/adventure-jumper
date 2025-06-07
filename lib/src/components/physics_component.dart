@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 
-import '../systems/interfaces/physics_state.dart';
+import '../systems/interfaces/collision_notifier.dart'; // Added for SurfaceMaterial
+import '../systems/interfaces/physics_state.dart' hide CollisionInfo;
 import 'interfaces/physics_integration.dart';
 
 /// PHY-3.1.1: Enhanced PhysicsComponent with IPhysicsIntegration
@@ -34,13 +35,13 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
     if (friction != null) _friction = friction;
     if (restitution != null) _restitution = restitution;
     if (gravityScale != null) _gravityScale = gravityScale;
-    if (isStatic != null) _isStatic = isStatic;
-    if (isSensor != null) _isSensor = isSensor;
-    if (affectedByGravity != null) _affectedByGravity = affectedByGravity;
+    if (isStatic != null) this.isStatic = isStatic;
+    if (isSensor != null) this.isSensor = isSensor;
+    if (affectedByGravity != null) this.affectedByGravity = affectedByGravity;
     if (bounciness != null) {
       _restitution = bounciness; // Use _restitution for bounciness
     }
-    if (useEdgeDetection != null) _useEdgeDetection = useEdgeDetection;
+    if (useEdgeDetection != null) this.useEdgeDetection = useEdgeDetection;
   }
 
   // Physics properties
@@ -50,13 +51,15 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   double _friction = 0.1;
   double _restitution = 0.2; // Internal field for bounciness
   double _gravityScale = 1;
-  bool _isStatic = false; // Static objects don't move
-  bool _isSensor = false; // Sensor objects don't collide physically
-  bool _affectedByGravity = true;
+  bool isStatic = false; // Static objects don't move
+  bool isSensor = false; // Sensor objects don't collide physically
+  bool affectedByGravity = true;
 
   // Ground contact state
   bool _isOnGround = false;
   bool _wasOnGround = false;
+  SurfaceMaterial? _currentGroundSurfaceMaterial;
+
 
   // T2.5.1: Enhanced landing detection with collision normals
   Vector2? _lastCollisionNormal;
@@ -74,7 +77,7 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
       32.0; // Distance threshold for edge proximity
   Vector2? _leftEdgePosition;
   Vector2? _rightEdgePosition;
-  bool _useEdgeDetection =
+  bool useEdgeDetection =
       false; // Whether this component should have edges detected by PhysicsSystem
 
   // Max velocity capping
@@ -84,7 +87,7 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   void update(double dt) {
     super.update(dt);
 
-    if (_isStatic) return; // Static objects don't update physics
+    if (isStatic) return; // Static objects don't update physics
 
     // Store previous ground state
     _wasOnGround = _isOnGround;
@@ -96,14 +99,23 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
 
   /// Apply a force to this entity
   void applyForce(Vector2 force) {
-    if (_isStatic) return;
+    if (isStatic) return;
     _acceleration += force / _mass;
   }
 
   /// Apply an impulse (instant change in velocity)
   void applyImpulse(Vector2 impulse) {
-    if (_isStatic) return;
-    _velocity += impulse / _mass;
+    if (isStatic || mass <= 0) return; // Cannot apply impulse to static or massless objects
+
+    final Vector2 deltaVelocity = impulse / mass;
+    velocity.add(deltaVelocity);
+  }
+
+  /// Apply a knockback force to this entity (as an impulse)
+  void applyKnockback(Vector2 knockbackForce) {
+    if (isStatic) return;
+    // Knockback is typically applied as an immediate change in velocity (impulse)
+    applyImpulse(knockbackForce);
   }
 
   /// Set velocity directly
@@ -122,8 +134,14 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   }
 
   /// Set ground contact state
-  void setOnGround(bool onGround) {
+  void setOnGround(bool onGround, {SurfaceMaterial? groundMaterial}) {
     _isOnGround = onGround;
+    if (_isOnGround) {
+      // Store the provided material, or null if the ground has no specific material / null was passed.
+      _currentGroundSurfaceMaterial = groundMaterial;
+    } else {
+      _currentGroundSurfaceMaterial = null;
+    }
   }
 
   /// T2.5.1: Set landing data for enhanced detection
@@ -174,16 +192,13 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   double get gravityScale => _gravityScale;
   double get maxVelocityX => _maxVelocityX;
   double get maxVelocityY => _maxVelocityY;
-  bool get isStatic => _isStatic;
-  set isStatic(bool value) => _isStatic = value;
-  bool get isSensor => _isSensor;
-  set isSensor(bool value) => _isSensor = value;
+
+
   bool get isOnGround => _isOnGround;
   bool get wasOnGround => _wasOnGround;
   bool get justLanded => _isOnGround && !_wasOnGround;
   bool get justLeftGround => !_isOnGround && _wasOnGround;
-  bool get affectedByGravity => _affectedByGravity;
-  set affectedByGravity(bool value) => _affectedByGravity = value;
+
 
   // T2.5.1: Enhanced landing detection getters
   Vector2? get lastCollisionNormal => _lastCollisionNormal?.clone();
@@ -191,6 +206,15 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   double get lastLandingVelocity => _lastLandingVelocity;
   Vector2? get lastLandingPosition => _lastLandingPosition?.clone();
   String? get lastPlatformType => _lastPlatformType;
+
+  /// Returns the surface material of the ground the entity is currently on.
+  /// Defaults to SurfaceMaterial.none if not grounded or if the material is unspecified.
+  SurfaceMaterial get currentGroundSurfaceMaterial {
+    if (!_isOnGround) {
+      return SurfaceMaterial.none;
+    }
+    return _currentGroundSurfaceMaterial ?? SurfaceMaterial.none;
+  }
 
   // T2.6.1: Edge detection getters
   bool get isNearLeftEdge => _isNearLeftEdge;
@@ -201,9 +225,6 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   double get edgeDetectionThreshold => _edgeDetectionThreshold;
   Vector2? get leftEdgePosition => _leftEdgePosition?.clone();
   Vector2? get rightEdgePosition => _rightEdgePosition?.clone();
-  bool get useEdgeDetection => _useEdgeDetection; // Getter for useEdgeDetection
-  set useEdgeDetection(bool value) =>
-      _useEdgeDetection = value; // Setter for useEdgeDetection
 
   /// Set gravity scale multiplier
   void setGravityScale(double scale) {
@@ -232,8 +253,8 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
     _gravityScale = state.gravityScale;
     _friction = state.friction;
     _restitution = state.restitution;
-    _isStatic = state.isStatic;
-    _affectedByGravity = state.affectedByGravity;
+    isStatic = state.isStatic;
+    affectedByGravity = state.affectedByGravity;
 
     // Notify of state update
     onPhysicsUpdate(state);
@@ -267,8 +288,8 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
     _gravityScale = 1.0;
     _friction = 0.1;
     _restitution = 0.2;
-    _isStatic = false;
-    _affectedByGravity = true;
+    isStatic = false;
+    affectedByGravity = true;
   }
 
   @override
@@ -314,9 +335,9 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
       gravityScale: _gravityScale,
       friction: _friction,
       restitution: _restitution,
-      isStatic: _isStatic,
-      affectedByGravity: _affectedByGravity,
-      useEdgeDetection: _useEdgeDetection,
+      isStatic: isStatic,
+      affectedByGravity: affectedByGravity,
+      useEdgeDetection: useEdgeDetection,
     );
   }
 
@@ -329,7 +350,7 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
   @override
   void onCollision(CollisionInfo collision) {
     // Update collision tracking
-    if (collision.collisionType == 'ground') {
+    if (collision.collisionType == CollisionType.ground) {
       _lastCollisionNormal = collision.contactNormal.clone();
       _lastLandingPosition = collision.contactPoint.clone();
       _lastLandingVelocity = _velocity.y;
@@ -383,8 +404,8 @@ class PhysicsComponent extends Component implements IPhysicsIntegration {
       gravityScale: _gravityScale,
       friction: _friction,
       restitution: _restitution,
-      isStatic: _isStatic,
-      affectedByGravity: _affectedByGravity,
+      isStatic: isStatic,
+      affectedByGravity: affectedByGravity,
       activeCollisions: [], // Empty for now
       accumulatedForces: Vector2.zero(),
       contactPointCount: 0,

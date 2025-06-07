@@ -13,6 +13,8 @@ class DialogueSystem extends BaseSystem {
 
   // Currently active dialogue - will be implemented in Sprint 2
   NPC? _activeNPC;
+  // TODO(christian): Implement usage of _currentDialogue in Sprint 2 for displaying current dialogue text.
+  // ignore: unused_field
   String? _currentDialogue;
   final List<String> _dialogueChoices = <String>[];
   bool _isInDialogue = false;

@@ -1,10 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flame/components.dart';
+import 'package:logging/logging.dart';
 
 /// Component that handles audio triggers and spatial sound for entities
 /// Manages sound effect activation based on entity state and events
 class AudioComponent extends Component {
+  static final _logger = Logger('AudioComponent');
+
   AudioComponent({
     bool? isActive,
     double? maxDistance,
@@ -12,7 +15,7 @@ class AudioComponent extends Component {
     bool? is3D,
     Map<String, List<String>>? soundMappings,
   }) {
-    if (isActive != null) _isActive = isActive;
+    if (isActive != null) this.isActive = isActive;
     if (maxDistance != null) _maxDistance = maxDistance;
     if (volume != null) _volume = volume;
     if (is3D != null) _is3D = is3D;
@@ -20,7 +23,7 @@ class AudioComponent extends Component {
   }
 
   // Audio properties
-  bool _isActive = true;
+  bool isActive = true;
   double _volume = 1;
   bool _is3D = true;
   double _maxDistance = 1000; // Maximum distance for audio falloff
@@ -51,7 +54,7 @@ class AudioComponent extends Component {
   void update(double dt) {
     super.update(dt);
 
-    if (!_isActive) return;
+    if (!isActive) return;
 
     // Update sound timers for periodic sounds (like footsteps)
     final List<String> triggeredSounds = <String>[];
@@ -99,7 +102,7 @@ class AudioComponent extends Component {
     double? volumeMultiplier,
     bool? force = false,
   }) {
-    if (!_isActive) return;
+    if (!isActive) return;
     if (_soundMappings[soundType] == null ||
         _soundMappings[soundType]!.isEmpty) {
       return;
@@ -187,9 +190,7 @@ class AudioComponent extends Component {
     // Example of what this might do:
     // audioSystem.play(soundFile, volume);
 
-    // Debug output
-    // TODO: Migrate to structured logging - see docs/05_Style_Guides/LoggingStyle.md
-    // print('Playing sound: $soundFile at volume $volume');
+    _logger.fine('Playing sound: $soundFile at volume $volume');
   }
 
   /// Update listener position (usually the player's position or camera)
@@ -200,6 +201,4 @@ class AudioComponent extends Component {
   // Getters/Setters
   double get volume => _volume;
   set volume(double value) => _volume = value.clamp(0.0, 1.0);
-  bool get isActive => _isActive;
-  set isActive(bool value) => _isActive = value;
 }

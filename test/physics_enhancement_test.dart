@@ -47,7 +47,7 @@ void main() {
     group('T2.1.1: Gravity Constant Application', () {
       test('should apply gravity from PhysicsConstants', () {
         // Arrange: Store initial acceleration
-        final initialAcceleration = physics.acceleration.clone();
+        // final initialAcceleration = physics.acceleration.clone(); // Unused
 
         // Act
         physicsSystem.processEntity(testEntity, 1 / 60); // 60 FPS

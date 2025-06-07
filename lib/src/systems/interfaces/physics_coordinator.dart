@@ -1,5 +1,6 @@
 import 'package:flame/components.dart';
 
+import 'collision_notifier.dart'; // Added for SurfaceMaterial
 import 'movement_response.dart';
 import 'physics_state.dart';
 
@@ -166,6 +167,17 @@ abstract class IPhysicsCoordinator {
   ///
   /// **Returns:** PhysicsState object with comprehensive entity physics data
   Future<PhysicsState> getPhysicsState(int entityId);
+
+  /// Get the material of the surface the entity is currently grounded on.
+  ///
+  /// Returns [SurfaceMaterial.none] or throws an error if the entity is not grounded
+  /// or if the surface material cannot be determined.
+  ///
+  /// **Parameters:**
+  /// - [entityId]: Target entity identifier
+  ///
+  /// **Returns:** The [SurfaceMaterial] of the ground contact.
+  Future<SurfaceMaterial> getCurrentGroundSurfaceMaterial(int entityId);
 
   // ============================================================================
   // State Management Methods
