@@ -310,17 +310,17 @@ abstract class Entity extends PositionComponent {
     if (component is IPhysicsIntegration) {
       // Sync initial physics state
       final physicsState = physics!.getPhysicsState();
-      await (component as IPhysicsIntegration).updatePhysicsState(physicsState);
+      await (component).updatePhysicsState(physicsState);
 
       // Set up accumulation prevention
-      await (component as IPhysicsIntegration).preventAccumulation();
+      await (component).preventAccumulation();
     }
 
     // Set up transform integration
     if (component is ITransformIntegration) {
       // Initialize transform with current physics position
       final physicsState = physics!.getPhysicsState();
-      (component as ITransformIntegration).syncWithPhysics(
+      (component).syncWithPhysics(
         physicsState.position,
         callerSystem: 'PhysicsSystem',
       );
@@ -330,7 +330,7 @@ abstract class Entity extends PositionComponent {
     if (component is ICollisionIntegration) {
       // Initialize collision state with physics state
       final physicsState = physics!.getPhysicsState();
-      await (component as ICollisionIntegration).syncWithPhysics(physicsState);
+      await (component).syncWithPhysics(physicsState);
     }
   }
 
